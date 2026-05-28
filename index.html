@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>幽靈密境：遊戲大廳</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00FFCC;
+            --bg: #0a0518;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: #e8d9b0;
+            font-family: "Noto Serif TC", serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        h1 {
+            margin-top: 60px;
+            font-size: 48px;
+            color: var(--primary);
+            text-shadow: 0 0 20px var(--primary);
+            letter-spacing: 10px;
+        }
+        .container {
+            width: 90%;
+            max-width: 500px;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .game-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(0, 255, 204, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .game-card:active {
+            transform: scale(0.95);
+            background: rgba(0, 255, 204, 0.1);
+            border-color: var(--primary);
+        }
+        .game-info h2 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 22px;
+        }
+        .game-info p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        .arrow {
+            font-size: 24px;
+            color: var(--primary);
+        }
+        .footer {
+            margin-top: auto;
+            padding-bottom: 30px;
+            font-size: 12px;
+            opacity: 0.4;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>幽靈密境</h1>
+    <p style="letter-spacing: 5px; opacity: 0.6;">GHOST SANCTUM HUB</p>
+
+    <div class="container">
+        <!-- 遊戲 1 -->
+        <a href="./adventure/index.html" class="game-card">
+            <div class="game-info">
+                <h2>Ⅰ. 幽靈密境</h2>
+                <p>橫向捲軸探索・靈能冒險</p>
+            </div>
+            <div class="arrow">➔</div>
+        </a>
+
+        <!-- 遊戲 2 -->
+        <a href="./defense/index.html" class="game-card">
+            <div class="game-info">
+                <h2>Ⅱ. 神殿保衛戰</h2>
+                <p>塔防生存・守護遠古聖地</p>
+            </div>
+            <div class="arrow">➔</div>
+        </a>
+
+        <!-- 預留位置 -->
+        <div class="game-card" style="opacity: 0.3; border-style: dashed;">
+            <div class="game-info">
+                <h2>Ⅲ. 敬請期待</h2>
+                <p>新的靈魂正在覺醒...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">© 2026 POLLER1117-ENG GAMES</div>
+
+</body>
+</html>

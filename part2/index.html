@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>幽靈密境：神殿保衛戰</title>
+    <style>
+        body { margin: 0; background: #050210; color: #00FFCC; font-family: sans-serif; overflow: hidden; touch-action: none; }
+        canvas { display: block; }
+        #ui { position: absolute; top: 10px; left: 10px; pointer-events: none; }
+        .stat { font-size: 20px; text-shadow: 0 0 10px #00FFCC; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <div class="stat">靈魂點數: <span id="score">0</span></div>
+        <div class="stat">神殿血量: <span id="hp">100</span>%</div>
+    </div>
+    <canvas id="g"></canvas>
+
+<script>
+    const canvas = document.getElementById('g');
+    const ctx = canvas.getContext('2d');
+    let w, h, enemies = [], particles = [], score = 0, hp = 100;
+
+    function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // 點擊發射靈波
+    window.addEventListener('touchstart', e => {
+        const t = e.touches[0];
+        fire(t.clientX, t.clientY);
+    });
+    window.addEventListener('mousedown', e => fire(e.clientX, e.clientY));
+
+    function fire(tx, ty) {
+        if(hp <= 0) return;
+        particles.push({x: w/2, y: h-50, tx, ty, speed: 15, r: 8, color: '#00FFCC'});
+    }
+
+    function spawn() {
+        if(hp <= 0) return;
+        enemies.push({x: Math.random()*w, y: -20, speed: 1 + Math.random()*2, r: 15});
+        setTimeout(spawn, 1000 - Math.min(score, 800));
+    }
+
+    function update() {
+        ctx.fillStyle = 'rgba(5, 2, 16, 0.3)';
+        ctx.fillRect(0, 0, w, h);
+
+        // 繪製神殿主體
+        ctx.fillStyle = '#1A0D3A';
+        ctx.beginPath(); ctx.arc(w/2, h+200, 250, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = '#00FFCC'; ctx.stroke();
+
+        // 處理我方靈波
+        particles.forEach((p, i) => {
+            const ang = Math.atan2(p.ty - p.y, p.tx - p.x);
+            p.x += Math.cos(ang) * p.speed;
+            p.y += Math.sin(ang) * p.speed;
+            ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+            if(p.y < 0 || p.y > h) particles.splice(i, 1);
+        });
+
+        // 處理敵人
+        enemies.forEach((e, i) => {
+            e.y += e.speed;
+            ctx.fillStyle = '#FF5577';
+            ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI*2); ctx.fill();
+
+            // 碰撞檢測
+            particles.forEach((p, pi) => {
+                const dist = Math.hypot(e.x - p.x, e.y - p.y);
+                if(dist < e.r + p.r) {
+                    enemies.splice(i, 1);
+                    particles.splice(pi, 1);
+                    score += 10;
+                    document.getElementById('score').innerText = score;
+                }
+            });
+
+            // 敵人抵達神殿
+            if(e.y > h - 50) {
+                enemies.splice(i, 1);
+                hp -= 10;
+                document.getElementById('hp').innerText = Math.max(0, hp);
+                if(hp <= 0) alert("神殿失守！最終得分: " + score);
+            }
+        });
+
+        requestAnimationFrame(update);
+    }
+
+    spawn();
+    update();
+</script>
+</body>
+</html>

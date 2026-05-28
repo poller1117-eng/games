@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>幽靈密境：神殿保衛戰</title>
+    <style>
+        body { margin: 0; background: #050210; color: #00FFCC; font-family: sans-serif; overflow: hidden; touch-action: none; }
+        canvas { display: block; }
+        #ui { position: absolute; top: 10px; left: 10px; pointer-events: none; z-index: 10; }
+        .stat { font-size: 20px; text-shadow: 0 0 10px #00FFCC; margin-bottom: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <div class="stat">靈魂點數: <span id="score">0</span></div>
+        <div class="stat">神殿血量: <span id="hp">100</span>%</div>
+    </div>
+    <canvas id="g"></canvas>
+<script>
+    const canvas = document.getElementById('g');
+    const ctx = canvas.getContext('2d');
+    let w, h, enemies = [], particles = [], score = 0, hp = 100;
+
+    function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function fire(tx, ty) {
+        if(hp <= 0) return;
+        particles.push({x: w/2, y: h-50, tx, ty, speed: 12, r: 6, color: '#00FFCC'});
+    }
+
+    window.addEventListener('touchstart', e => { fire(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); }, {passive: false});
+    window.addEventListener('mousedown', e => fire(e.clientX, e.clientY));
+
+    function spawn() {
+        if(hp <= 0) return;
+        enemies.push({x: Math.random()*w, y: -20, speed: 1.5 + Math.random()*2, r: 18});
+        setTimeout(spawn, Math.max(300, 1000 - score/5));
+    }
+
+    function update() {
+        ctx.fillStyle = 'rgba(5, 2, 16, 0.4)';
+        ctx.fillRect(0, 0, w, h);
+
+        // 神殿基地
+        ctx.fillStyle = '#1A0D3A';
+        ctx.beginPath(); ctx.arc(w/2, h+150, 200, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = '#00FFCC'; ctx.lineWidth = 3; ctx.stroke();
+
+        // 靈波更新
+        for(let i=particles.length-1; i>=0; i--) {
+            let p = particles[i];
+            let ang = Math.atan2(p.ty - p.y, p.tx - p.x);
+            p.x += Math.cos(ang) * p.speed;
+            p.y += Math.sin(ang) * p.speed;
+            ctx.fillStyle = p.color;
+            ctx.shadowBlur = 10; ctx.shadowColor = p.color;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0;
+            if(p.y < -10 || p.y > h+10 || p.x < -10 || p.x > w+10) particles.splice(i, 1);
+        }
+
+        // 敵人更新
+        for(let i=enemies.length-1; i>=0; i--) {
+            let e = enemies[i];
+            e.y += e.speed;
+            ctx.fillStyle = '#FF5577';
+            ctx.shadowBlur = 15; ctx.shadowColor = '#FF5577';
+            ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // 碰撞檢測
+            for(let j=particles.length-1; j>=0; j--) {
+                let p = particles[j];
+                if(Math.hypot(e.x - p.x, e.y - p.y) < e.r + p.r) {
+                    enemies.splice(i, 1);
+                    particles.splice(j, 1);
+                    score += 10;
+                    document.getElementById('score').innerText = score;
+                    break;
+                }
+            }
+
+            if(e && e.y > h - 60) {
+                enemies.splice(i, 1);
+                hp -= 10;
+                document.getElementById('hp').innerText = Math.max(0, hp);
+                if(hp <= 0) {
+                    ctx.fillStyle = "white"; ctx.font = "40px Arial"; ctx.textAlign = "center";
+                    ctx.fillText("神殿失守!", w/2, h/2);
+                    ctx.font = "20px Arial";
+                    ctx.fillText("點擊重新開始", w/2, h/2 + 50);
+                }
+            }
+        }
+        if(hp > 0) requestAnimationFrame(update);
+        else window.onclick = () => location.reload();
+    }
+    spawn(); update();
+</script>
+</body>
+</html>

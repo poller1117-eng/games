@@ -154,6 +154,56 @@
     100% { opacity: 0; transform: translateY(-30px); }
   }
 
+  #spellBar {
+    flex: 0 0 auto;
+    background: linear-gradient(0deg, #1e1208, #2c1d10);
+    border-top: 1px solid #6b4a26;
+    padding: 6px 8px;
+    display: flex; gap: 6px; justify-content: center;
+  }
+  .spell-btn {
+    flex: 0 0 auto;
+    padding: 5px 12px;
+    background: linear-gradient(180deg, #3a2818, #1e1208);
+    border: 1.5px solid #8c6038; border-radius: 6px;
+    color: #f4e6c8; font-size: 12px; font-weight: bold;
+    cursor: pointer; position: relative; min-width: 90px; text-align: center;
+    transition: opacity 0.2s;
+  }
+  .spell-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .spell-btn.ready { border-color: #ffd83a; box-shadow: 0 0 8px rgba(255,216,58,0.4); }
+  .spell-btn .cd-bar {
+    position: absolute; bottom: 0; left: 0;
+    height: 3px; background: #ffd83a; border-radius: 0 0 4px 4px;
+    transition: width 0.1s linear;
+  }
+
+  #branchModal {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.82);
+    display: none; align-items: center; justify-content: center;
+    z-index: 60;
+  }
+  #branchModal.show { display: flex; }
+  #branchModal .panel {
+    background: linear-gradient(180deg, #3a2818, #1e1208);
+    border: 2px solid #ffd83a; border-radius: 10px;
+    padding: 20px; text-align: center; width: 320px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.8);
+  }
+  #branchModal h3 { color: #ffd83a; margin-bottom: 6px; font-size: 16px; }
+  #branchModal p { color: #c4a878; font-size: 12px; margin-bottom: 14px; }
+  .branch-choice {
+    width: 100%; margin: 6px 0;
+    padding: 10px 14px;
+    background: linear-gradient(180deg, #2f8f3a, #1a5520);
+    border: 1.5px solid #6fdf78; border-radius: 6px;
+    color: #fff; font-size: 13px; font-weight: bold;
+    cursor: pointer; text-align: left;
+  }
+  .branch-choice:hover { filter: brightness(1.2); }
+  .branch-choice .sub { font-size: 11px; color: #a0e0a8; font-weight: normal; display:block; margin-top:2px; }
+
   /* Wave banner */
   #waveBanner {
     position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
@@ -169,6 +219,16 @@
     15%, 85% { opacity: 1; transform: translate(-50%, 0); }
     100% { opacity: 0; transform: translate(-50%, -10px); }
   }
+  .map-btn {
+    padding: 8px 14px;
+    background: linear-gradient(180deg, #3a2818, #1e1208);
+    border: 2px solid #6b4a26; border-radius: 6px;
+    color: #f4e6c8; font-size: 13px; font-weight: bold;
+    cursor: pointer; text-align: center; min-width: 90px;
+    line-height: 1.4;
+  }
+  .map-btn.active { border-color: #ffd83a; box-shadow: 0 0 10px rgba(255,216,58,0.5); }
+  .map-btn:hover { filter: brightness(1.2); }
 </style>
 </head>
 <body>
@@ -178,6 +238,10 @@
     <div class="stat"><span class="icon">❤️</span><span id="livesText">20</span></div>
     <div class="title">汪汪紀元：中古傳奇</div>
     <div class="stat"><span class="icon">🌊</span><span id="waveText">0/10</span></div>
+    <div class="stat" id="nextWaveStat" style="max-width:180px;overflow:hidden;">
+      <span class="icon">👁</span>
+      <span id="nextWaveInfo" style="font-size:11px;letter-spacing:0;">-</span>
+    </div>
     <button id="startBtn" class="btn go ready">出戰</button>
     <button id="speedBtn" class="btn">x1</button>
   </div>
@@ -197,7 +261,21 @@
     </div>
   </div>
 
+  <div id="spellBar">
+    <button class="spell-btn ready" id="spell-freeze"><span class="slabel">🌀 石化 60🦴</span><span class="cd-bar" id="cd-freeze" style="width:100%"></span></button>
+    <button class="spell-btn ready" id="spell-fire"><span class="slabel">🔥 業火 80🦴</span><span class="cd-bar" id="cd-fire" style="width:100%"></span></button>
+    <button class="spell-btn ready" id="spell-buff"><span class="slabel">💛 號令 100🦴</span><span class="cd-bar" id="cd-buff" style="width:100%"></span></button>
+  </div>
   <div id="shop"></div>
+</div>
+
+<div id="branchModal">
+  <div class="panel">
+    <h3 id="branchTitle">選擇升級路線</h3>
+    <p id="branchDesc">此英雄達到 Lv2，選擇專精方向：</p>
+    <button class="branch-choice" id="branchA"></button>
+    <button class="branch-choice" id="branchB"></button>
+  </div>
 </div>
 
 <div id="overlay" class="show">
@@ -206,6 +284,11 @@
     <h2>英雄派駐式塔防</h2>
     <p>「招募汪汪猛將，抵抗狡詐貓貓軍團，<br>在中古大陸成就屬於你的傳說。」</p>
     <p style="font-size:11px;color:#8c7050;">點擊地圖部署英雄 · 拖動職業卡到位置 · 點英雄可升級/出售<br>共 10 波，守住終點即可獲勝</p>
+    <div id="mapSelect" style="margin: 14px 0 10px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+      <button class="map-btn active" data-map="0">🌲 翠林古道<br><small style="font-weight:normal;font-size:10px;color:#c4a878;">S 型林間路</small></button>
+      <button class="map-btn" data-map="1">🏜️ 荒漠險途<br><small style="font-weight:normal;font-size:10px;color:#c4a878;">U 型沙漠路</small></button>
+      <button class="map-btn" data-map="2">🌋 熔岩深淵<br><small style="font-weight:normal;font-size:10px;color:#c4a878;">Z 型熔岩路</small></button>
+    </div>
     <button class="big-btn" id="startGame">開始冒險</button>
     <p class="small">提示：右下角速度按鈕可切換 1x / 2x / 4x</p>
   </div>
@@ -220,33 +303,80 @@ const TILE = 60;       // 每格 60px
 const COLS = 15;
 const ROWS = 9;
 
+// =====================================================================
+// 地圖定義
+// =====================================================================
+const MAP_DEFS = [
+  {
+    id: 'forest',
+    name: '🌲 翠林古道',
+    desc: '蜿蜒的 S 型林間古道',
+    path: [{c:0,r:4},{c:4,r:4},{c:4,r:1},{c:8,r:1},{c:8,r:7},{c:12,r:7},{c:12,r:4},{c:14,r:4}],
+    theme: {
+      groundHue: 88, groundSat: 38, groundLit: 24,
+      pathColor: '#7a5230', pathHi: '#9a6e44',
+      bgFrom: '#3a2818', bgTo: '#1a1008',
+    }
+  },
+  {
+    id: 'desert',
+    name: '🏜️ 荒漠險途',
+    desc: '炎熱的 U 型沙漠路線',
+    path: [{c:0,r:2},{c:3,r:2},{c:3,r:7},{c:7,r:7},{c:7,r:2},{c:11,r:2},{c:11,r:7},{c:14,r:7}],
+    theme: {
+      groundHue: 36, groundSat: 45, groundLit: 44,
+      pathColor: '#a07848', pathHi: '#c09860',
+      bgFrom: '#4a3018', bgTo: '#2a1c08',
+    }
+  },
+  {
+    id: 'volcano',
+    name: '🌋 熔岩深淵',
+    desc: '險峻的折返熔岩地帶',
+    path: [{c:0,r:1},{c:6,r:1},{c:6,r:5},{c:2,r:5},{c:2,r:8},{c:10,r:8},{c:10,r:3},{c:14,r:3}],
+    theme: {
+      groundHue: 15, groundSat: 40, groundLit: 18,
+      pathColor: '#3a1808', pathHi: '#5a2810',
+      bgFrom: '#2a1208', bgTo: '#0a0604',
+    }
+  }
+];
+let currentMapDef = MAP_DEFS[0];
+
 // 路徑（S 型）— 結合 PDF 階段二「分流」概念，最終用簡化單路 + 兩個轉折模擬
 // 座標為 grid (col,row)，從左進入，右側到達終點
-const PATH = [
-  {c: 0, r: 4}, {c: 4, r: 4},
-  {c: 4, r: 1}, {c: 8, r: 1},
-  {c: 8, r: 7}, {c: 12, r: 7},
-  {c: 12, r: 4}, {c: 14, r: 4}
-];
+let PATH = currentMapDef.path.slice();
 
 // 將格子座標轉成像素中心
 const px = (c) => c * TILE + TILE / 2;
 const py = (r) => r * TILE + TILE / 2;
 
 // 構建順著路徑的中心點陣列（含轉折）
-const PATH_POINTS = PATH.map(p => ({x: px(p.c), y: py(p.r)}));
+let PATH_POINTS = PATH.map(p => ({x: px(p.c), y: py(p.r)}));
 
 // 哪些格子被路徑佔用，不可放英雄
-const blocked = new Set();
-for (let i = 0; i < PATH.length - 1; i++) {
-  const a = PATH[i], b = PATH[i + 1];
-  if (a.c === b.c) {
-    const [lo, hi] = [Math.min(a.r, b.r), Math.max(a.r, b.r)];
-    for (let r = lo; r <= hi; r++) blocked.add(`${a.c},${r}`);
-  } else {
-    const [lo, hi] = [Math.min(a.c, b.c), Math.max(a.c, b.c)];
-    for (let c = lo; c <= hi; c++) blocked.add(`${c},${a.r}`);
+let blocked = new Set();
+function rebuildBlocked() {
+  blocked.clear();
+  for (let i = 0; i < PATH.length - 1; i++) {
+    const a = PATH[i], b = PATH[i + 1];
+    if (a.c === b.c) {
+      const [lo, hi] = [Math.min(a.r, b.r), Math.max(a.r, b.r)];
+      for (let r = lo; r <= hi; r++) blocked.add(`${a.c},${r}`);
+    } else {
+      const [lo, hi] = [Math.min(a.c, b.c), Math.max(a.c, b.c)];
+      for (let c = lo; c <= hi; c++) blocked.add(`${c},${a.r}`);
+    }
   }
+}
+rebuildBlocked();
+
+function switchMap(mapDef) {
+  currentMapDef = mapDef;
+  PATH = mapDef.path.slice();
+  PATH_POINTS = PATH.map(p => ({x: px(p.c), y: py(p.r)}));
+  rebuildBlocked();
+  buildScenery();
 }
 
 // =====================================================================
@@ -256,6 +386,7 @@ const HERO_TYPES = {
   changchang: {
     name: '臘腸盾衛', cls: 'tank', emoji: '🐕', color: '#a86b3a',
     quote: '固執守備，防禦心極強。',
+    maxHp: 400,
     cost: 80,
     range: 90, damage: 18, fireRate: 1.0, splash: 0,
     special: 'taunt',
@@ -267,6 +398,7 @@ const HERO_TYPES = {
   baga: {
     name: '巴哥衛兵', cls: 'tank', emoji: '🐶', color: '#c89860',
     quote: '鎧面無私，揮拳速碎粉碎岩石。',
+    maxHp: 450,
     cost: 120,
     range: 110, damage: 38, fireRate: 0.75, splash: 30,
     special: 'stun',
@@ -278,6 +410,7 @@ const HERO_TYPES = {
   bulldog: {
     name: '鬥牛犬鐵匠', cls: 'tank', emoji: '🐶', color: '#7a5a3a',
     quote: '鐵鎚帶來希望與毀滅。',
+    maxHp: 500,
     cost: 160,
     range: 130, damage: 55, fireRate: 1.0, splash: 50,
     special: 'fire',
@@ -289,6 +422,7 @@ const HERO_TYPES = {
   husky: {
     name: '哈士奇巡林者', cls: 'dps', emoji: '🐺', color: '#7a8ca4',
     quote: '自信亂吼，木箭精準得驚人。',
+    maxHp: 200,
     cost: 100,
     range: 200, damage: 22, fireRate: 1.6, splash: 0,
     special: 'multi',
@@ -300,6 +434,7 @@ const HERO_TYPES = {
   shiba: {
     name: '柴犬武士', cls: 'dps', emoji: '🦊', color: '#d68040',
     quote: '孤傲劍客，追求極限一閃。',
+    maxHp: 180,
     cost: 140,
     range: 140, damage: 70, fireRate: 0.9, splash: 0,
     special: 'crit',
@@ -312,6 +447,7 @@ const HERO_TYPES = {
   chihuahua: {
     name: '奇瓦瓦僧侶', cls: 'mage', emoji: '🐕‍🦺', color: '#dca860',
     quote: '聖光無比堅定的小太陽。',
+    maxHp: 150,
     cost: 90,
     range: 130, damage: 12, fireRate: 1.6, splash: 0,
     special: 'holy',
@@ -324,6 +460,7 @@ const HERO_TYPES = {
   poodle: {
     name: '聖伯納療癒師', cls: 'mage', emoji: '🐩', color: '#e8d4a0',
     quote: '有他在的地方就沒有死亡。',
+    maxHp: 160,
     cost: 110,
     range: 160, damage: 8, fireRate: 1.2, splash: 60,
     special: 'aoe',
@@ -335,6 +472,7 @@ const HERO_TYPES = {
   butterfly: {
     name: '蝴蝶犬神偷', cls: 'ctrl', emoji: '🐕', color: '#b890d8',
     quote: '動作輕盈，敵人未察錢已落袋。',
+    maxHp: 170,
     cost: 130,
     range: 180, damage: 15, fireRate: 2.0, splash: 0,
     special: 'gold',
@@ -346,6 +484,7 @@ const HERO_TYPES = {
   shepherd: {
     name: '德牧隊長', cls: 'ctrl', emoji: '🐺', color: '#604020',
     quote: '一聲軍令激發戰士潛能。',
+    maxHp: 250,
     cost: 180,
     range: 150, damage: 25, fireRate: 1.1, splash: 0,
     special: 'buff',
@@ -360,16 +499,16 @@ const HERO_TYPES = {
 // 敵人定義 — 對應 PDF 貓貓軍團
 // =====================================================================
 const ENEMY_TYPES = {
-  blackcat:   { name: '黑貓潛行者', emoji: '🐈‍⬛', color: '#2c2c2c', hp: 50,  speed: 90, gold: 6,  size: 14 },
-  tabby:      { name: '虎斑棍棒手', emoji: '🐈', color: '#a88060', hp: 90,  speed: 60, gold: 8,  size: 16 },
-  white:      { name: '白貓弩手',   emoji: '🐈', color: '#e8d8c4', hp: 65,  speed: 75, gold: 7,  size: 14 },
-  orange:     { name: '橘貓掠奪者', emoji: '🐈', color: '#d88030', hp: 140, speed: 55, gold: 12, size: 18 },
-  longhair:   { name: '長毛貓巫師', emoji: '🐈', color: '#a890c8', hp: 180, speed: 65, gold: 18, size: 18, elite: true },
-  leopard:    { name: '豹貓狂戰士', emoji: '🐅', color: '#c88040', hp: 240, speed: 80, gold: 22, size: 20, elite: true },
-  calico:     { name: '三花戰術家', emoji: '🐈', color: '#e8a070', hp: 200, speed: 60, gold: 20, size: 18, elite: true },
-  siamese:    { name: '暹羅刺客',   emoji: '🐈', color: '#7060c0', hp: 130, speed: 130, gold: 25, size: 14, elite: true },
-  mainecoon:  { name: '緬因貓步兵', emoji: '🦁', color: '#604020', hp: 1400, speed: 40, gold: 80, size: 28, boss: true },
-  sphynx:     { name: '無毛貓領主', emoji: '👹', color: '#a07060', hp: 4000, speed: 50, gold: 200, size: 32, boss: true }
+  blackcat:  { name:'黑貓潛行者', emoji:'🐈‍⬛', color:'#2c2c2c', hp:130,  maxHp:130,  speed:90,  gold:6,   size:14, atkDmg:8,   atkRange:40, atkRate:1.2 },
+  tabby:     { name:'虎斑棍棒手', emoji:'🐈',   color:'#a88060', hp:220,  maxHp:220,  speed:60,  gold:8,   size:16, atkDmg:15,  atkRange:38, atkRate:0.8 },
+  white:     { name:'白貓弩手',   emoji:'🐈',   color:'#e8d8c4', hp:160,  maxHp:160,  speed:75,  gold:7,   size:14, atkDmg:10,  atkRange:55, atkRate:1.0 },
+  orange:    { name:'橘貓掠奪者', emoji:'🐈',   color:'#d88030', hp:350,  maxHp:350,  speed:55,  gold:12,  size:18, atkDmg:25,  atkRange:42, atkRate:0.7 },
+  longhair:  { name:'長毛貓巫師', emoji:'🐈',   color:'#a890c8', hp:500,  maxHp:500,  speed:65,  gold:18,  size:18, elite:true,  atkDmg:20,  atkRange:80, atkRate:1.5 },
+  leopard:   { name:'豹貓狂戰士', emoji:'🐅',   color:'#c88040', hp:700,  maxHp:700,  speed:80,  gold:22,  size:20, elite:true,  atkDmg:45,  atkRange:42, atkRate:0.8 },
+  calico:    { name:'三花戰術家', emoji:'🐈',   color:'#e8a070', hp:600,  maxHp:600,  speed:60,  gold:20,  size:18, elite:true,  atkDmg:30,  atkRange:60, atkRate:0.9 },
+  siamese:   { name:'暹羅刺客',   emoji:'🐈',   color:'#7060c0', hp:350,  maxHp:350,  speed:130, gold:25,  size:14, elite:true,  atkDmg:35,  atkRange:45, atkRate:1.2 },
+  mainecoon: { name:'緬因貓步兵', emoji:'🦁',   color:'#604020', hp:4500, maxHp:4500, speed:40,  gold:80,  size:28, boss:true,   atkDmg:80,  atkRange:55, atkRate:0.5 },
+  sphynx:    { name:'無毛貓領主', emoji:'👹',   color:'#a07060', hp:12000,maxHp:12000,speed:50,  gold:200, size:32, boss:true,   atkDmg:150, atkRange:65, atkRate:0.6 }
 };
 
 // =====================================================================
@@ -389,8 +528,101 @@ const WAVES = [
   { name: '第 8 波 · 刺客突襲', enemies: [['siamese', 5, 0.8], ['blackcat', 12, 0.35], ['orange', 4, 0.9]] },
   // 階段四：BOSS
   { name: '第 9 波 · 帝國銅牆', enemies: [['leopard', 4, 1.2], ['orange', 6, 0.8], ['mainecoon', 1, 0]] },
-  { name: '第 10 波 · 深淵主宰', enemies: [['siamese', 6, 0.7], ['calico', 4, 1.0], ['longhair', 3, 1.2], ['sphynx', 1, 0]] }
+  { name: '第 10 波 · 深淵主宰', enemies: [['siamese', 6, 0.7], ['calico', 4, 1.0], ['longhair', 3, 1.2], ['sphynx', 1, 0]] },
+  // 階段五：末日
+  { name: '第 11 波 · 精英大軍', enemies: [['leopard', 6, 0.9], ['siamese', 8, 0.45], ['orange', 8, 0.6]] },
+  { name: '第 12 波 · 巫師洪流', enemies: [['longhair', 8, 0.8], ['calico', 6, 1.0], ['white', 12, 0.35]] },
+  { name: '第 13 波 · 死亡潮汐', enemies: [['blackcat', 25, 0.22], ['siamese', 10, 0.4], ['leopard', 6, 0.9]] },
+  { name: '第 14 波 · 帝國鐵衛', enemies: [['mainecoon', 2, 4.0], ['leopard', 8, 0.7], ['siamese', 8, 0.45]] },
+  { name: '第 15 波 · 末日審判', enemies: [['sphynx', 1, 0], ['calico', 8, 0.7], ['siamese', 12, 0.4], ['longhair', 6, 0.6]] }
 ];
+
+// =====================================================================
+// 升級分支定義
+// =====================================================================
+const UPGRADE_BRANCHES = {
+  changchang: [
+    { name:'盾牆強化', sub:'防禦範圍 +30，減速效果增強至 45%', apply: h => { h.range += 30; h._slowStrength = 0.45; } },
+    { name:'骨頭連射', sub:'攻速 ×1.4，可同時挑釁 2 個目標', apply: h => { h.fireRate *= 0.72; h._multiTaunt = true; } },
+  ],
+  baga: [
+    { name:'重甲突擊', sub:'暈眩機率 35%，暈眩時間 +0.4s', apply: h => { h._stunChance = 0.35; h._stunDur = 1000; } },
+    { name:'震波衝擊', sub:'濺射範圍 +20，濺射傷害 70%', apply: h => { h.splash += 20; h._splashRatio = 0.7; } },
+  ],
+  bulldog: [
+    { name:'熔岩精通', sub:'火焰傷害 +40%，燃燒持續 2 秒', apply: h => { h._fireDmgBonus = 1.4; } },
+    { name:'鐵砧衝鋒', sub:'攻速 ×1.3，火球速度 +50%', apply: h => { h.fireRate *= 0.77; } },
+  ],
+  husky: [
+    { name:'暴風射擊', sub:'同時射出 5 箭（原 3 箭）', apply: h => { h._multiCount = 5; } },
+    { name:'穿透弓法', sub:'箭矢穿透 2 個敵人，射程 +30', apply: h => { h._pierce = 2; h.range += 30; } },
+  ],
+  shiba: [
+    { name:'血月居合', sub:'暴擊率提升至 50%，暴擊傷害 ×2.5', apply: h => { h._critRate = 0.5; } },
+    { name:'劍氣釋放', sub:'每次攻擊發出劍氣，射程 +25', apply: h => { h.range += 25; h._swordWave = true; } },
+  ],
+  chihuahua: [
+    { name:'神聖共鳴', sub:'鐘響範圍 +40，減速效果 +15%', apply: h => { h.range += 40; } },
+    { name:'虔誠禱告', sub:'每 8 秒自動回復附近英雄 10 點氣血', apply: h => { h._healAura = true; } },
+  ],
+  poodle: [
+    { name:'虹彩爆炸', sub:'法球爆炸半徑 +25，可連鎖 1 次', apply: h => { h.splash += 25; h._chain = true; } },
+    { name:'繁星魔法', sub:'攻速 ×1.35，同時發射 2 顆法球', apply: h => { h.fireRate *= 0.74; } },
+  ],
+  butterfly: [
+    { name:'影子步法', sub:'每次擊殺額外 +5 骨頭', apply: h => { h._killGold = 5; } },
+    { name:'毒刃精通', sub:'命中後持續中毒，每秒 8 傷害，持續 3 秒', apply: h => { h._poison = true; } },
+  ],
+  shepherd: [
+    { name:'戰場指揮', sub:'光環範圍 +30，友軍額外獲得 25% 攻速', apply: h => { h.range += 30; } },
+    { name:'突擊先鋒', sub:'自身攻速 ×1.4，每次攻擊有 20% 暈眩', apply: h => { h.fireRate *= 0.72; h._stunChance = 0.2; } },
+  ],
+};
+
+let pendingBranchHero = null;
+
+function showBranchModal(hero) {
+  pendingBranchHero = hero;
+  const branches = UPGRADE_BRANCHES[hero.typeKey];
+  if (!branches) { applyLevelUp(hero); return; }
+  document.getElementById('branchTitle').textContent = `${hero.type.name} 專精選擇`;
+  document.getElementById('branchDesc').textContent = `Lv2 達成！選擇此英雄的強化路線：`;
+  document.getElementById('branchA').innerHTML = `${branches[0].name}<span class="sub">${branches[0].sub}</span>`;
+  document.getElementById('branchB').innerHTML = `${branches[1].name}<span class="sub">${branches[1].sub}</span>`;
+  document.getElementById('branchModal').classList.add('show');
+  state.paused = true;
+}
+
+function applyLevelUp(hero) {
+  const u = hero.type.upgrade;
+  hero.damage += u.damage || 0;
+  hero.range  += u.range  || 0;
+  hero.fireRate = Math.max(0.2, hero.fireRate - (u.fireRate || 0));
+  hero.splash = (hero.splash || 0) + (u.splash || 0);
+}
+
+document.getElementById('branchA').addEventListener('click', () => {
+  if (!pendingBranchHero) return;
+  applyLevelUp(pendingBranchHero);
+  const b = UPGRADE_BRANCHES[pendingBranchHero.typeKey];
+  if (b) b[0].apply(pendingBranchHero);
+  spawnFloat(pendingBranchHero.x, pendingBranchHero.y, b[0].name, '#6fdf78');
+  document.getElementById('branchModal').classList.remove('show');
+  state.paused = false;
+  pendingBranchHero = null;
+  updateHud();
+});
+document.getElementById('branchB').addEventListener('click', () => {
+  if (!pendingBranchHero) return;
+  applyLevelUp(pendingBranchHero);
+  const b = UPGRADE_BRANCHES[pendingBranchHero.typeKey];
+  if (b) b[1].apply(pendingBranchHero);
+  spawnFloat(pendingBranchHero.x, pendingBranchHero.y, b[1].name, '#6fdf78');
+  document.getElementById('branchModal').classList.remove('show');
+  state.paused = false;
+  pendingBranchHero = null;
+  updateHud();
+});
 
 // =====================================================================
 // 英雄圖片預載
@@ -403,6 +635,13 @@ IMG_KEYS.forEach(key => {
   img.src = `heroes/${key}.png`;
   img.onload = () => { imgsLoaded++; };
   HERO_IMGS[key] = img;
+});
+
+const ENEMY_IMGS = {};
+Object.keys(ENEMY_TYPES).forEach(key => {
+  const img = new Image();
+  img.src = `enemies/${key}.png`;
+  ENEMY_IMGS[key] = img;
 });
 
 // =====================================================================
@@ -423,7 +662,9 @@ const state = {
   speed: 1,
   gameOver: false,
   won: false,
-  paused: true
+  paused: true,
+  earlyBonus: 0,
+  earlyTimer: 0
 };
 
 // =====================================================================
@@ -445,6 +686,70 @@ function fitCanvas() {
   canvas.style.height = h + 'px';
 }
 window.addEventListener('resize', fitCanvas);
+
+// =====================================================================
+// 法術系統
+// =====================================================================
+const SPELLS = {
+  freeze: { name:'石化', cost: 60, cd: 18, cdLeft: 0,
+    label: () => `🌀 石化`,
+    use() {
+      const now = performance.now();
+      for (const e of state.enemies) e.stunUntil = now + 3000;
+      state.effects.push({type:'bellring', x:canvas.width/2, y:canvas.height/2, r:800, life:0.6, maxLife:0.6, color:'#7fdfff'});
+      spawnFloat(canvas.width/2, canvas.height/2, '❄ 全場石化！', '#7fdfff');
+    }
+  },
+  fire: { name:'業火', cost: 80, cd: 22, cdLeft: 0,
+    label: () => `🔥 業火`,
+    use() {
+      for (const e of state.enemies) {
+        const dmg = 60 + Math.random()*40;
+        applyDamage(e, dmg, {color:'#ff6020'});
+        state.effects.push({type:'lava', x:e.x, y:e.y, particles:8, seed:Math.random()*999|0, life:0.5, maxLife:0.5});
+      }
+      spawnFloat(canvas.width/2, canvas.height/2, '🔥 業火燃燒！', '#ff8040');
+    }
+  },
+  buff: { name:'號令', cost: 100, cd: 25, cdLeft: 0,
+    label: () => `💛 號令`,
+    use() {
+      const until = performance.now() + 5000;
+      for (const h of state.heroes) h._buffUntil = until;
+      spawnFloat(canvas.width/2, canvas.height/2, '💛 全軍號令！', '#ffd83a');
+    }
+  }
+};
+
+function updateSpells(dt) {
+  for (const [key, sp] of Object.entries(SPELLS)) {
+    if (sp.cdLeft > 0) {
+      sp.cdLeft = Math.max(0, sp.cdLeft - dt);
+    }
+    const btn = document.getElementById(`spell-${key}`);
+    const cdBar = document.getElementById(`cd-${key}`);
+    if (!btn) continue;
+    const ready = sp.cdLeft <= 0 && state.gold >= sp.cost && !state.gameOver;
+    btn.disabled = !ready;
+    btn.classList.toggle('ready', ready);
+    const lbl = btn.querySelector('.slabel');
+    if (lbl) lbl.textContent = `${sp.label()} ${sp.cost}🦴`;
+    if (cdBar) cdBar.style.width = (sp.cdLeft <= 0 ? 100 : (1 - sp.cdLeft/sp.cd)*100) + '%';
+  }
+}
+
+function initSpells() {
+  for (const [key, sp] of Object.entries(SPELLS)) {
+    document.getElementById(`spell-${key}`).addEventListener('click', () => {
+      if (sp.cdLeft > 0 || state.gold < sp.cost || state.gameOver) return;
+      state.gold -= sp.cost;
+      sp.cdLeft = sp.cd;
+      sp.use();
+      updateHud();
+      updateSpells(0);
+    });
+  }
+}
 
 // =====================================================================
 // UI 構建
@@ -532,14 +837,16 @@ document.getElementById('ipUp').addEventListener('click', () => {
   state.gold -= cost;
   h.upgradesPaid = (h.upgradesPaid || 0) + cost;
   h.level += 1;
-  const u = h.type.upgrade;
-  h.damage += u.damage || 0;
-  h.range += u.range || 0;
-  h.fireRate = Math.max(0.2, h.fireRate - (u.fireRate || 0));
-  h.splash = (h.splash || 0) + (u.splash || 0);
-  updateHud();
-  showInfo(h);
-  spawnFloat(h.x, h.y, '升級！');
+  if (h.level === 2 && UPGRADE_BRANCHES[h.typeKey]) {
+    // 彈出分支選擇（applyLevelUp 在選擇後才執行）
+    hideInfo();
+    showBranchModal(h);
+  } else {
+    applyLevelUp(h);
+    updateHud();
+    showInfo(h);
+    spawnFloat(h.x, h.y, '升級！');
+  }
 });
 
 document.getElementById('startBtn').addEventListener('click', () => {
@@ -550,6 +857,13 @@ document.getElementById('startBtn').addEventListener('click', () => {
 document.getElementById('speedBtn').addEventListener('click', () => {
   state.speed = state.speed === 1 ? 2 : state.speed === 2 ? 4 : 1;
   document.getElementById('speedBtn').textContent = `x${state.speed}`;
+});
+document.querySelectorAll('.map-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.map-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    switchMap(MAP_DEFS[parseInt(btn.dataset.map)]);
+  });
 });
 document.getElementById('startGame').addEventListener('click', () => {
   document.getElementById('overlay').classList.remove('show');
@@ -564,8 +878,24 @@ function updateHud() {
   const sb = document.getElementById('startBtn');
   sb.classList.toggle('ready', !state.waveActive && state.wave < WAVES.length);
   sb.textContent = state.wave === 0 ? '出戰' : state.waveActive ? '進行中' : (state.wave >= WAVES.length ? '完成' : '下一波');
+  if (!state.waveActive && state.wave > 0 && state.wave < WAVES.length && state.earlyBonus > 0) {
+    sb.textContent = `出戰 +${state.earlyBonus}🦴`;
+  }
   sb.disabled = state.waveActive || state.wave >= WAVES.length;
   updateShop();
+  // 下一波預覽
+  const nwIdx = state.wave; // wave 是已完成波次，nwIdx 是下一波的 index
+  const nwInfoEl = document.getElementById('nextWaveInfo');
+  if (nwIdx < WAVES.length) {
+    const nw = WAVES[nwIdx];
+    const counts = {};
+    for (const [type, count] of nw.enemies) counts[type] = (counts[type]||0) + count;
+    nwInfoEl.textContent = Object.entries(counts)
+      .map(([t, n]) => `${ENEMY_TYPES[t].emoji}×${n}`)
+      .join(' ');
+  } else {
+    nwInfoEl.textContent = '完結';
+  }
 }
 
 // =====================================================================
@@ -615,6 +945,7 @@ function placeHero(type, c, r) {
     x: px(c), y: py(r),
     cooldown: 0,
     damage: t.damage, range: t.range, fireRate: t.fireRate, splash: t.splash || 0,
+    hp: t.maxHp || 200, maxHp: t.maxHp || 200,
     upgradesPaid: 0
   };
   state.heroes.push(hero);
@@ -626,6 +957,12 @@ function placeHero(type, c, r) {
 // 波次與生怪
 // =====================================================================
 function startWave() {
+  if (state.earlyBonus > 0) {
+    state.gold += state.earlyBonus;
+    spawnFloat(canvas.width / 2, 60, `提早出戰！+${state.earlyBonus}🦴`, '#7fff5f');
+  }
+  state.earlyBonus = 0;
+  state.earlyTimer = 0;
   const w = WAVES[state.wave];
   state.wave += 1;
   state.waveActive = true;
@@ -656,7 +993,8 @@ function spawnEnemy(typeKey) {
     x: PATH_POINTS[0].x - 30,
     y: PATH_POINTS[0].y,
     slowUntil: 0, slowFactor: 1,
-    stunUntil: 0
+    stunUntil: 0,
+    atkCooldown: 0
   };
   state.enemies.push(e);
 }
@@ -825,6 +1163,34 @@ function update(dt) {
     }
   }
 
+  // 敵人反擊英雄
+  for (const e of state.enemies) {
+    if (!e.type.atkDmg || e.stunUntil > now) continue;
+    e.atkCooldown = Math.max(0, e.atkCooldown - dt);
+    if (e.atkCooldown > 0) continue;
+    let nearHero = null, nearDist = Infinity;
+    for (const h of state.heroes) {
+      const d = Math.hypot(h.x - e.x, h.y - e.y);
+      if (d <= e.type.atkRange && d < nearDist) { nearDist = d; nearHero = h; }
+    }
+    if (nearHero) {
+      nearHero.hp -= e.type.atkDmg;
+      e.atkCooldown = 1 / e.type.atkRate;
+      state.effects.push({type:'heroHit', x:nearHero.x, y:nearHero.y - 10, life:0.4, maxLife:0.4, dmg:e.type.atkDmg});
+      spawnFloat(nearHero.x + 20, nearHero.y - 20, `-${e.type.atkDmg}`, '#ff5555');
+    }
+  }
+  // 英雄死亡清理
+  for (const h of state.heroes) {
+    if (h.hp <= 0) {
+      h.dead = true;
+      state.effects.push({type:'explode', x:h.x, y:h.y, r:30, life:0.5, maxLife:0.5, color:'#ff8040'});
+      spawnFloat(h.x, h.y, `${h.type.name} 倒下！`, '#ff4040');
+      if (state.selectedHero === h) { state.selectedHero = null; hideInfo(); }
+    }
+  }
+  state.heroes = state.heroes.filter(h => !h.dead);
+
   // 英雄攻擊
   for (const h of state.heroes) {
     h.cooldown = Math.max(0, h.cooldown - dt);
@@ -952,6 +1318,13 @@ function update(dt) {
     if (state.wave >= WAVES.length) endGame(true);
   }
 
+  // 提早召喚倒數
+  if (!state.waveActive && state.wave > 0 && state.wave < WAVES.length) {
+    state.earlyTimer += dt;
+    state.earlyBonus = Math.max(0, Math.floor(50 - state.earlyTimer * 4));
+  }
+
+  updateSpells(dt);
   updateHud();
 }
 
@@ -988,8 +1361,9 @@ function buildScenery() {
         // 漸層草地基色
         const grad = g.createLinearGradient(x, y, x + TILE, y + TILE);
         const tone = srand(c, r);
-        const base1 = `hsl(${88 + tone*14}, ${38 + tone*10}%, ${24 + tone*8}%)`;
-        const base2 = `hsl(${82 + tone*10}, ${42 + tone*8}%, ${18 + tone*6}%)`;
+        const th = currentMapDef.theme;
+        const base1 = `hsl(${th.groundHue + tone*14}, ${th.groundSat + tone*10}%, ${th.groundLit + tone*8}%)`;
+        const base2 = `hsl(${th.groundHue - 6 + tone*10}, ${th.groundSat + 4 + tone*8}%, ${th.groundLit - 6 + tone*6}%)`;
         grad.addColorStop(0, base1);
         grad.addColorStop(1, base2);
         g.fillStyle = grad;
@@ -1017,11 +1391,11 @@ function buildScenery() {
   for (let i = 1; i < PATH_POINTS.length; i++) g.lineTo(PATH_POINTS[i].x, PATH_POINTS[i].y);
   g.stroke();
   // 泥土主道
-  g.strokeStyle = '#7a5230';
+  g.strokeStyle = currentMapDef.theme.pathColor;
   g.lineWidth = TILE * 0.78;
   g.stroke();
   // 泥土亮層
-  g.strokeStyle = '#9a6e44';
+  g.strokeStyle = currentMapDef.theme.pathHi;
   g.lineWidth = TILE * 0.66;
   g.stroke();
 
@@ -1799,6 +2173,17 @@ function render() {
       ctx.font = 'bold 9px sans-serif';
       ctx.fillText('★'.repeat(h.level), h.x, h.y - 14);
     }
+    // 英雄 HP 條
+    if (h.maxHp) {
+      const hw = 44;
+      const hpFrac = Math.max(0, h.hp / h.maxHp);
+      ctx.fillStyle = 'rgba(0,0,0,0.75)';
+      ctx.fillRect(h.x - hw/2 - 1, h.y - 32, hw + 2, 5);
+      ctx.fillStyle = '#600';
+      ctx.fillRect(h.x - hw/2, h.y - 31, hw, 3);
+      ctx.fillStyle = hpFrac > 0.5 ? '#4ef04e' : hpFrac > 0.25 ? '#ffd83a' : '#ff4040';
+      ctx.fillRect(h.x - hw/2, h.y - 31, hw * hpFrac, 3);
+    }
     // buff 光環
     if (h._buffUntil > nowMs) {
       ctx.strokeStyle = '#ffd83a';
@@ -1816,20 +2201,27 @@ function render() {
     // 落地陰影
     ctx.fillStyle = 'rgba(0,0,0,0.45)';
     ctx.beginPath(); ctx.ellipse(e.x, e.y + e.type.size*0.95, e.type.size*0.95, e.type.size*0.3, 0, 0, Math.PI*2); ctx.fill();
-    // 身體漸層
-    const eg = ctx.createRadialGradient(e.x - e.type.size*0.3, e.y - e.type.size*0.3, 2, e.x, e.y, e.type.size);
-    eg.addColorStop(0, '#fff5d4');
-    eg.addColorStop(0.3, e.type.color);
-    eg.addColorStop(1, '#1a0c04');
-    ctx.fillStyle = eg;
-    ctx.beginPath(); ctx.arc(e.x, e.y + wobble, e.type.size, 0, Math.PI*2); ctx.fill();
-    // 描邊
-    ctx.strokeStyle = 'rgba(0,0,0,0.55)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.arc(e.x, e.y + wobble, e.type.size, 0, Math.PI*2); ctx.stroke();
-    // emoji
-    ctx.font = `${e.type.size*1.5}px sans-serif`; ctx.textAlign='center';
-    ctx.fillText(e.type.emoji, e.x, e.y + wobble + e.type.size*0.5);
+    // 角色圖片（透明底，依 size 等比放大）
+    const enemyImg = ENEMY_IMGS[e.typeKey];
+    const eImgSize = e.type.size * 4;
+    if (enemyImg && enemyImg.complete && enemyImg.naturalWidth > 0) {
+      ctx.drawImage(enemyImg,
+        e.x - eImgSize / 2,
+        e.y + wobble + e.type.size - eImgSize,
+        eImgSize, eImgSize);
+    } else {
+      // Fallback：原始漸層圓形 + emoji
+      const eg = ctx.createRadialGradient(e.x - e.type.size*0.3, e.y - e.type.size*0.3, 2, e.x, e.y, e.type.size);
+      eg.addColorStop(0, '#fff5d4');
+      eg.addColorStop(0.3, e.type.color);
+      eg.addColorStop(1, '#1a0c04');
+      ctx.fillStyle = eg;
+      ctx.beginPath(); ctx.arc(e.x, e.y + wobble, e.type.size, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(e.x, e.y + wobble, e.type.size, 0, Math.PI*2); ctx.stroke();
+      ctx.font = `${e.type.size*1.5}px sans-serif`; ctx.textAlign='center';
+      ctx.fillText(e.type.emoji, e.x, e.y + wobble + e.type.size*0.5);
+    }
     // 血條（外框）
     const w = e.type.size * 2;
     ctx.fillStyle = 'rgba(0,0,0,0.85)';
@@ -1972,6 +2364,12 @@ function render() {
       ctx.strokeStyle = `rgba(220,220,255,${lifeFrac})`;
       ctx.lineWidth = 3;
       ctx.beginPath(); ctx.arc(e.x, e.y, 20 + p * 30, 0, Math.PI*2); ctx.stroke();
+    } else if (e.type === 'heroHit') {
+      // 英雄被攻擊閃紅
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.fillStyle = `rgba(255,60,60,${lifeFrac * 0.6})`;
+      ctx.beginPath(); ctx.arc(e.x, e.y, 26, 0, Math.PI*2); ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
     }
   }
 }
@@ -2029,6 +2427,9 @@ function resetGame() {
   state.selectedHero = null;
   state.gameOver = false;
   state.won = false;
+  state.earlyBonus = 0;
+  state.earlyTimer = 0;
+  for (const sp of Object.values(SPELLS)) sp.cdLeft = 0;
   state.paused = false;
   hideInfo();
   updateHud();
@@ -2038,6 +2439,7 @@ function resetGame() {
 // 啟動
 // =====================================================================
 buildShop();
+initSpells();
 updateHud();
 fitCanvas();
 requestAnimationFrame(loop);

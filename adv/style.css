@@ -1,0 +1,687 @@
+/* ============ 全域 ============ */
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg-deep: #0a0613;
+  --bg-mid: #1a1233;
+  --bg-card: #251a45;
+  --bg-card-hi: #312055;
+  --accent: #ff7f3f;
+  --accent-glow: #ffb86b;
+  --ghost-blue: #7df9ff;
+  --text: #f0e8ff;
+  --text-dim: #a89bc7;
+  --border: #3b2966;
+
+  --r-common: #c8c8d0;
+  --r-uncommon: #4ade80;
+  --r-rare: #60a5fa;
+  --r-epic: #c084fc;
+  --r-legendary: #fbbf24;
+  --r-mythic: #f87171;
+}
+
+html, body {
+  height: 100%;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  background: var(--bg-deep);
+  color: var(--text);
+  overflow: hidden;
+  user-select: none;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 20% 10%, #3a1d5e 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 90%, #1d1d6e 0%, transparent 50%),
+    var(--bg-deep);
+  background-attachment: fixed;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 10% 20%, white, transparent),
+    radial-gradient(1px 1px at 80% 60%, white, transparent),
+    radial-gradient(1.5px 1.5px at 50% 80%, white, transparent),
+    radial-gradient(1px 1px at 30% 70%, white, transparent),
+    radial-gradient(2px 2px at 70% 30%, white, transparent),
+    radial-gradient(1px 1px at 90% 90%, white, transparent);
+  background-size: 100% 100%;
+  pointer-events: none;
+  opacity: 0.4;
+  z-index: 0;
+}
+
+/* ============ 螢幕 ============ */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  z-index: 1;
+}
+.screen.active { display: flex; }
+
+/* ============ 標題畫面 ============ */
+#title-screen {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.title-content {
+  max-width: 380px;
+  width: 88%;
+  padding: 32px 24px;
+  background: rgba(37, 26, 69, 0.6);
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+}
+.game-title {
+  font-size: 42px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent), var(--accent-glow), var(--ghost-blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 4px;
+  margin-bottom: 4px;
+  text-shadow: 0 0 24px rgba(255, 127, 63, 0.3);
+}
+.game-subtitle {
+  color: var(--text-dim);
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+.title-tagline {
+  color: var(--text-dim);
+  font-style: italic;
+  margin: 24px 0;
+  line-height: 1.6;
+}
+.version-tag {
+  color: var(--text-dim);
+  font-size: 11px;
+  margin-top: 16px;
+  opacity: 0.6;
+}
+
+/* ============ 按鈕 ============ */
+.btn-primary, .btn-secondary {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+  letter-spacing: 1px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #e85f1f);
+  color: white;
+  box-shadow: 0 0 20px rgba(255, 127, 63, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 28px rgba(255,127,63,0.6); }
+.btn-primary:active { transform: translateY(1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { background: var(--bg-card-hi); }
+.btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ============ 選角畫面 ============ */
+#select-screen {
+  padding: 32px 16px;
+  overflow-y: auto;
+}
+.select-header { text-align: center; margin-bottom: 24px; }
+.select-header h2 { font-size: 22px; margin-bottom: 6px; }
+.select-header .hint { color: var(--text-dim); font-size: 13px; }
+
+.ghost-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.ghost-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.ghost-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 127, 63, 0.2);
+}
+.ghost-card.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.ghost-card.locked::after {
+  content: '🔒';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 18px;
+}
+.ghost-card-avatar { font-size: 60px; margin-bottom: 12px; }
+.ghost-card-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.ghost-card-desc { font-size: 12px; color: var(--text-dim); margin-bottom: 12px; min-height: 32px; }
+.ghost-card-skill { font-size: 11px; color: var(--accent-glow); border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 8px; }
+
+/* ============ 主畫面 ============ */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: linear-gradient(180deg, rgba(10,6,19,0.95), rgba(10,6,19,0.6));
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.currency {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg-card);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+}
+.coin-icon { font-size: 16px; }
+.coin-label { color: var(--text-dim); font-size: 12px; }
+.top-actions { display: flex; gap: 8px; }
+.icon-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--text);
+  transition: background 0.2s;
+}
+.icon-btn:hover { background: var(--bg-card-hi); }
+
+.stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  padding: 24px 16px;
+  overflow: hidden;
+}
+.stage-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at center, rgba(255,127,63,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ghost-display { text-align: center; z-index: 1; }
+.ghost-avatar {
+  font-size: 120px;
+  display: block;
+  filter: drop-shadow(0 0 30px rgba(125, 249, 255, 0.4));
+  margin-bottom: 8px;
+}
+.floating { animation: float 3s ease-in-out infinite; }
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+}
+.ghost-name { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.ghost-level { font-size: 13px; color: var(--text-dim); }
+.exp-bar {
+  width: 160px;
+  height: 6px;
+  background: var(--bg-card);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 6px auto 0;
+}
+.exp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-glow));
+  transition: width 0.3s;
+}
+
+.drift-status {
+  width: 100%;
+  max-width: 380px;
+  background: rgba(37, 26, 69, 0.6);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+  z-index: 1;
+}
+.drift-msg { text-align: center; color: var(--text-dim); margin-bottom: 12px; }
+.drift-progress {
+  height: 12px;
+  background: var(--bg-card);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 12px 0 8px;
+}
+.drift-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ghost-blue), var(--accent));
+  width: 0%;
+  transition: width 0.5s;
+  box-shadow: 0 0 8px var(--ghost-blue);
+}
+.drift-timer {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin: 8px 0 16px;
+  letter-spacing: 2px;
+}
+.hidden { display: none !important; }
+
+.bottom-bar {
+  display: flex;
+  justify-content: space-around;
+  padding: 12px 16px;
+  background: linear-gradient(0deg, rgba(10,6,19,0.95), rgba(10,6,19,0.6));
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--border);
+}
+.stat-mini {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+.stat-mini span { color: var(--text); margin-left: 4px; font-size: 15px; }
+
+/* ============ Modal ============ */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  backdrop-filter: blur(4px);
+}
+.modal.active { display: flex; animation: fadeIn 0.2s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-content {
+  background: linear-gradient(160deg, var(--bg-mid), var(--bg-deep));
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 20px;
+  position: relative;
+}
+.modal-content.small { max-width: 360px; }
+.modal-content.loot-content { max-width: 420px; text-align: center; }
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-header h2 { font-size: 20px; }
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+.close-btn:hover { color: var(--text); }
+
+/* ============ 地圖列表 ============ */
+.map-list { display: flex; flex-direction: column; gap: 10px; }
+.map-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.map-card:not(.locked):hover { border-color: var(--accent); transform: translateX(4px); }
+.map-card.locked { opacity: 0.5; cursor: not-allowed; }
+.map-icon { font-size: 38px; }
+.map-info { flex: 1; }
+.map-name { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+.map-meta { font-size: 12px; color: var(--text-dim); }
+.map-loot-preview {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.rarity-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  display: inline-block;
+}
+
+/* ============ 背包 ============ */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.tab {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.bag-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 8px;
+  min-height: 120px;
+}
+.item-slot {
+  aspect-ratio: 1;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.1s;
+}
+.item-slot:hover { transform: scale(1.05); }
+.item-slot[data-rarity="common"]    { border-color: var(--r-common); }
+.item-slot[data-rarity="uncommon"]  { border-color: var(--r-uncommon); box-shadow: 0 0 8px rgba(74,222,128,0.3); }
+.item-slot[data-rarity="rare"]      { border-color: var(--r-rare); box-shadow: 0 0 10px rgba(96,165,250,0.4); }
+.item-slot[data-rarity="epic"]      { border-color: var(--r-epic); box-shadow: 0 0 12px rgba(192,132,252,0.5); }
+.item-slot[data-rarity="legendary"] { border-color: var(--r-legendary); box-shadow: 0 0 16px rgba(251,191,36,0.6); }
+.item-slot[data-rarity="mythic"]    { border-color: var(--r-mythic); box-shadow: 0 0 18px rgba(248,113,113,0.7); animation: mythicGlow 1.5s ease-in-out infinite; }
+@keyframes mythicGlow {
+  0%, 100% { box-shadow: 0 0 18px rgba(248,113,113,0.7); }
+  50% { box-shadow: 0 0 28px rgba(248,113,113,1); }
+}
+
+.item-count {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(0,0,0,0.6);
+  padding: 1px 5px;
+  border-radius: 6px;
+}
+.item-equipped {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 10px;
+  color: var(--accent-glow);
+}
+.empty-hint {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-dim);
+  padding: 40px 0;
+  font-size: 13px;
+}
+
+/* ============ 物品詳情 ============ */
+.item-detail {
+  text-align: center;
+  padding: 16px 0;
+}
+.item-detail-icon {
+  font-size: 64px;
+  margin-bottom: 12px;
+}
+.item-detail-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.item-rarity-label {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.item-rarity-common    { background: var(--r-common); color: #333; }
+.item-rarity-uncommon  { background: var(--r-uncommon); color: #051a08; }
+.item-rarity-rare      { background: var(--r-rare); color: #051121; }
+.item-rarity-epic      { background: var(--r-epic); color: #220140; }
+.item-rarity-legendary { background: var(--r-legendary); color: #2a1a00; }
+.item-rarity-mythic    { background: var(--r-mythic); color: #2a0606; }
+.item-flavor {
+  color: var(--text-dim);
+  font-style: italic;
+  font-size: 13px;
+  margin: 12px 0;
+  line-height: 1.5;
+}
+.item-stats {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 12px 0;
+  text-align: left;
+}
+.item-stat-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 3px 0;
+}
+.item-stat-line .stat-val { color: var(--accent-glow); font-weight: 700; }
+.item-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.item-actions button { flex: 1; min-width: 100px; margin: 0; }
+
+/* ============ 鬼魂資訊 ============ */
+.ghost-detail {
+  display: flex;
+  gap: 16px;
+  background: var(--bg-card);
+  padding: 16px;
+  border-radius: 14px;
+  margin-bottom: 16px;
+}
+.ghost-detail-avatar { font-size: 64px; }
+.ghost-detail-info { flex: 1; }
+.ghost-detail-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.ghost-detail-skill { font-size: 12px; color: var(--accent-glow); margin-bottom: 8px; }
+.ghost-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 13px; }
+.ghost-stat-line { color: var(--text-dim); }
+.ghost-stat-line span { color: var(--text); font-weight: 700; margin-left: 4px; }
+
+.section-title {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin: 16px 0 10px;
+  letter-spacing: 1px;
+}
+
+.equip-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.equip-slot {
+  aspect-ratio: 1;
+  background: var(--bg-card);
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  position: relative;
+  cursor: pointer;
+}
+.equip-slot:hover { border-color: var(--accent); border-style: solid; }
+.equip-slot-label {
+  position: absolute;
+  bottom: 4px;
+  font-size: 10px;
+  color: var(--text-dim);
+}
+.equip-slot.has-item { border-style: solid; }
+.equip-slot.has-item[data-rarity="uncommon"]  { border-color: var(--r-uncommon); }
+.equip-slot.has-item[data-rarity="rare"]      { border-color: var(--r-rare); }
+.equip-slot.has-item[data-rarity="epic"]      { border-color: var(--r-epic); }
+.equip-slot.has-item[data-rarity="legendary"] { border-color: var(--r-legendary); }
+.equip-slot.has-item[data-rarity="mythic"]    { border-color: var(--r-mythic); }
+
+.ghost-collection {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+}
+.ghost-mini {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ghost-mini:hover { border-color: var(--accent); }
+.ghost-mini.active { border-color: var(--accent); background: var(--bg-card-hi); }
+.ghost-mini.locked { opacity: 0.4; cursor: pointer; }
+.ghost-mini-avatar { font-size: 32px; }
+.ghost-mini-name { font-size: 11px; margin-top: 2px; color: var(--text-dim); }
+
+/* ============ 戰利品揭曉 ============ */
+.special-modal .modal-content {
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 40px rgba(255,127,63,0.4);
+}
+.loot-title {
+  font-size: 24px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 8px;
+}
+.loot-subtitle { color: var(--text-dim); margin-bottom: 20px; font-size: 13px; }
+.loot-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.loot-item {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 8px;
+  text-align: center;
+  animation: lootPop 0.4s ease-out backwards;
+}
+.loot-item:nth-child(1) { animation-delay: 0.1s; }
+.loot-item:nth-child(2) { animation-delay: 0.2s; }
+.loot-item:nth-child(3) { animation-delay: 0.3s; }
+.loot-item:nth-child(4) { animation-delay: 0.4s; }
+.loot-item:nth-child(5) { animation-delay: 0.5s; }
+@keyframes lootPop {
+  from { transform: scale(0.3); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.loot-item[data-rarity="uncommon"]  { border-color: var(--r-uncommon); }
+.loot-item[data-rarity="rare"]      { border-color: var(--r-rare); }
+.loot-item[data-rarity="epic"]      { border-color: var(--r-epic); }
+.loot-item[data-rarity="legendary"] { border-color: var(--r-legendary); box-shadow: 0 0 16px rgba(251,191,36,0.6); }
+.loot-item[data-rarity="mythic"]    { border-color: var(--r-mythic); box-shadow: 0 0 20px rgba(248,113,113,0.7); }
+.loot-icon { font-size: 36px; margin-bottom: 6px; }
+.loot-name { font-size: 13px; font-weight: 700; }
+.loot-count { color: var(--text-dim); font-size: 11px; }
+
+/* ============ Menu ============ */
+.menu-actions { display: flex; flex-direction: column; gap: 8px; }
+.menu-hint {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* ============ Toast ============ */
+.toast {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 14px;
+  z-index: 200;
+  opacity: 0;
+  transition: all 0.3s;
+  max-width: 320px;
+  text-align: center;
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ============ 適配 ============ */
+@media (min-width: 768px) {
+  .stage { padding: 40px; }
+  .ghost-avatar { font-size: 150px; }
+}

@@ -24,6 +24,7 @@
       <div class="dungeon-stage" id="dungeonStage">1-1</div>
     </div>
     <div class="hud-right">
+      <button class="icon-btn" id="btnMute" title="靜音切換">🔊</button>
       <button class="icon-btn" id="btnMenu">☰</button>
     </div>
   </header>
@@ -152,12 +153,24 @@
       <button class="close-btn" data-close="menuModal">✕</button>
     </div>
     <div class="modal-body">
+      <div class="sound-section">
+        <div class="sound-title">🎵 音效設定</div>
+        <div class="sound-row">
+          <button class="sound-btn" id="btnToggleSfx">🔊 音效 開</button>
+          <input type="range" class="sound-slider" id="sfxVolume" min="0" max="1" step="0.05" value="0.5">
+        </div>
+        <div class="sound-row">
+          <button class="sound-btn" id="btnToggleBgm">🎵 音樂 開</button>
+          <input type="range" class="sound-slider" id="bgmVolume" min="0" max="1" step="0.05" value="0.35">
+        </div>
+      </div>
       <button class="menu-item" id="btnSave">💾 立即存檔</button>
       <button class="menu-item" id="btnReset">🔄 重置遊戲</button>
       <div class="menu-info">
-        版本 v2.0 · 自動存檔已啟用<br>
-        離線最多累積 12 小時收益<br>
-        補血藥 HP &lt; 30% 自動使用
+        版本 v3.0 · 含音效音樂<br>
+        自動存檔 · 離線最多 12 小時收益<br>
+        補血藥 HP &lt; 30% 自動使用<br>
+        首次點擊頁面後音效才會啟動（瀏覽器限制）
       </div>
     </div>
   </div>
@@ -188,6 +201,7 @@
 <!-- ============== 拖曳虛影 ============== -->
 <div id="dragGhost" class="hidden"></div>
 
+<script src="sound.js"></script>
 <script src="game.js"></script>
 </body>
 </html>

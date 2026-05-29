@@ -345,6 +345,50 @@ html,body{
 .menu-item:active{background:rgba(60,80,140,0.6)}
 .menu-info{font-size:10px;color:#506080;text-align:center;margin-top:8px;line-height:1.7}
 
+/* 音效控制 */
+.sound-section{
+  background:rgba(15,20,40,0.6);
+  border:1px solid #2a3a64;border-radius:8px;
+  padding:12px;
+}
+.sound-title{
+  font-size:11px;color:#7eb8f7;letter-spacing:2px;
+  border-bottom:1px solid #2a3a64;padding-bottom:6px;margin-bottom:10px;
+}
+.sound-row{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:8px;
+}
+.sound-row:last-child{margin-bottom:0}
+.sound-btn{
+  flex-shrink:0;
+  background:rgba(20,28,52,0.7);
+  border:1px solid #3a4a78;color:#c8d8ff;
+  padding:7px 12px;border-radius:6px;
+  cursor:pointer;font-size:11px;letter-spacing:1px;
+  min-width:100px;text-align:left;
+  font-family:inherit;
+}
+.sound-btn:active{transform:scale(0.96);background:rgba(40,58,98,0.7)}
+.sound-slider{
+  flex:1;height:6px;
+  background:#1a1a3a;border-radius:3px;
+  outline:none;
+  -webkit-appearance:none;appearance:none;
+  cursor:pointer;
+}
+.sound-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:16px;height:16px;border-radius:50%;
+  background:#9a6af7;cursor:pointer;
+  box-shadow:0 0 8px #9a6af7;
+}
+.sound-slider::-moz-range-thumb{
+  width:16px;height:16px;border-radius:50%;border:none;
+  background:#9a6af7;cursor:pointer;
+  box-shadow:0 0 8px #9a6af7;
+}
+
 /* 地城清單 */
 .dungeon-item{
   padding:11px;background:rgba(20,28,52,0.7);

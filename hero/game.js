@@ -326,11 +326,13 @@ function unequip(slot) {
   const idx = findEmptySlot();
   if (idx === -1) {
     showToast('背包已滿', 'warn');
+    if (typeof SOUND !== 'undefined') SOUND.error();
     return false;
   }
   S.inventory[idx] = item;
   S.equipped[slot] = null;
   invalidateStats();
+  if (typeof SOUND !== 'undefined') SOUND.unequip();
   return true;
 }
 
@@ -470,6 +472,7 @@ function usePotion(kind) {
     kind: 'dmg', x: 50 + Math.random() * 30, y: 60,
     vy: -1.5, life: 1.0, text: '+' + formatNum(heal), color: '#3aff8a', size: 14
   });
+  if (typeof SOUND !== 'undefined') SOUND.potion();
   return true;
 }
 
@@ -968,6 +971,22 @@ function refreshLevel() {
   const need = expForLevel(S.level);
   document.getElementById('expFill').style.width = (S.exp / need * 100) + '%';
   document.getElementById('expText').textContent = formatNum(S.exp) + ' / ' + formatNum(need);
+}
+
+function refreshSoundUI() {
+  if (typeof SOUND === 'undefined') return;
+  const muted = !SOUND.sfxEnabled && !SOUND.bgmEnabled;
+  const muteBtn = document.getElementById('btnMute');
+  if (muteBtn) muteBtn.textContent = muted ? '🔇' : '🔊';
+
+  const sfxBtn = document.getElementById('btnToggleSfx');
+  const bgmBtn = document.getElementById('btnToggleBgm');
+  if (sfxBtn) sfxBtn.textContent = SOUND.sfxEnabled ? '🔊 音效 開' : '🔇 音效 關';
+  if (bgmBtn) bgmBtn.textContent = SOUND.bgmEnabled ? '🎵 音樂 開' : '🔕 音樂 關';
+  const sfxVol = document.getElementById('sfxVolume');
+  const bgmVol = document.getElementById('bgmVolume');
+  if (sfxVol) sfxVol.value = SOUND.sfxVolume;
+  if (bgmVol) bgmVol.value = SOUND.bgmVolume;
 }
 
 function refreshEnemyInfo() {
@@ -1711,16 +1730,28 @@ function showSummonAnimation(items) {
 
 function doSummon(times) {
   const cost = times === 1 ? CFG.SUMMON_COST : CFG.SUMMON10_COST;
-  if (S.gold < cost) { showToast('靈幣不足', 'warn'); return; }
-  if (findEmptySlot() === -1) { showToast('背包已滿，請先合成', 'warn'); return; }
+  if (S.gold < cost) { showToast('靈幣不足', 'warn'); if (typeof SOUND !== 'undefined') SOUND.error(); return; }
+  if (findEmptySlot() === -1) { showToast('背包已滿，請先合成', 'warn'); if (typeof SOUND !== 'undefined') SOUND.error(); return; }
   S.gold -= cost;
   const items = [];
+  let bestRarity = 'common';
+  const rarOrder = ['common', 'rare', 'epic', 'legendary', 'mythic'];
   for (let i = 0; i < times; i++) {
     if (findEmptySlot() === -1) break;
     const item = rollSummon(times === 10 ? 1 : 0);
     addItem(item);
     items.push(item);
     S.totalSummons++;
+    const r = tierToRarity(item.tier);
+    if (rarOrder.indexOf(r) > rarOrder.indexOf(bestRarity)) bestRarity = r;
+  }
+  if (typeof SOUND !== 'undefined') {
+    SOUND.summon();
+    if (bestRarity === 'mythic' || bestRarity === 'legendary') {
+      setTimeout(() => SOUND.legendaryDrop(), 900);
+    } else if (bestRarity === 'epic' || bestRarity === 'rare') {
+      setTimeout(() => SOUND.rareDrop(), 900);
+    }
   }
   showSummonAnimation(items);
 }
@@ -1888,12 +1919,15 @@ function showOfflineModal(rw) {
 // 事件綁定
 // ─────────────────────────────────────────────────────────────
 function bindUI() {
-  document.getElementById('btnSummon').onclick = () => doSummon(1);
-  document.getElementById('btnSummon10').onclick = () => doSummon(10);
-  document.getElementById('btnDungeon').onclick = openDungeonModal;
-  document.getElementById('btnShop').onclick = openShop;
+  const sfx = () => { if (typeof SOUND !== 'undefined') SOUND.button(); };
+  document.getElementById('btnSummon').onclick = () => { sfx(); doSummon(1); };
+  document.getElementById('btnSummon10').onclick = () => { sfx(); doSummon(10); };
+  document.getElementById('btnDungeon').onclick = () => { sfx(); openDungeonModal(); };
+  document.getElementById('btnShop').onclick = () => { sfx(); openShop(); };
   document.getElementById('btnMenu').onclick = () => {
+    sfx();
     document.getElementById('menuModal').classList.remove('hidden');
+    refreshSoundUI();
   };
   document.getElementById('btnSave').onclick = () => {
     save();
@@ -1908,27 +1942,61 @@ function bindUI() {
     }
   };
   document.getElementById('btnAutoMerge').onclick = () => {
+    sfx();
     const n = autoMerge();
     if (n > 0) { refreshAllUI(); showToast(`✨ 合成 ${n} 次`, 'success'); }
     else showToast('沒有可合成的裝備', 'warn');
   };
   document.getElementById('btnAutoEquip').onclick = () => {
+    sfx();
     const n = autoEquipBest();
     if (n > 0) { refreshAllUI(); showToast(`⚔ 已穿戴 ${n} 件最佳裝備`, 'success'); }
     else showToast('沒有更好的裝備可穿戴', 'warn');
   };
   document.getElementById('btnSort').onclick = () => {
+    sfx();
     sortInventory();
     refreshInventory();
     showToast('🗂 已整理背包', 'success');
   };
   document.getElementById('btnSellLow').onclick = () => {
+    sfx();
     if (!confirm('賣出所有 T1-T3 裝備？')) return;
     const r = sellLowTier();
     if (r.count > 0) {
       refreshAllUI();
       showToast(`💰 賣出 ${r.count} 件 +${formatNum(r.gold)}`, 'success');
+      if (typeof SOUND !== 'undefined') SOUND.coin();
     } else showToast('沒有可賣的裝備', 'warn');
+  };
+  // 音量控制
+  document.getElementById('btnToggleSfx').onclick = () => {
+    SOUND.toggleSfx();
+    refreshSoundUI();
+  };
+  document.getElementById('btnToggleBgm').onclick = () => {
+    SOUND.toggleBgm();
+    refreshSoundUI();
+  };
+  document.getElementById('sfxVolume').oninput = e => {
+    SOUND.setSfxVolume(parseFloat(e.target.value));
+  };
+  document.getElementById('bgmVolume').oninput = e => {
+    SOUND.setBgmVolume(parseFloat(e.target.value));
+  };
+  // HUD 快速靜音
+  document.getElementById('btnMute').onclick = () => {
+    const newState = !SOUND.sfxEnabled || !SOUND.bgmEnabled;
+    // 同時切換 BGM 和 SFX
+    if (newState) {
+      // 開啟（兩個都打開）
+      if (!SOUND.sfxEnabled) SOUND.toggleSfx();
+      if (!SOUND.bgmEnabled) SOUND.toggleBgm();
+    } else {
+      if (SOUND.sfxEnabled) SOUND.toggleSfx();
+      if (SOUND.bgmEnabled) SOUND.toggleBgm();
+    }
+    refreshSoundUI();
   };
   document.querySelectorAll('[data-close]').forEach(btn => {
     btn.onclick = () => {
@@ -1997,6 +2065,7 @@ function init() {
   RT.hero.atkCooldown = 1 / stats.SPD;
 
   refreshAllUI();
+  refreshSoundUI();
 
   if (loaded && S.lastSave) {
     const offlineSec = Math.min((Date.now() - S.lastSave) / 1000, CFG.MAX_OFFLINE_HOURS * 3600);

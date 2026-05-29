@@ -244,6 +244,7 @@
     </div>
     <button id="startBtn" class="btn go ready">出戰</button>
     <button id="speedBtn" class="btn">x1</button>
+    <button id="audioBtn" class="btn" title="音效開關" style="padding:4px 8px;font-size:14px;">🔊</button>
   </div>
 
   <div id="canvasWrap">
@@ -594,6 +595,7 @@ function showBranchModal(hero) {
 }
 
 function applyLevelUp(hero) {
+  sfxUpgrade();
   const u = hero.type.upgrade;
   hero.damage += u.damage || 0;
   hero.range  += u.range  || 0;
@@ -697,6 +699,7 @@ const SPELLS = {
       const now = performance.now();
       for (const e of state.enemies) e.stunUntil = now + 3000;
       state.effects.push({type:'bellring', x:canvas.width/2, y:canvas.height/2, r:800, life:0.6, maxLife:0.6, color:'#7fdfff'});
+      sfxSpellFreeze();
       spawnFloat(canvas.width/2, canvas.height/2, '❄ 全場石化！', '#7fdfff');
     }
   },
@@ -708,6 +711,7 @@ const SPELLS = {
         applyDamage(e, dmg, {color:'#ff6020'});
         state.effects.push({type:'lava', x:e.x, y:e.y, particles:8, seed:Math.random()*999|0, life:0.5, maxLife:0.5});
       }
+      sfxSpellFire();
       spawnFloat(canvas.width/2, canvas.height/2, '🔥 業火燃燒！', '#ff8040');
     }
   },
@@ -716,6 +720,7 @@ const SPELLS = {
     use() {
       const until = performance.now() + 5000;
       for (const h of state.heroes) h._buffUntil = until;
+      sfxSpellBuff();
       spawnFloat(canvas.width/2, canvas.height/2, '💛 全軍號令！', '#ffd83a');
     }
   }
@@ -949,6 +954,7 @@ function placeHero(type, c, r) {
     upgradesPaid: 0
   };
   state.heroes.push(hero);
+  sfxPlace();
   spawnFloat(hero.x, hero.y, `部署！${t.name}`, '#ffd83a');
   updateHud();
 }
@@ -957,6 +963,8 @@ function placeHero(type, c, r) {
 // 波次與生怪
 // =====================================================================
 function startWave() {
+  sfxWaveStart();
+  bgmStart();
   if (state.earlyBonus > 0) {
     state.gold += state.earlyBonus;
     spawnFloat(canvas.width / 2, 60, `提早出戰！+${state.earlyBonus}🦴`, '#7fff5f');
@@ -1175,6 +1183,7 @@ function update(dt) {
     }
     if (nearHero) {
       nearHero.hp -= e.type.atkDmg;
+      sfxHeroHit();
       e.atkCooldown = 1 / e.type.atkRate;
       state.effects.push({type:'heroHit', x:nearHero.x, y:nearHero.y - 10, life:0.4, maxLife:0.4, dmg:e.type.atkDmg});
       spawnFloat(nearHero.x + 20, nearHero.y - 20, `-${e.type.atkDmg}`, '#ff5555');
@@ -1184,6 +1193,7 @@ function update(dt) {
   for (const h of state.heroes) {
     if (h.hp <= 0) {
       h.dead = true;
+      sfxHeroDeath();
       state.effects.push({type:'explode', x:h.x, y:h.y, r:30, life:0.5, maxLife:0.5, color:'#ff8040'});
       spawnFloat(h.x, h.y, `${h.type.name} 倒下！`, '#ff4040');
       if (state.selectedHero === h) { state.selectedHero = null; hideInfo(); }
@@ -1303,7 +1313,9 @@ function update(dt) {
   for (const e of state.enemies) {
     if (e.hp <= 0 && !e.dead) {
       e.dead = true;
+      sfxDeath();
       state.gold += e.type.gold + (e._bonusGold || 0);
+      sfxGold();
       spawnFloat(e.x, e.y, `+${e.type.gold + (e._bonusGold || 0)}🦴`);
     }
   }
@@ -1313,6 +1325,7 @@ function update(dt) {
   // 波次結束判斷
   if (state.waveActive && state.spawnQueue.length === 0 && state.enemies.length === 0) {
     state.waveActive = false;
+    sfxWaveClear();
     state.gold += 30 + state.wave * 5; // 波次完成獎勵
     spawnFloat(canvas.width / 2, 30, `波次清空！+${30 + state.wave * 5}🦴`, '#7fff5f');
     if (state.wave >= WAVES.length) endGame(true);
@@ -1329,6 +1342,7 @@ function update(dt) {
 }
 
 function applyDamage(enemy, dmg, source) {
+  sfxHit();
   enemy.hp -= dmg;
   state.effects.push({type:'hit', x: enemy.x, y: enemy.y, life: 0.15, maxLife: 0.15, color: source.color});
 }
@@ -2388,6 +2402,8 @@ function endGame(win) {
   state.gameOver = true;
   state.won = win;
   state.paused = true;
+  bgmStop();
+  if (win) sfxWin(); else sfxLose();
   const panel = document.getElementById('overlayPanel');
   if (win) {
     panel.innerHTML = `
@@ -2431,9 +2447,292 @@ function resetGame() {
   state.earlyTimer = 0;
   for (const sp of Object.values(SPELLS)) sp.cdLeft = 0;
   state.paused = false;
+  bgmStop();
+  bgmStart();
   hideInfo();
   updateHud();
 }
+
+// =====================================================================
+// 音效系統（Web Audio API — 程序化生成，零外部依賴）
+// =====================================================================
+let audioCtx = null;
+let audioMuted = false;
+let _hitLast = 0, _goldLast = 0;
+
+function getAC() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+// ─── 基礎音源 ──────────────────────────────────────────────────────
+function sTone(freq, dur, type, vol, when, dest) {
+  if (audioMuted) return;
+  const c = getAC();
+  const w = (when != null && when > 0) ? when : c.currentTime;
+  const o = c.createOscillator(), g = c.createGain();
+  o.connect(g); g.connect(dest || c.destination);
+  o.type = type || 'sine'; o.frequency.value = freq;
+  g.gain.setValueAtTime(vol || 0.25, w);
+  g.gain.exponentialRampToValueAtTime(0.0001, w + dur);
+  o.start(w); o.stop(w + dur + 0.01);
+}
+
+function sSweep(f1, f2, dur, type, vol, when) {
+  if (audioMuted) return;
+  const c = getAC(); const w = (when != null && when > 0) ? when : c.currentTime;
+  const o = c.createOscillator(), g = c.createGain();
+  o.connect(g); g.connect(c.destination);
+  o.type = type || 'sine';
+  o.frequency.setValueAtTime(f1, w);
+  o.frequency.exponentialRampToValueAtTime(f2, w + dur);
+  g.gain.setValueAtTime(vol || 0.2, w);
+  g.gain.exponentialRampToValueAtTime(0.0001, w + dur);
+  o.start(w); o.stop(w + dur + 0.01);
+}
+
+function sNoise(dur, vol, cutoff, when) {
+  if (audioMuted) return;
+  const c = getAC(); const w = (when != null && when > 0) ? when : c.currentTime;
+  const len = Math.ceil(c.sampleRate * dur);
+  const buf = c.createBuffer(1, len, c.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  const src = c.createBufferSource();
+  src.buffer = buf;
+  const bpf = c.createBiquadFilter();
+  bpf.type = 'bandpass'; bpf.frequency.value = cutoff || 800; bpf.Q.value = 1.2;
+  const g = c.createGain();
+  src.connect(bpf); bpf.connect(g); g.connect(c.destination);
+  g.gain.setValueAtTime(vol || 0.15, w);
+  g.gain.exponentialRampToValueAtTime(0.0001, w + dur);
+  src.start(w); src.stop(w + dur + 0.01);
+}
+
+// ─── 各事件音效 ────────────────────────────────────────────────────
+function sfxPlace() {
+  const c = getAC(), t = c.currentTime;
+  sTone(523, .08, 'sine', .18, t);
+  sTone(659, .11, 'sine', .22, t + .07);
+  sTone(784, .16, 'sine', .26, t + .14);
+}
+
+function sfxHit() {
+  const n = performance.now();
+  if (n - _hitLast < 65) return;
+  _hitLast = n;
+  sNoise(.05, .12, 1100);
+  sTone(110, .06, 'square', .08);
+}
+
+function sfxDeath() {
+  sSweep(440, 110, .22, 'sawtooth', .18);
+  sNoise(.14, .1, 550);
+}
+
+function sfxHeroHit() {
+  sTone(170, .1, 'square', .14);
+  sNoise(.08, .1, 380);
+}
+
+function sfxHeroDeath() {
+  const c = getAC(), t = c.currentTime;
+  sSweep(440, 220, .2, 'sawtooth', .22, t);
+  sSweep(220, 110, .3, 'sawtooth', .18, t + .21);
+  sNoise(.3, .12, 290, t);
+}
+
+function sfxWaveStart() {
+  const c = getAC(), t = c.currentTime;
+  sTone(261.6, .18, 'square', .18, t);
+  sTone(329.6, .18, 'square', .20, t + .16);
+  sTone(392, .32, 'square', .22, t + .32);
+}
+
+function sfxWaveClear() {
+  const c = getAC(), t = c.currentTime;
+  [392, 523, 659, 784].forEach((f, i) =>
+    sTone(f, .15 + i * .04, 'sine', .20, t + i * .13));
+}
+
+function sfxSpellFreeze() {
+  const c = getAC(), t = c.currentTime;
+  sSweep(1200, 300, .4, 'sine', .18, t);
+  for (let i = 0; i < 6; i++) sTone(500 + i * 200, .09, 'sine', .07, t + i * .055);
+}
+
+function sfxSpellFire() {
+  sNoise(.3, .2, 900);
+  const c = getAC(), t = c.currentTime;
+  sSweep(200, 1400, .15, 'sawtooth', .12, t);
+  sSweep(1400, 300, .25, 'sawtooth', .10, t + .16);
+}
+
+function sfxSpellBuff() {
+  const c = getAC(), t = c.currentTime;
+  sTone(523, .22, 'square', .15, t);
+  sTone(659, .22, 'square', .15, t);
+  sTone(784, .22, 'square', .15, t);
+  sTone(1047, .36, 'square', .2, t + .22);
+}
+
+function sfxGold() {
+  const n = performance.now();
+  if (n - _goldLast < 200) return;
+  _goldLast = n;
+  const c = getAC(), t = c.currentTime;
+  sTone(1047, .07, 'sine', .1, t);
+  sTone(1319, .1, 'sine', .13, t + .07);
+}
+
+function sfxUpgrade() {
+  const c = getAC(), t = c.currentTime;
+  [523, 659, 784, 1047, 1319].forEach((f, i) =>
+    sTone(f, .1, 'square', .13, t + i * .07));
+}
+
+function sfxWin() {
+  const c = getAC(); let t = c.currentTime;
+  [[523,.18],[659,.18],[784,.18],[1047,.4],[784,.15],[1047,.65]].forEach(([f, d]) => {
+    sTone(f, d, 'square', .18, t); t += d;
+  });
+}
+
+function sfxLose() {
+  const c = getAC(); let t = c.currentTime;
+  [[440,.3],[330,.3],[261.6,.3],[196,.65]].forEach(([f, d]) => {
+    sTone(f, d, 'sawtooth', .18, t); t += d;
+  });
+}
+
+// ─── 背景音樂（中古戰場進行曲）──────────────────────────────────────
+const BGM_BPM  = 132;
+const BGM_BEAT = 60 / BGM_BPM;
+
+// 旋律（G 宮五聲）格式：[Hz, 拍數]，-1 = 休止符
+const BGM_MEL = [
+  [392,.5],[392,.5],[440,.5],[392,.5],
+  [329.6,.75],[-1,.25],[329.6,.5],[293.7,.5],
+  [392,.5],[440,.5],[523.3,.5],[440,.5],
+  [392,1.5],[-1,.5],
+  [440,.5],[440,.5],[523.3,.5],[440,.5],
+  [392,.75],[-1,.25],[392,.5],[329.6,.5],
+  [293.7,.5],[329.6,.5],[392,.5],[293.7,.5],
+  [261.6,1.5],[-1,.5],
+];
+// 低音聲部
+const BGM_BASS = [
+  [98,2],[98,2],
+  [82.4,1],[82.4,1],[98,1],[98,1],
+  [110,1],[110,1],[98,1],[98,1],
+  [130.8,1],[130.8,1],[98,1],[98,1],
+];
+// 踢鼓節奏（0.5 拍步距）
+const BGM_KICK = [1,0,.5,0,1,0,.5,1, 1,0,.5,0,1,.5,0,.5];
+
+let _bgmOn=false, _bgmGain=null;
+let _bgmMI=0, _bgmBI=0, _bgmKI=0;
+let _bgmNM=0,  _bgmNB=0,  _bgmNK=0;
+let _bgmT=null;
+
+function bgmStart() {
+  if (_bgmOn || audioMuted) return;
+  _bgmOn = true;
+  const c = getAC();
+  if (_bgmGain) { try { _bgmGain.disconnect(); } catch(e){} }
+  _bgmGain = c.createGain();
+  _bgmGain.gain.value = 0.11;
+  _bgmGain.connect(c.destination);
+  const t = c.currentTime + 0.05;
+  _bgmNM = _bgmNB = _bgmNK = t;
+  _bgmMI = _bgmBI = _bgmKI = 0;
+  _bgmSched();
+}
+
+function bgmStop() {
+  if (!_bgmOn) return;
+  _bgmOn = false;
+  clearTimeout(_bgmT);
+  if (_bgmGain) {
+    try {
+      const c = getAC();
+      _bgmGain.gain.setValueAtTime(_bgmGain.gain.value, c.currentTime);
+      _bgmGain.gain.linearRampToValueAtTime(0, c.currentTime + 0.7);
+    } catch(e) {}
+  }
+}
+
+function _bgmSched() {
+  if (!_bgmOn) return;
+  const c = getAC(); const ahead = 0.28;
+
+  // 旋律
+  while (_bgmNM < c.currentTime + ahead) {
+    const [f, b] = BGM_MEL[_bgmMI % BGM_MEL.length];
+    const dur = b * BGM_BEAT;
+    if (f > 0) {
+      const o = c.createOscillator(), g = c.createGain();
+      o.connect(g); g.connect(_bgmGain);
+      o.type = 'square'; o.frequency.value = f;
+      const w = _bgmNM;
+      g.gain.setValueAtTime(0, w);
+      g.gain.linearRampToValueAtTime(0.5, w + 0.018);
+      g.gain.setValueAtTime(0.5, w + dur * 0.58);
+      g.gain.linearRampToValueAtTime(0, w + dur * 0.92);
+      o.start(w); o.stop(w + dur + 0.02);
+    }
+    _bgmNM += dur; _bgmMI++;
+  }
+
+  // 低音
+  while (_bgmNB < c.currentTime + ahead) {
+    const [f, b] = BGM_BASS[_bgmBI % BGM_BASS.length];
+    const dur = b * BGM_BEAT;
+    if (f > 0) {
+      const o = c.createOscillator(), g = c.createGain();
+      o.connect(g); g.connect(_bgmGain);
+      o.type = 'sine'; o.frequency.value = f;
+      const w = _bgmNB;
+      g.gain.setValueAtTime(0, w);
+      g.gain.linearRampToValueAtTime(0.65, w + 0.02);
+      g.gain.setValueAtTime(0.65, w + dur * 0.5);
+      g.gain.linearRampToValueAtTime(0, w + dur * 0.88);
+      o.start(w); o.stop(w + dur + 0.02);
+    }
+    _bgmNB += dur; _bgmBI++;
+  }
+
+  // 踢鼓
+  while (_bgmNK < c.currentTime + ahead) {
+    const vel = BGM_KICK[_bgmKI % BGM_KICK.length];
+    if (vel > 0) {
+      const o = c.createOscillator(), g = c.createGain();
+      o.connect(g); g.connect(_bgmGain);
+      o.type = 'sine';
+      const w = _bgmNK;
+      o.frequency.setValueAtTime(160, w);
+      o.frequency.exponentialRampToValueAtTime(50, w + 0.1);
+      g.gain.setValueAtTime(vel, w);
+      g.gain.exponentialRampToValueAtTime(0.0001, w + 0.13);
+      o.start(w); o.stop(w + 0.15);
+    }
+    _bgmNK += 0.5 * BGM_BEAT; _bgmKI++;
+  }
+
+  _bgmT = setTimeout(_bgmSched, 100);
+}
+
+// ─── 音效開關按鈕 ──────────────────────────────────────────────────
+document.getElementById('audioBtn').addEventListener('click', () => {
+  audioMuted = !audioMuted;
+  document.getElementById('audioBtn').textContent = audioMuted ? '🔇' : '🔊';
+  if (audioMuted) {
+    bgmStop();
+  } else if (!state.gameOver && state.wave > 0) {
+    bgmStart();
+  }
+});
 
 // =====================================================================
 // 啟動

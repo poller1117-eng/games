@@ -1,207 +1,2945 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>幽靈勇者 · 合成放置 RPG</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>幽靈漂流記 v0.4 (recipe-scroll)</title>
+  <style>
+/* ============ 全域 ============ */
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg-deep: #0a0613;
+  --bg-mid: #1a1233;
+  --bg-card: #251a45;
+  --bg-card-hi: #312055;
+  --accent: #ff7f3f;
+  --accent-glow: #ffb86b;
+  --ghost-blue: #7df9ff;
+  --text: #f0e8ff;
+  --text-dim: #a89bc7;
+  --border: #3b2966;
+
+  --r-common: #c8c8d0;
+  --r-uncommon: #4ade80;
+  --r-rare: #60a5fa;
+  --r-epic: #c084fc;
+  --r-legendary: #fbbf24;
+  --r-mythic: #f87171;
+}
+
+html, body {
+  height: 100%;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  background: var(--bg-deep);
+  color: var(--text);
+  overflow: hidden;
+  user-select: none;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 20% 10%, #3a1d5e 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 90%, #1d1d6e 0%, transparent 50%),
+    var(--bg-deep);
+  background-attachment: fixed;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 10% 20%, white, transparent),
+    radial-gradient(1px 1px at 80% 60%, white, transparent),
+    radial-gradient(1.5px 1.5px at 50% 80%, white, transparent),
+    radial-gradient(1px 1px at 30% 70%, white, transparent),
+    radial-gradient(2px 2px at 70% 30%, white, transparent),
+    radial-gradient(1px 1px at 90% 90%, white, transparent);
+  background-size: 100% 100%;
+  pointer-events: none;
+  opacity: 0.4;
+  z-index: 0;
+}
+
+/* ============ 螢幕 ============ */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  z-index: 1;
+}
+.screen.active { display: flex; }
+
+/* ============ 標題畫面 ============ */
+#title-screen {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.title-content {
+  max-width: 380px;
+  width: 88%;
+  padding: 32px 24px;
+  background: rgba(37, 26, 69, 0.6);
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+}
+.game-title {
+  font-size: 42px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent), var(--accent-glow), var(--ghost-blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 4px;
+  margin-bottom: 4px;
+  text-shadow: 0 0 24px rgba(255, 127, 63, 0.3);
+}
+.game-subtitle {
+  color: var(--text-dim);
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+.title-tagline {
+  color: var(--text-dim);
+  font-style: italic;
+  margin: 24px 0;
+  line-height: 1.6;
+}
+.version-tag {
+  color: var(--text-dim);
+  font-size: 11px;
+  margin-top: 16px;
+  opacity: 0.6;
+}
+
+/* ============ 按鈕 ============ */
+.btn-primary, .btn-secondary {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+  letter-spacing: 1px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #e85f1f);
+  color: white;
+  box-shadow: 0 0 20px rgba(255, 127, 63, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 28px rgba(255,127,63,0.6); }
+.btn-primary:active { transform: translateY(1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { background: var(--bg-card-hi); }
+.btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ============ 選角畫面 ============ */
+#select-screen {
+  padding: 32px 16px;
+  overflow-y: auto;
+}
+.select-header { text-align: center; margin-bottom: 24px; }
+.select-header h2 { font-size: 22px; margin-bottom: 6px; }
+.select-header .hint { color: var(--text-dim); font-size: 13px; }
+
+.ghost-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.ghost-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.ghost-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 127, 63, 0.2);
+}
+.ghost-card.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.ghost-card.locked::after {
+  content: '🔒';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 18px;
+}
+.ghost-card-avatar { font-size: 60px; margin-bottom: 12px; }
+.ghost-card-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.ghost-card-desc { font-size: 12px; color: var(--text-dim); margin-bottom: 12px; min-height: 32px; }
+.ghost-card-skill { font-size: 11px; color: var(--accent-glow); border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 8px; }
+
+/* ============ 主畫面 ============ */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: linear-gradient(180deg, rgba(10,6,19,0.95), rgba(10,6,19,0.6));
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.currency {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg-card);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+}
+.coin-icon { font-size: 16px; }
+.coin-label { color: var(--text-dim); font-size: 12px; }
+.top-actions { display: flex; gap: 8px; }
+.icon-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--text);
+  transition: background 0.2s;
+}
+.icon-btn:hover { background: var(--bg-card-hi); }
+.icon-btn.has-notif::after {
+  content: '';
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: #ff4757;
+  box-shadow: 0 0 6px #ff4757, 0 0 0 2px var(--bg-deep);
+  animation: notifPulse 1.5s ease-in-out infinite;
+}
+.icon-btn { position: relative; }
+@keyframes notifPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
+
+.stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  padding: 24px 16px;
+  overflow: hidden;
+}
+.stage-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at center, rgba(255,127,63,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ghost-display { text-align: center; z-index: 1; }
+.ghost-avatar {
+  font-size: 120px;
+  display: block;
+  filter: drop-shadow(0 0 30px rgba(125, 249, 255, 0.4));
+  margin-bottom: 8px;
+}
+.floating { animation: float 3s ease-in-out infinite; }
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+}
+.ghost-name { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.ghost-level { font-size: 13px; color: var(--text-dim); }
+.exp-bar {
+  width: 160px;
+  height: 6px;
+  background: var(--bg-card);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 6px auto 0;
+}
+.exp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-glow));
+  transition: width 0.3s;
+}
+
+/* ============ 魂力條 ============ */
+.spirit-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  background: rgba(37, 26, 69, 0.6);
+  padding: 4px 10px 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+.spirit-icon { font-size: 16px; }
+.spirit-bar {
+  flex: 1;
+  height: 10px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 999px;
+  overflow: hidden;
+  min-width: 100px;
+}
+.spirit-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7df9ff, #a78bfa);
+  box-shadow: 0 0 8px rgba(125,249,255,0.5);
+  transition: width 0.3s;
+}
+.spirit-text {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  min-width: 60px;
+  text-align: right;
+}
+.heal-btn {
+  background: linear-gradient(135deg, #ff6b6b, #f87171);
+  border: none;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  color: white;
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+  box-shadow: 0 0 8px rgba(248,113,113,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.heal-btn:hover { transform: scale(1.1); }
+.heal-btn:active { transform: scale(0.95); }
+
+.drift-status {
+  width: 100%;
+  max-width: 380px;
+  background: rgba(37, 26, 69, 0.6);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+  z-index: 1;
+}
+.drift-msg { text-align: center; color: var(--text-dim); margin-bottom: 12px; }
+.drift-progress {
+  height: 12px;
+  background: var(--bg-card);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 12px 0 8px;
+}
+.drift-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ghost-blue), var(--accent));
+  width: 0%;
+  transition: width 0.5s;
+  box-shadow: 0 0 8px var(--ghost-blue);
+}
+.drift-timer {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin: 8px 0 16px;
+  letter-spacing: 2px;
+}
+.hidden { display: none !important; }
+
+.bottom-bar {
+  display: flex;
+  justify-content: space-around;
+  padding: 12px 16px;
+  background: linear-gradient(0deg, rgba(10,6,19,0.95), rgba(10,6,19,0.6));
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--border);
+}
+.stat-mini {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+.stat-mini span { color: var(--text); margin-left: 4px; font-size: 15px; }
+
+/* ============ Modal ============ */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  backdrop-filter: blur(4px);
+}
+.modal.active { display: flex; animation: fadeIn 0.2s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-content {
+  background: linear-gradient(160deg, var(--bg-mid), var(--bg-deep));
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 20px;
+  position: relative;
+}
+.modal-content.small { max-width: 360px; }
+.modal-content.loot-content { max-width: 420px; text-align: center; }
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-header h2 { font-size: 20px; }
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+.close-btn:hover { color: var(--text); }
+
+/* ============ 地圖列表 ============ */
+.map-list { display: flex; flex-direction: column; gap: 10px; }
+.map-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.map-card:not(.locked):hover { border-color: var(--accent); transform: translateX(4px); }
+.map-card.locked { opacity: 0.5; cursor: not-allowed; }
+.map-icon { font-size: 38px; }
+.map-info { flex: 1; }
+.map-name { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+.map-meta { font-size: 12px; color: var(--text-dim); }
+.map-loot-preview {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.rarity-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  display: inline-block;
+}
+
+/* ============ 背包 ============ */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.tab {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.bag-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 8px;
+  min-height: 120px;
+}
+.item-slot {
+  aspect-ratio: 1;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.1s;
+}
+.item-slot:hover { transform: scale(1.05); }
+.item-slot[data-rarity="common"]    { border-color: var(--r-common); }
+.item-slot[data-rarity="uncommon"]  { border-color: var(--r-uncommon); box-shadow: 0 0 8px rgba(74,222,128,0.3); }
+.item-slot[data-rarity="rare"]      { border-color: var(--r-rare); box-shadow: 0 0 10px rgba(96,165,250,0.4); }
+.item-slot[data-rarity="epic"]      { border-color: var(--r-epic); box-shadow: 0 0 12px rgba(192,132,252,0.5); }
+.item-slot[data-rarity="legendary"] { border-color: var(--r-legendary); box-shadow: 0 0 16px rgba(251,191,36,0.6); }
+.item-slot[data-rarity="mythic"]    { border-color: var(--r-mythic); box-shadow: 0 0 18px rgba(248,113,113,0.7); animation: mythicGlow 1.5s ease-in-out infinite; }
+@keyframes mythicGlow {
+  0%, 100% { box-shadow: 0 0 18px rgba(248,113,113,0.7); }
+  50% { box-shadow: 0 0 28px rgba(248,113,113,1); }
+}
+
+.item-count {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(0,0,0,0.6);
+  padding: 1px 5px;
+  border-radius: 6px;
+}
+.item-equipped {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 10px;
+  color: var(--accent-glow);
+}
+.empty-hint {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-dim);
+  padding: 40px 0;
+  font-size: 13px;
+}
+
+/* ============ 物品詳情 ============ */
+.item-detail {
+  text-align: center;
+  padding: 16px 0;
+}
+.item-detail-icon {
+  font-size: 64px;
+  margin-bottom: 12px;
+}
+.item-detail-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.item-rarity-label {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.item-rarity-common    { background: var(--r-common); color: #333; }
+.item-rarity-uncommon  { background: var(--r-uncommon); color: #051a08; }
+.item-rarity-rare      { background: var(--r-rare); color: #051121; }
+.item-rarity-epic      { background: var(--r-epic); color: #220140; }
+.item-rarity-legendary { background: var(--r-legendary); color: #2a1a00; }
+.item-rarity-mythic    { background: var(--r-mythic); color: #2a0606; }
+.item-flavor {
+  color: var(--text-dim);
+  font-style: italic;
+  font-size: 13px;
+  margin: 12px 0;
+  line-height: 1.5;
+}
+.item-stats {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 12px 0;
+  text-align: left;
+}
+.item-stat-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 3px 0;
+}
+.item-stat-line .stat-val { color: var(--accent-glow); font-weight: 700; }
+.item-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.item-actions button { flex: 1; min-width: 100px; margin: 0; }
+
+/* ============ 鬼魂資訊 ============ */
+.ghost-detail {
+  display: flex;
+  gap: 16px;
+  background: var(--bg-card);
+  padding: 16px;
+  border-radius: 14px;
+  margin-bottom: 16px;
+}
+.ghost-detail-avatar { font-size: 64px; }
+.ghost-detail-info { flex: 1; }
+.ghost-detail-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.ghost-detail-skill { font-size: 12px; color: var(--accent-glow); margin-bottom: 8px; }
+.ghost-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 13px; }
+.ghost-stat-line { color: var(--text-dim); }
+.ghost-stat-line span { color: var(--text); font-weight: 700; margin-left: 4px; }
+
+.section-title {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin: 16px 0 10px;
+  letter-spacing: 1px;
+}
+
+.equip-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.equip-slot {
+  aspect-ratio: 1;
+  background: var(--bg-card);
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  position: relative;
+  cursor: pointer;
+}
+.equip-slot:hover { border-color: var(--accent); border-style: solid; }
+.equip-slot-label {
+  position: absolute;
+  bottom: 4px;
+  font-size: 10px;
+  color: var(--text-dim);
+}
+.equip-slot.has-item { border-style: solid; }
+.equip-slot.has-item[data-rarity="uncommon"]  { border-color: var(--r-uncommon); }
+.equip-slot.has-item[data-rarity="rare"]      { border-color: var(--r-rare); }
+.equip-slot.has-item[data-rarity="epic"]      { border-color: var(--r-epic); }
+.equip-slot.has-item[data-rarity="legendary"] { border-color: var(--r-legendary); }
+.equip-slot.has-item[data-rarity="mythic"]    { border-color: var(--r-mythic); }
+
+.ghost-collection {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+}
+.ghost-mini {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ghost-mini:hover { border-color: var(--accent); }
+.ghost-mini.active { border-color: var(--accent); background: var(--bg-card-hi); }
+.ghost-mini.locked { opacity: 0.4; cursor: pointer; }
+.ghost-mini-avatar { font-size: 32px; }
+.ghost-mini-name { font-size: 11px; margin-top: 2px; color: var(--text-dim); }
+
+/* ============ 戰利品揭曉 ============ */
+.special-modal .modal-content {
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 40px rgba(255,127,63,0.4);
+}
+.loot-title {
+  font-size: 24px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 8px;
+}
+.loot-subtitle { color: var(--text-dim); margin-bottom: 20px; font-size: 13px; }
+.loot-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.loot-item {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 8px;
+  text-align: center;
+  animation: lootPop 0.4s ease-out backwards;
+}
+.loot-item:nth-child(1) { animation-delay: 0.1s; }
+.loot-item:nth-child(2) { animation-delay: 0.2s; }
+.loot-item:nth-child(3) { animation-delay: 0.3s; }
+.loot-item:nth-child(4) { animation-delay: 0.4s; }
+.loot-item:nth-child(5) { animation-delay: 0.5s; }
+@keyframes lootPop {
+  from { transform: scale(0.3); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.loot-item[data-rarity="uncommon"]  { border-color: var(--r-uncommon); }
+.loot-item[data-rarity="rare"]      { border-color: var(--r-rare); }
+.loot-item[data-rarity="epic"]      { border-color: var(--r-epic); }
+.loot-item[data-rarity="legendary"] { border-color: var(--r-legendary); box-shadow: 0 0 16px rgba(251,191,36,0.6); }
+.loot-item[data-rarity="mythic"]    { border-color: var(--r-mythic); box-shadow: 0 0 20px rgba(248,113,113,0.7); }
+.loot-icon { font-size: 36px; margin-bottom: 6px; }
+.loot-name { font-size: 13px; font-weight: 700; }
+.loot-count { color: var(--text-dim); font-size: 11px; }
+
+/* ============ Menu ============ */
+.menu-actions { display: flex; flex-direction: column; gap: 8px; }
+.menu-hint {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* ============ Toast ============ */
+.toast {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 14px;
+  z-index: 200;
+  opacity: 0;
+  transition: all 0.3s;
+  max-width: 320px;
+  text-align: center;
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ============ 適配 ============ */
+@media (min-width: 768px) {
+  .stage { padding: 40px; }
+  .ghost-avatar { font-size: 150px; }
+}
+
+/* ============ 物品強化標籤 ============ */
+.item-enhance {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--accent-glow);
+  text-shadow: 0 0 4px rgba(0,0,0,0.8);
+}
+
+/* ============ 鍛造工坊 ============ */
+.forge-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.forge-hint {
+  font-size: 12px;
+  color: var(--text-dim);
+  background: var(--bg-card);
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px dashed var(--border);
+  text-align: center;
+}
+.recipe-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  transition: border-color 0.2s;
+}
+.recipe-card.disabled { opacity: 0.5; }
+.recipe-card.locked {
+  opacity: 0.55;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--bg-card),
+    var(--bg-card) 10px,
+    rgba(0,0,0,0.18) 10px,
+    rgba(0,0,0,0.18) 20px
+  );
+  border-style: dashed;
+}
+.recipe-card.locked .recipe-result { filter: grayscale(0.8); }
+
+.forge-section-title {
+  font-size: 13px;
+  color: var(--accent-glow);
+  font-weight: 700;
+  padding: 4px 2px;
+  margin-top: 8px;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: 1px;
+}
+.forge-section-title:first-child { margin-top: 0; }
+.recipe-result {
+  flex: 0 0 76px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 10px;
+  padding: 8px 4px;
+  text-align: center;
+  border: 2px solid var(--border);
+}
+.recipe-result[data-rarity="uncommon"]  { border-color: var(--r-uncommon); }
+.recipe-result[data-rarity="rare"]      { border-color: var(--r-rare); }
+.recipe-result[data-rarity="epic"]      { border-color: var(--r-epic); }
+.recipe-result[data-rarity="legendary"] { border-color: var(--r-legendary); box-shadow: 0 0 10px rgba(251,191,36,0.4); }
+.recipe-icon { font-size: 32px; }
+.recipe-name { font-size: 12px; font-weight: 700; margin-top: 4px; }
+.recipe-body {
+  flex: 1;
+  min-width: 0;
+}
+.recipe-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+.recipe-mats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.mat-req {
+  font-size: 11px;
+  padding: 2px 6px;
+  background: var(--bg-deep);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.mat-req.ok   { color: var(--r-uncommon); border-color: rgba(74,222,128,0.4); }
+.mat-req.fail { color: #f87171; border-color: rgba(248,113,113,0.4); }
+.recipe-meta {
+  font-size: 11px;
+  color: var(--accent-glow);
+}
+.recipe-btn {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 64px;
+  padding: 10px 14px !important;
+  margin: 0 !important;
+  font-size: 13px !important;
+}
+.tierup-card .recipe-result {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 8px 10px;
+  gap: 4px;
+}
+.tierup-card .recipe-result .recipe-icon { font-size: 24px; }
+.tierup-card .recipe-result .recipe-name { font-size: 11px; margin: 0; }
+
+/* ============ 補血選單 ============ */
+.heal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.heal-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+.heal-icon { font-size: 32px; }
+.heal-info { flex: 1; }
+.heal-name { font-size: 15px; font-weight: 700; }
+.heal-meta { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+/* ============ 音效設定 ============ */
+.audio-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 8px 4px;
+}
+.audio-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.audio-label {
+  font-size: 14px;
+  color: var(--text);
+}
+.vol-slider {
+  flex: 1;
+  max-width: 180px;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: var(--bg-card);
+  border-radius: 999px;
+  outline: none;
+  border: 1px solid var(--border);
+}
+.vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+  box-shadow: 0 0 8px rgba(255,127,63,0.5);
+  cursor: pointer;
+}
+.vol-slider::-moz-range-thumb {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+  box-shadow: 0 0 8px rgba(255,127,63,0.5);
+  cursor: pointer;
+  border: none;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px; height: 26px;
+  flex: 0 0 auto;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch .slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  transition: .25s;
+  border-radius: 999px;
+}
+.switch .slider::before {
+  position: absolute;
+  content: "";
+  height: 18px; width: 18px;
+  left: 3px; top: 3px;
+  background: var(--text-dim);
+  transition: .25s;
+  border-radius: 50%;
+}
+.switch input:checked + .slider {
+  background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+  border-color: transparent;
+}
+.switch input:checked + .slider::before {
+  transform: translateX(22px);
+  background: white;
+}
+
+
+</style>
 </head>
 <body>
 
-<canvas id="bgCanvas"></canvas>
+<!-- 啟動畫面 -->
+<div id="title-screen" class="screen active">
+  <div class="title-stars"></div>
+  <div class="title-content">
+    <h1 class="game-title">幽靈漂流記</h1>
+    <p class="game-subtitle">Ghost Drift Chronicle</p>
+    <p class="title-tagline">「夜深了，該放你出去走走了。」</p>
+    <button id="btn-new-game" class="btn-primary">開始新遊戲</button>
+    <button id="btn-continue" class="btn-secondary">繼續遊戲</button>
+    <p class="version-tag">v0.4 recipe-scroll</p>
+  </div>
+</div>
 
-<div id="game">
+<!-- 選角畫面 -->
+<div id="select-screen" class="screen">
+  <div class="select-header">
+    <h2>選擇你的第一隻幽靈寵物</h2>
+    <p class="hint">其他鬼魂可在遊戲中解鎖</p>
+  </div>
+  <div class="ghost-grid" id="ghost-select-grid"></div>
+</div>
 
-  <!-- ============== HUD ============== -->
-  <header id="hud">
-    <div class="hud-left">
-      <div class="resource"><span class="ico">💰</span><span id="goldText">0</span></div>
-      <div class="resource"><span class="ico">💎</span><span id="crystalText">0</span></div>
+<!-- 主遊戲畫面 -->
+<div id="main-screen" class="screen">
+  <header class="top-bar">
+    <div class="currency">
+      <span class="coin-icon">💰</span>
+      <span id="coin-display">0</span>
+      <span class="coin-label">靈幣</span>
     </div>
-    <div class="hud-center">
-      <div class="dungeon-name" id="dungeonName">幽冥森林</div>
-      <div class="dungeon-stage" id="dungeonStage">1-1</div>
-    </div>
-    <div class="hud-right">
-      <button class="icon-btn" id="btnMute" title="靜音切換">🔊</button>
-      <button class="icon-btn" id="btnMenu">☰</button>
+    <div class="top-actions">
+      <button class="icon-btn" id="btn-forge" title="鍛造工坊">🔨</button>
+      <button class="icon-btn" id="btn-bag" title="背包">🎒</button>
+      <button class="icon-btn" id="btn-ghost-info" title="鬼魂資訊">📜</button>
+      <button class="icon-btn" id="btn-menu" title="選單">⚙️</button>
     </div>
   </header>
 
-  <!-- ============== 戰鬥場景 ============== -->
-  <section id="battleSection">
-    <canvas id="battleCanvas"></canvas>
+  <main class="stage">
+    <div class="stage-bg"></div>
 
-    <div class="enemy-info" id="enemyInfo">
-      <div class="enemy-name" id="enemyName">史萊姆</div>
-      <div class="enemy-hpbar">
-        <div class="enemy-hpfill" id="enemyHPFill"></div>
-        <div class="enemy-hptext" id="enemyHPText">100 / 100</div>
-      </div>
-      <div class="enemy-kills" id="enemyKills">擊殺 0 / 5</div>
-    </div>
-
-    <div class="hero-info" id="heroInfo">
-      <div class="hero-name">
-        幽冥騎士
-        <span class="hero-shield hidden" id="heroShield">🛡 0.0s</span>
-      </div>
-      <div class="hero-hpbar">
-        <div class="hero-hpfill" id="heroHPFill"></div>
-        <div class="hero-hptext" id="heroHPText">100 / 100</div>
-      </div>
-    </div>
-
-    <div class="floating-rewards" id="floatRewards"></div>
-  </section>
-
-  <!-- ============== 裝備欄 + 等級 ============== -->
-  <section id="equipmentSection">
-    <div id="equipmentRow"></div>
-    <div class="level-block">
-      <div class="level-text" id="levelText">Lv.1</div>
-      <div class="exp-bar"><div class="exp-fill" id="expFill"></div></div>
-      <div class="exp-text" id="expText">0 / 50</div>
-    </div>
-  </section>
-
-  <!-- ============== 技能 + 補血藥 ============== -->
-  <section id="skillSection">
-    <div id="skillRow"></div>
-    <div id="potionRow"></div>
-  </section>
-
-  <!-- ============== 屬性條 ============== -->
-  <section id="statsBar">
-    <div class="stat"><span class="lbl">⚔</span><span class="val" id="statATK">10</span></div>
-    <div class="stat"><span class="lbl">🛡</span><span class="val" id="statDEF">0</span></div>
-    <div class="stat"><span class="lbl">❤</span><span class="val" id="statHP">100</span></div>
-    <div class="stat"><span class="lbl">⚡</span><span class="val" id="statSPD">1.0</span></div>
-    <div class="stat"><span class="lbl">🎯</span><span class="val" id="statCRIT">5%</span></div>
-    <div class="stat dps"><span class="lbl">DPS</span><span class="val" id="statDPS">10</span></div>
-  </section>
-
-  <!-- ============== 背包 ============== -->
-  <section id="inventorySection">
-    <div class="section-title">
-      <span>🎒 背包 · 拖曳合成 · 雙擊穿戴</span>
-      <div class="inv-tools">
-        <button class="mini-btn" id="btnSort" title="按類型階級排序">🗂</button>
-        <button class="mini-btn" id="btnAutoMerge" title="自動合成所有同階">✨</button>
-        <button class="mini-btn" id="btnAutoEquip" title="自動穿戴最強">⚔</button>
-        <button class="mini-btn warn" id="btnSellLow" title="賣出 T1-T3 垃圾">💰</button>
-      </div>
-    </div>
-    <div id="inventoryGrid"></div>
-  </section>
-
-  <!-- ============== 操作按鈕 ============== -->
-  <section id="actions">
-    <button class="action-btn primary" id="btnSummon">
-      <span class="ico">🎁</span><span class="lbl">召喚</span>
-      <span class="cost"><span id="summonCost">100</span>💰</span>
-    </button>
-    <button class="action-btn" id="btnSummon10">
-      <span class="ico">📦</span><span class="lbl">十連</span>
-      <span class="cost"><span id="summonCost10">900</span>💰</span>
-    </button>
-    <button class="action-btn" id="btnShop">
-      <span class="ico">🏪</span><span class="lbl">商店</span>
-    </button>
-    <button class="action-btn" id="btnDungeon">
-      <span class="ico">🗺</span><span class="lbl">地城</span>
-    </button>
-  </section>
-
-</div>
-
-<!-- ============== 召喚動畫 ============== -->
-<div id="summonOverlay" class="overlay hidden">
-  <div class="summon-stage"></div>
-</div>
-
-<!-- ============== 地城選單 ============== -->
-<div id="dungeonModal" class="modal hidden">
-  <div class="modal-box">
-    <div class="modal-header">
-      <span>🗺 選擇地城</span>
-      <button class="close-btn" data-close="dungeonModal">✕</button>
-    </div>
-    <div class="modal-body">
-      <div id="dungeonList"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ============== 商店 ============== -->
-<div id="shopModal" class="modal hidden">
-  <div class="modal-box">
-    <div class="modal-header">
-      <span>🏪 商店</span>
-      <button class="close-btn" data-close="shopModal">✕</button>
-    </div>
-    <div class="modal-body" id="shopBody"></div>
-  </div>
-</div>
-
-<!-- ============== 選單 ============== -->
-<div id="menuModal" class="modal hidden">
-  <div class="modal-box">
-    <div class="modal-header">
-      <span>☰ 選單</span>
-      <button class="close-btn" data-close="menuModal">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="sound-section">
-        <div class="sound-title">🎵 音效設定</div>
-        <div class="sound-row">
-          <button class="sound-btn" id="btnToggleSfx">🔊 音效 開</button>
-          <input type="range" class="sound-slider" id="sfxVolume" min="0" max="1" step="0.05" value="0.5">
-        </div>
-        <div class="sound-row">
-          <button class="sound-btn" id="btnToggleBgm">🎵 音樂 開</button>
-          <input type="range" class="sound-slider" id="bgmVolume" min="0" max="1" step="0.05" value="0.35">
+    <div class="ghost-display" id="ghost-display">
+      <div class="ghost-avatar floating" id="ghost-avatar">👻</div>
+      <div class="ghost-name" id="ghost-name">飄飄</div>
+      <div class="ghost-level">
+        Lv.<span id="ghost-level">1</span>
+        <div class="exp-bar">
+          <div class="exp-fill" id="exp-fill" style="width:0%"></div>
         </div>
       </div>
-      <button class="menu-item" id="btnSave">💾 立即存檔</button>
-      <button class="menu-item" id="btnReset">🔄 重置遊戲</button>
-      <div class="menu-info">
-        版本 v3.0 · 含音效音樂<br>
-        自動存檔 · 離線最多 12 小時收益<br>
-        補血藥 HP &lt; 30% 自動使用<br>
-        首次點擊頁面後音效才會啟動（瀏覽器限制）
+      <div class="spirit-row">
+        <span class="spirit-icon">🔮</span>
+        <div class="spirit-bar">
+          <div class="spirit-fill" id="spirit-fill" style="width:100%"></div>
+        </div>
+        <span class="spirit-text" id="spirit-text">100 / 100</span>
+        <button class="heal-btn" id="btn-heal" title="補魂">＋</button>
+      </div>
+    </div>
+
+    <div class="drift-status" id="drift-status">
+      <div class="drift-empty" id="drift-empty">
+        <p class="drift-msg">寵物正在家裡發呆…</p>
+        <button class="btn-primary" id="btn-open-map">出門漂流</button>
+      </div>
+      <div class="drift-active hidden" id="drift-active">
+        <p class="drift-msg" id="drift-msg">漂流中...</p>
+        <div class="drift-progress">
+          <div class="drift-progress-fill" id="drift-progress-fill"></div>
+        </div>
+        <p class="drift-timer" id="drift-timer">--:--</p>
+        <button class="btn-secondary" id="btn-speedup">使用陰氣丹加速</button>
+      </div>
+      <div class="drift-done hidden" id="drift-done">
+        <p class="drift-msg">寵物回家了！</p>
+        <button class="btn-primary" id="btn-claim">領取戰利品</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bottom-bar">
+    <div class="stat-mini" title="幸運">🍀 <span id="stat-luck">5</span></div>
+    <div class="stat-mini" title="速度">💨 <span id="stat-speed">5</span></div>
+    <div class="stat-mini" title="膽量">💪 <span id="stat-courage">5</span></div>
+    <div class="stat-mini" title="感知">👁 <span id="stat-sense">5</span></div>
+  </footer>
+</div>
+
+<!-- 地圖選擇 -->
+<div id="map-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header"><h2>選擇漂流地點</h2><button class="close-btn" data-close>✕</button></div>
+    <div class="map-list" id="map-list"></div>
+  </div>
+</div>
+
+<!-- 背包 -->
+<div id="bag-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header"><h2>背包</h2><button class="close-btn" data-close>✕</button></div>
+    <div class="tabs">
+      <button class="tab active" data-tab="all">全部</button>
+      <button class="tab" data-tab="equipment">裝備</button>
+      <button class="tab" data-tab="material">素材</button>
+      <button class="tab" data-tab="consumable">消耗品</button>
+    </div>
+    <div class="bag-grid" id="bag-grid"></div>
+  </div>
+</div>
+
+<!-- 物品詳情 -->
+<div id="item-modal" class="modal">
+  <div class="modal-content small">
+    <div class="modal-header"><h2 id="item-modal-name">物品名稱</h2><button class="close-btn" data-close>✕</button></div>
+    <div class="item-detail" id="item-detail"></div>
+    <div class="item-actions" id="item-actions"></div>
+  </div>
+</div>
+
+<!-- 鬼魂資訊 -->
+<div id="ghost-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header"><h2>鬼魂資訊</h2><button class="close-btn" data-close>✕</button></div>
+    <div class="ghost-detail" id="ghost-detail"></div>
+    <h3 class="section-title">穿戴裝備</h3>
+    <div class="equip-grid" id="equip-grid"></div>
+    <h3 class="section-title">擁有的鬼魂</h3>
+    <div class="ghost-collection" id="ghost-collection"></div>
+  </div>
+</div>
+
+<!-- 鍛造工坊 -->
+<div id="forge-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header"><h2>🔨 鍛造工坊</h2><button class="close-btn" data-close>✕</button></div>
+    <div class="tabs" id="forge-tabs">
+      <button class="tab active" data-forgetab="recipe">配方</button>
+      <button class="tab" data-forgetab="enhance">強化</button>
+      <button class="tab" data-forgetab="tierup">升階</button>
+      <button class="tab" data-forgetab="material">合成素材</button>
+    </div>
+    <div class="forge-body" id="forge-body"></div>
+  </div>
+</div>
+
+<!-- 補血選單 -->
+<div id="heal-modal" class="modal">
+  <div class="modal-content small">
+    <div class="modal-header"><h2>使用補血道具</h2><button class="close-btn" data-close>✕</button></div>
+    <div class="heal-list" id="heal-list"></div>
+  </div>
+</div>
+
+<!-- 戰利品 -->
+<div id="loot-modal" class="modal special-modal">
+  <div class="modal-content loot-content">
+    <h2 class="loot-title">🌟 漂流歸來 🌟</h2>
+    <p class="loot-subtitle" id="loot-subtitle">寵物帶回了這些東西…</p>
+    <div class="loot-list" id="loot-list"></div>
+    <button class="btn-primary" id="btn-close-loot">收下</button>
+  </div>
+</div>
+
+<!-- 選單 -->
+<div id="menu-modal" class="modal">
+  <div class="modal-content small">
+    <div class="modal-header"><h2>選單</h2><button class="close-btn" data-close>✕</button></div>
+    <div class="menu-actions">
+      <button class="btn-secondary" id="btn-audio">🎵 音效設定</button>
+      <button class="btn-secondary" id="btn-save">手動存檔</button>
+      <button class="btn-secondary" id="btn-reset">重置遊戲</button>
+      <p class="menu-hint">遊戲會自動存檔到瀏覽器</p>
+    </div>
+  </div>
+</div>
+
+<!-- 音效設定 -->
+<div id="audio-modal" class="modal">
+  <div class="modal-content small">
+    <div class="modal-header"><h2>🎵 音效設定</h2><button class="close-btn" data-close>✕</button></div>
+    <div class="audio-settings">
+      <div class="audio-row">
+        <span class="audio-label">背景音樂</span>
+        <label class="switch"><input type="checkbox" id="audio-bgm-toggle" checked><span class="slider"></span></label>
+      </div>
+      <div class="audio-row">
+        <span class="audio-label">BGM 音量</span>
+        <input type="range" min="0" max="100" value="25" id="audio-bgm-vol" class="vol-slider">
+      </div>
+      <div class="audio-row">
+        <span class="audio-label">音效</span>
+        <label class="switch"><input type="checkbox" id="audio-sfx-toggle" checked><span class="slider"></span></label>
+      </div>
+      <div class="audio-row">
+        <span class="audio-label">音效音量</span>
+        <input type="range" min="0" max="100" value="55" id="audio-sfx-vol" class="vol-slider">
       </div>
     </div>
   </div>
 </div>
 
-<!-- ============== 離線獎勵彈窗 ============== -->
-<div id="offlineModal" class="modal hidden">
-  <div class="modal-box offline-box">
-    <div class="modal-header center">
-      <span>👻 主人，歡迎回來</span>
-    </div>
-    <div class="modal-body center">
-      <div class="offline-time" id="offlineTime">離線 0 分鐘</div>
-      <div class="offline-rewards">
-        <div class="offline-row"><span>💰 靈幣</span><span id="offlineGold">+0</span></div>
-        <div class="offline-row"><span>⚔ 擊殺</span><span id="offlineKills">+0</span></div>
-        <div class="offline-row"><span>⭐ 經驗</span><span id="offlineExp">+0</span></div>
-        <div class="offline-row" id="offlineDropsRow"><span>🎁 掉落</span><span id="offlineDrops">無</span></div>
+<div id="toast" class="toast"></div>
+
+<script>
+/* ============ 幽靈漂流記 - 遊戲資料 ============ */
+
+const RARITY = {
+  common:    { label: '普通', weight: 100, sellMul: 1,   color: '#c8c8d0' },
+  uncommon:  { label: '優良', weight: 50,  sellMul: 2.5, color: '#4ade80' },
+  rare:      { label: '珍貴', weight: 18,  sellMul: 6,   color: '#60a5fa' },
+  epic:      { label: '史詩', weight: 5,   sellMul: 16,  color: '#c084fc' },
+  legendary: { label: '傳說', weight: 1,   sellMul: 50,  color: '#fbbf24' },
+  mythic:    { label: '神話', weight: 0.1, sellMul: 200, color: '#f87171' },
+};
+const RARITY_ORDER = ['common','uncommon','rare','epic','legendary','mythic'];
+const RARITY_STAT_MUL = { common:1, uncommon:1.3, rare:1.7, epic:2.5, legendary:4, mythic:7 };
+
+/* ============ 鬼魂 ============ */
+const GHOSTS = [
+  {
+    id: 'piaopiao', name: '飄飄', avatar: '👻',
+    desc: '新手小白鬼，天真好奇',
+    skill: '⭐ 偶爾帶回兩件物品 (+10%)',
+    baseStats: { luck: 5, speed: 5, courage: 5, sense: 5 },
+    baseSpirit: 100,
+    unlockCost: 0,
+    bonusDropChance: 0.10,
+  },
+  {
+    id: 'mingming', name: '冥冥', avatar: '🌚',
+    desc: '暗影古靈，冷靜神秘',
+    skill: '⭐ 黑暗地圖找稀有物機率 +25%',
+    baseStats: { luck: 4, speed: 4, courage: 7, sense: 5 },
+    baseSpirit: 110,
+    unlockCost: 2000,
+    rareBoost: 0.25,
+  },
+  {
+    id: 'linlin', name: '燐燐', avatar: '🔥',
+    desc: '磷火幽靈，暴躁熱情',
+    skill: '⭐ 帶回的鍛造素材數量 +50%',
+    baseStats: { luck: 5, speed: 7, courage: 5, sense: 3 },
+    baseSpirit: 90,
+    unlockCost: 5000,
+    materialBoost: 0.5,
+  },
+];
+
+/* ============ 物品 ============ */
+const ITEMS = {
+  // ---- 素材（依 tier 分級）----
+  spider_silk:        { name: '蛛絲',     icon: '🕸️', type: 'material', tier: 1, baseValue: 8,   flavor: '黏黏的，有種感覺。' },
+  ling_stone:         { name: '靈石',     icon: '💎', type: 'material', tier: 1, baseValue: 10,  flavor: '凝聚陰氣的結晶。' },
+  ghost_bone:         { name: '幽骨',     icon: '🦴', type: 'material', tier: 2, baseValue: 15,  flavor: '不知是誰的骨頭。' },
+  soul_fire:          { name: '魂火',     icon: '🕯️', type: 'material', tier: 2, baseValue: 25,  flavor: '永不熄滅的鬼火。' },
+  moon_dust:          { name: '月光塵',   icon: '✨', type: 'material', tier: 3, baseValue: 40,  flavor: '月光的殘渣。' },
+  dark_crystal:       { name: '冥晶',     icon: '🔮', type: 'material', tier: 3, baseValue: 60,  flavor: '映照彼岸的水晶。' },
+  memory_shard:       { name: '記憶碎片', icon: '🌀', type: 'material', tier: 4, baseValue: 120, flavor: '前世的零碎片段。' },
+  underworld_essence: { name: '冥華精',   icon: '⚜️', type: 'material', tier: 5, baseValue: 400, flavor: '陰陽交界凝結而成。' },
+
+  // ---- 補血消耗品 ----
+  paper_money:   { name: '紙錢',     icon: '💴', type: 'consumable', baseValue: 20,  flavor: '燒了就能用的鬼界貨幣。', effect: 'heal', effectValue: 20 },
+  offering:      { name: '三牲供品', icon: '🍱', type: 'consumable', baseValue: 100, flavor: '剛從人間貢桌端來的。',   effect: 'heal', effectValue: 50 },
+  revival_pill:  { name: '還魂丹',   icon: '🍡', type: 'consumable', baseValue: 500, flavor: '吃下去命都能回來。',     effect: 'heal', effectValue: 9999 },
+
+  // ---- 功能消耗品 ----
+  yin_pill:       { name: '陰氣丹', icon: '💊', type: 'consumable', baseValue: 30, flavor: '吃了精神百倍（如果你還有命的話）。', effect: 'speedup' },
+  ghost_talisman: { name: '鬼符',   icon: '🪄', type: 'consumable', baseValue: 50, flavor: '據說能招來好運。',                   effect: 'luck_buff' },
+
+  // ---- 配方卷軸 ----
+  scroll_shroud:     { name: '配方：破舊壽衣',  icon: '📜', type: 'scroll', baseValue: 80,   unlocks: 'r_shroud',     flavor: '泛黃殘破的紙卷，記著縫衣手法。' },
+  scroll_bonefan:    { name: '配方：骨扇',      icon: '📜', type: 'scroll', baseValue: 120,  unlocks: 'r_bonefan',    flavor: '骨製道具的鍛造心得。' },
+  scroll_bonecrown:  { name: '配方：骸骨王冠',  icon: '📜', type: 'scroll', baseValue: 350,  unlocks: 'r_bonecrown',  flavor: '某位冥王留下的工藝祕本。' },
+  scroll_spiritrobe: { name: '配方：青魂袍',    icon: '📜', type: 'scroll', baseValue: 500,  unlocks: 'r_spiritrobe', flavor: '織匠用月光與火焰寫下的圖樣。' },
+  scroll_jade:       { name: '配方：玉墜',      icon: '📜', type: 'scroll', baseValue: 900,  unlocks: 'r_jade',       flavor: '一段細緻的玉雕工序。' },
+  scroll_yamablade:  { name: '配方：冥羅刀',    icon: '📜', type: 'scroll', baseValue: 1200, unlocks: 'r_yamablade',  flavor: '冥府鑄兵的禁傳手稿。' },
+  scroll_lantern:    { name: '配方：彼岸燈籠',  icon: '📜', type: 'scroll', baseValue: 3000, unlocks: 'r_lantern',    flavor: '據說只有彼岸花下能讀懂。' },
+  scroll_yamaseal:   { name: '配方：閻王印',    icon: '📜', type: 'scroll', baseValue: 9000, unlocks: 'r_yamaseal',   flavor: '蓋著閻王朱印的工藝禁書。' },
+
+  // ---- 裝備 ----
+  paper_hat:         { name: '紙糊帽',   icon: '🎩', type: 'equipment', slot: 'head',      baseValue: 20,   stats: { sense: 2 },                       flavor: '便宜，但會破。' },
+  bone_crown:        { name: '骸骨王冠', icon: '👑', type: 'equipment', slot: 'head',      baseValue: 80,   stats: { sense: 5, courage: 2 },           flavor: '某位過氣冥王的遺物。' },
+  yama_helm:         { name: '冥府冠冕', icon: '🪦', type: 'equipment', slot: 'head',      baseValue: 1500, stats: { sense: 12, courage: 8 },          flavor: '只有死過的人才戴得起。' },
+  shroud:            { name: '破舊壽衣', icon: '👘', type: 'equipment', slot: 'body',      baseValue: 25,   stats: { courage: 2 },                     flavor: '上面還有摺痕。' },
+  spirit_robe:       { name: '青魂袍',   icon: '🥋', type: 'equipment', slot: 'body',      baseValue: 100,  stats: { courage: 4, luck: 3 },            flavor: '飄逸到不行。' },
+  ghost_master_robe: { name: '陰陽道袍', icon: '🎴', type: 'equipment', slot: 'body',      baseValue: 1500, stats: { luck: 8, courage: 10, sense: 8 }, flavor: '陰陽兩界皆認得的法衣。' },
+  bone_fan:          { name: '骨扇',     icon: '🪭', type: 'equipment', slot: 'weapon',    baseValue: 30,   stats: { luck: 2 },                        flavor: '搧出陰風一陣。' },
+  yama_blade:        { name: '冥羅刀',   icon: '🗡️', type: 'equipment', slot: 'weapon',    baseValue: 120,  stats: { luck: 4, speed: 3 },              flavor: '殺氣有點重。' },
+  hibana_lantern:    { name: '彼岸燈籠', icon: '🏮', type: 'equipment', slot: 'weapon',    baseValue: 1200, stats: { luck: 10, speed: 6, sense: 5 },   flavor: '指引迷途幽魂的明燈。' },
+  copper_coin:       { name: '銅錢符',   icon: '🪙', type: 'equipment', slot: 'accessory', baseValue: 15,   stats: { luck: 1 },                        flavor: '冥府通用貨幣。' },
+  jade_pendant:      { name: '玉墜',     icon: '💚', type: 'equipment', slot: 'accessory', baseValue: 90,   stats: { luck: 3, sense: 2 },              flavor: '溫潤如人界記憶。' },
+  yama_seal:         { name: '閻王印',   icon: '🟥', type: 'equipment', slot: 'accessory', baseValue: 800,  stats: { luck: 8, courage: 6, sense: 4 },  flavor: '蓋下去什麼都做數。' },
+};
+
+/* ============ 地圖 ============ */
+const ZONES = [
+  {
+    id: 'old_house', name: '廢棄古宅', icon: '🏚️',
+    duration: 30, minGhostLevel: 1, unlockCost: 0, spiritCost: 10,
+    desc: '陰風陣陣，蛛網滿佈。',
+    drops: [
+      { id: 'spider_silk', weight: 100, count: [1,3] },
+      { id: 'ling_stone',  weight: 80,  count: [1,2] },
+      { id: 'ghost_bone',  weight: 40,  count: [1,1] },
+      { id: 'paper_money', weight: 35,  count: [1,2] },
+      { id: 'copper_coin', weight: 30,  count: [1,1] },
+      { id: 'paper_hat',   weight: 15,  count: [1,1] },
+      { id: 'shroud',      weight: 12,  count: [1,1] },
+      { id: 'bone_fan',    weight: 10,  count: [1,1] },
+      { id: 'yin_pill',    weight: 8,   count: [1,1] },
+      // 卷軸（低階）
+      { id: 'scroll_shroud',  weight: 4, count: [1,1] },
+      { id: 'scroll_bonefan', weight: 3, count: [1,1] },
+    ],
+    rarityWeights: { common: 70, uncommon: 25, rare: 4.5, epic: 0.5 },
+  },
+  {
+    id: 'graveyard', name: '亂葬崗', icon: '⚰️',
+    duration: 90, minGhostLevel: 5, unlockCost: 800, spiritCost: 25,
+    desc: '骸骨堆積，怨氣四溢。',
+    drops: [
+      { id: 'ghost_bone',    weight: 100, count: [2,4] },
+      { id: 'ling_stone',    weight: 70,  count: [1,3] },
+      { id: 'soul_fire',     weight: 50,  count: [1,2] },
+      { id: 'offering',      weight: 30,  count: [1,1] },
+      { id: 'shroud',        weight: 25,  count: [1,1] },
+      { id: 'bone_crown',    weight: 15,  count: [1,1] },
+      { id: 'yama_blade',    weight: 10,  count: [1,1] },
+      { id: 'ghost_talisman',weight: 12,  count: [1,2] },
+      { id: 'spirit_robe',   weight: 8,   count: [1,1] },
+      // 卷軸（中階）
+      { id: 'scroll_bonecrown',  weight: 4, count: [1,1] },
+      { id: 'scroll_spiritrobe', weight: 3, count: [1,1] },
+      { id: 'scroll_jade',       weight: 2, count: [1,1] },
+      { id: 'scroll_yamablade',  weight: 2, count: [1,1] },
+    ],
+    rarityWeights: { common: 50, uncommon: 32, rare: 14, epic: 3.5, legendary: 0.5 },
+  },
+  {
+    id: 'spirit_forest', name: '幽冥森林', icon: '🌲',
+    duration: 180, minGhostLevel: 12, unlockCost: 3000, spiritCost: 50,
+    desc: '入夜的森林，連月光都不敢進來。',
+    drops: [
+      { id: 'soul_fire',          weight: 100, count: [2,4] },
+      { id: 'dark_crystal',       weight: 60,  count: [1,2] },
+      { id: 'moon_dust',          weight: 70,  count: [1,3] },
+      { id: 'offering',           weight: 30,  count: [1,2] },
+      { id: 'revival_pill',       weight: 5,   count: [1,1] },
+      { id: 'spirit_robe',        weight: 20,  count: [1,1] },
+      { id: 'yama_blade',         weight: 18,  count: [1,1] },
+      { id: 'jade_pendant',       weight: 15,  count: [1,1] },
+      { id: 'bone_crown',         weight: 12,  count: [1,1] },
+      { id: 'memory_shard',       weight: 10,  count: [1,1] },
+      { id: 'yama_seal',          weight: 2,   count: [1,1] },
+      { id: 'hibana_lantern',     weight: 1,   count: [1,1] },
+      { id: 'underworld_essence', weight: 1,   count: [1,1] },
+      // 卷軸（高階）
+      { id: 'scroll_yamablade', weight: 3, count: [1,1] },
+      { id: 'scroll_lantern',   weight: 2, count: [1,1] },
+      { id: 'scroll_yamaseal',  weight: 1, count: [1,1] },
+    ],
+    rarityWeights: { common: 30, uncommon: 35, rare: 25, epic: 8, legendary: 1.8, mythic: 0.2 },
+  },
+];
+
+/* ============ 配方鍛造 ============ */
+const RECIPES = [
+  // common
+  { id: 'r_paperhat',   result: 'paper_hat',   rarity: 'common',
+    mats: { spider_silk: 5, ling_stone: 2 }, coin: 50, desc: '紙與絲縫成的簡陋頭飾。' },
+  { id: 'r_shroud',     result: 'shroud',      rarity: 'common',
+    mats: { spider_silk: 8, ghost_bone: 2 }, coin: 60, desc: '湊合著穿吧。' },
+  { id: 'r_bonefan',    result: 'bone_fan',    rarity: 'common',
+    mats: { ghost_bone: 3, soul_fire: 1 }, coin: 80, desc: '一搧便起陰風。' },
+  { id: 'r_coppercoin', result: 'copper_coin', rarity: 'common',
+    mats: { ling_stone: 5 }, coin: 30, desc: '冥幣鍛造的護符。' },
+  // uncommon
+  { id: 'r_bonecrown',  result: 'bone_crown',  rarity: 'uncommon',
+    mats: { ghost_bone: 6, soul_fire: 2, ling_stone: 3 }, coin: 200, desc: '王冠由骨頭與火焰焊成。' },
+  { id: 'r_spiritrobe', result: 'spirit_robe', rarity: 'uncommon',
+    mats: { moon_dust: 3, soul_fire: 2, dark_crystal: 1 }, coin: 350, desc: '月光與火焰織就的法袍。' },
+  // rare
+  { id: 'r_jade',       result: 'jade_pendant',rarity: 'rare',
+    mats: { dark_crystal: 2, moon_dust: 4, ling_stone: 8 }, coin: 600, desc: '玉石裡封了一縷魂。' },
+  { id: 'r_yamablade',  result: 'yama_blade',  rarity: 'rare',
+    mats: { ghost_bone: 10, soul_fire: 6, dark_crystal: 2 }, coin: 800, desc: '冥羅鑄成的鬼刀。' },
+  // epic
+  { id: 'r_lantern',    result: 'hibana_lantern', rarity: 'epic',
+    mats: { soul_fire: 12, moon_dust: 8, dark_crystal: 5, memory_shard: 2 }, coin: 2000, desc: '彼岸花田的引魂燈。' },
+  // legendary
+  { id: 'r_yamaseal',   result: 'yama_seal',   rarity: 'legendary',
+    mats: { dark_crystal: 10, moon_dust: 8, memory_shard: 5, underworld_essence: 1 }, coin: 6000, desc: '需要閻王的默許才能蓋成。' },
+];
+
+/* ============ 素材合成 ============ */
+const MATERIAL_RECIPES = [
+  { id: 'mr_spider2bone',   input: { spider_silk: 5 },                input2: null, output: { ghost_bone: 1 } },
+  { id: 'mr_ling2fire',     input: { ling_stone: 5 },                 input2: null, output: { soul_fire: 1 } },
+  { id: 'mr_fire2crystal',  input: { soul_fire: 5 },                  input2: null, output: { dark_crystal: 1 } },
+  { id: 'mr_dust2memory',   input: { moon_dust: 3, dark_crystal: 1 }, input2: null, output: { memory_shard: 1 } },
+  { id: 'mr_memory2essence',input: { memory_shard: 5, dark_crystal: 3 }, input2: null, output: { underworld_essence: 1 } },
+];
+
+/* ============ 強化系統 ============ */
+const ENHANCE_STAT_PER_LEVEL = 0.10;
+const ENHANCE_MAX = 15;
+
+function enhanceData(currentLv) {
+  const next = currentLv + 1;
+  if (next > ENHANCE_MAX) return null;
+  if (next <= 4)  return { successRate: 1.00, mats: { ling_stone: 2 * next },                                            coin: 50 * next };
+  if (next <= 9)  return { successRate: 0.80, mats: { ling_stone: 5 * next, soul_fire: next - 3 },                       coin: 200 * next };
+  return            { successRate: 0.50, mats: { soul_fire: 3 * next, dark_crystal: next - 8, memory_shard: 1 },          coin: 1000 * next };
+}
+
+/* ============ 升階鍛造 ============ */
+const TIER_UP_REQUIRED = 3;
+const TIER_UP_COIN = { common: 100, uncommon: 300, rare: 800, epic: 2500, legendary: 8000 };
+
+/* ============ 等級曲線 ============ */
+function expForLevel(lv) { return Math.floor(50 * Math.pow(lv, 1.6)); }
+function maxSpirit(ghost, ghostDef) { return ghostDef.baseSpirit + (ghost.level - 1) * 5; }
+
+/* ============ 漂流獎勵 ============ */
+function zoneRewards(zone) {
+  return {
+    exp: Math.floor(zone.duration * 0.8 + zone.minGhostLevel * 10),
+    coins: Math.floor(zone.duration * 0.5 + zone.minGhostLevel * 5),
+  };
+}
+
+/* ============ 魂力 ============ */
+const SPIRIT_REGEN_PER_SEC = 1 / 30; // 每 30 秒回 1 點
+
+/* ============ 幽靈漂流記 - 主邏輯 ============ */
+const SAVE_KEY = 'ghost_drift_save_v04_single';
+const AUDIO_KEY = 'ghost_drift_audio_v02';
+
+// ============ 音效引擎 ============
+const Audio = {
+  ctx: null, master: null, bgmGain: null, sfxGain: null,
+  bgmNodes: [],
+  cfg: { bgmOn: true, sfxOn: true, bgmVol: 0.25, sfxVol: 0.55 },
+
+  loadCfg() {
+    try { const raw = localStorage.getItem(AUDIO_KEY); if (raw) Object.assign(this.cfg, JSON.parse(raw)); } catch {}
+  },
+  saveCfg() { localStorage.setItem(AUDIO_KEY, JSON.stringify(this.cfg)); },
+
+  init() {
+    if (this.ctx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    this.ctx = new AC();
+    this.master = this.ctx.createGain(); this.master.gain.value = 1; this.master.connect(this.ctx.destination);
+    this.bgmGain = this.ctx.createGain(); this.bgmGain.gain.value = this.cfg.bgmOn ? this.cfg.bgmVol : 0; this.bgmGain.connect(this.master);
+    this.sfxGain = this.ctx.createGain(); this.sfxGain.gain.value = this.cfg.sfxOn ? this.cfg.sfxVol : 0; this.sfxGain.connect(this.master);
+  },
+  resume() { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); },
+
+  // 基本音色
+  tone(freq, dur, type = 'sine', vol = 0.2, delay = 0) {
+    if (!this.ctx || !this.cfg.sfxOn) return;
+    const now = this.ctx.currentTime + delay;
+    const o = this.ctx.createOscillator(); o.type = type; o.frequency.value = freq;
+    const g = this.ctx.createGain();
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(vol, now + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    o.connect(g); g.connect(this.sfxGain);
+    o.start(now); o.stop(now + dur + 0.05);
+  },
+  sweep(fromF, toF, dur, type = 'sine', vol = 0.15, delay = 0) {
+    if (!this.ctx || !this.cfg.sfxOn) return;
+    const now = this.ctx.currentTime + delay;
+    const o = this.ctx.createOscillator(); o.type = type;
+    o.frequency.setValueAtTime(fromF, now);
+    o.frequency.exponentialRampToValueAtTime(toF, now + dur);
+    const g = this.ctx.createGain();
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(vol, now + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    o.connect(g); g.connect(this.sfxGain);
+    o.start(now); o.stop(now + dur + 0.05);
+  },
+  bell(freq, dur = 0.5, delay = 0) {
+    if (!this.ctx || !this.cfg.sfxOn) return;
+    const now = this.ctx.currentTime + delay;
+    // 雙振盪器模擬鐘音
+    [1, 2.76].forEach((mul, i) => {
+      const o = this.ctx.createOscillator(); o.type = 'sine'; o.frequency.value = freq * mul;
+      const g = this.ctx.createGain();
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(i ? 0.06 : 0.18, now + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      o.connect(g); g.connect(this.sfxGain);
+      o.start(now); o.stop(now + dur + 0.05);
+    });
+  },
+  chord(freqs, dur = 0.35, type = 'sine', vol = 0.13) {
+    freqs.forEach((f, i) => this.tone(f, dur, type, vol, i * 0.04));
+  },
+  noise(dur, vol = 0.05, delay = 0) {
+    if (!this.ctx || !this.cfg.sfxOn) return;
+    const now = this.ctx.currentTime + delay;
+    const buf = this.ctx.createBuffer(1, this.ctx.sampleRate * dur, this.ctx.sampleRate);
+    const ch = buf.getChannelData(0);
+    for (let i = 0; i < ch.length; i++) ch[i] = (Math.random() * 2 - 1);
+    const src = this.ctx.createBufferSource(); src.buffer = buf;
+    const filt = this.ctx.createBiquadFilter(); filt.type = 'bandpass'; filt.frequency.value = 800; filt.Q.value = 1.5;
+    const g = this.ctx.createGain();
+    g.gain.setValueAtTime(vol, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    src.connect(filt); filt.connect(g); g.connect(this.sfxGain);
+    src.start(now); src.stop(now + dur + 0.05);
+  },
+
+  // ============ 具名 SFX ============
+  click()       { this.tone(700, 0.04, 'square', 0.05); },
+  modalOpen()   { this.sweep(330, 660, 0.15, 'sine', 0.08); },
+  modalClose()  { this.sweep(660, 330, 0.12, 'sine', 0.06); },
+  toast()       { this.tone(660, 0.08, 'sine', 0.08); },
+  driftStart()  { this.sweep(180, 900, 0.45, 'sine', 0.12); this.noise(0.4, 0.025); },
+  driftReturn() { this.bell(523, 0.6); this.bell(784, 0.6, 0.12); },
+  coin()        { this.tone(988, 0.05, 'sine', 0.1); this.tone(1318, 0.06, 'sine', 0.08, 0.04); },
+  heal()        { this.tone(587, 0.18, 'sine', 0.15); this.tone(880, 0.22, 'sine', 0.12, 0.08); },
+  levelUp()     { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.18, 'triangle', 0.18, i * 0.08)); },
+  forgeSuccess(){ this.noise(0.08, 0.08); this.bell(880, 0.4, 0.08); this.bell(1175, 0.5, 0.18); },
+  forgeFail()   { this.sweep(400, 80, 0.5, 'sawtooth', 0.1); },
+  equip()       { this.tone(523, 0.08, 'triangle', 0.12); this.tone(784, 0.1, 'triangle', 0.1, 0.04); },
+  unequip()     { this.tone(440, 0.08, 'triangle', 0.1); },
+  speedup()     { this.sweep(880, 1760, 0.2, 'square', 0.08); },
+  // 開箱：依品質
+  lootByRarity(rarity) {
+    switch (rarity) {
+      case 'common':    return this.tone(523, 0.12, 'sine', 0.12);
+      case 'uncommon':  return this.chord([523, 659], 0.2);
+      case 'rare':      return this.chord([523, 659, 784], 0.28);
+      case 'epic':      return this.chord([392, 523, 659, 784], 0.4, 'triangle', 0.15);
+      case 'legendary': { this.chord([261, 329, 392, 523, 659], 0.5, 'triangle', 0.16); this.bell(1047, 0.7, 0.3); return; }
+      case 'mythic':    {
+        this.noise(0.2, 0.1);
+        this.chord([196, 247, 311, 392, 466, 587], 0.6, 'sawtooth', 0.14);
+        this.bell(1318, 1.0, 0.4);
+        this.bell(1568, 0.9, 0.6);
+        return;
+      }
+    }
+  },
+
+  // ============ BGM：程序化氛圍音樂 ============
+  startBGM() {
+    if (!this.ctx || !this.cfg.bgmOn || this.bgmNodes.length) return;
+    const now = this.ctx.currentTime;
+
+    // 低音 drone（兩個微微錯位的振盪器）
+    [55, 55.3, 82.5].forEach(f => {
+      const o = this.ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+      const g = this.ctx.createGain(); g.gain.value = 0.12;
+      // 慢呼吸 LFO
+      const lfo = this.ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.08;
+      const lfoG = this.ctx.createGain(); lfoG.gain.value = 0.05;
+      lfo.connect(lfoG); lfoG.connect(g.gain);
+      o.connect(g); g.connect(this.bgmGain);
+      o.start(now); lfo.start(now);
+      this.bgmNodes.push(o, lfo);
+    });
+
+    // 高音 pad（D 小調）
+    const padFreqs = [293.66, 349.23, 440]; // D F A
+    padFreqs.forEach((f, i) => {
+      const o = this.ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+      const g = this.ctx.createGain(); g.gain.value = 0.018;
+      const lfo = this.ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.05 + i * 0.02;
+      const lfoG = this.ctx.createGain(); lfoG.gain.value = 0.015;
+      lfo.connect(lfoG); lfoG.connect(g.gain);
+      o.connect(g); g.connect(this.bgmGain);
+      o.start(now); lfo.start(now);
+      this.bgmNodes.push(o, lfo);
+    });
+
+    // 隨機琴音點綴
+    const scale = [261.63, 293.66, 349.23, 392, 440, 523.25, 587.33, 659.25];
+    const pluck = () => {
+      if (!this.ctx || !this.cfg.bgmOn) return;
+      const f = scale[Math.floor(Math.random() * scale.length)];
+      const dur = 1.2;
+      const t = this.ctx.currentTime;
+      const o = this.ctx.createOscillator(); o.type = 'triangle'; o.frequency.value = f;
+      const g = this.ctx.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.06, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.connect(g); g.connect(this.bgmGain);
+      o.start(t); o.stop(t + dur + 0.05);
+    };
+    this.pluckTimer = setInterval(() => { if (Math.random() < 0.6) pluck(); }, 2200);
+  },
+  stopBGM() {
+    this.bgmNodes.forEach(n => { try { n.stop(); } catch {} });
+    this.bgmNodes = [];
+    if (this.pluckTimer) { clearInterval(this.pluckTimer); this.pluckTimer = null; }
+  },
+
+  setBgmOn(on) {
+    this.cfg.bgmOn = on; this.saveCfg();
+    if (!this.ctx) return;
+    if (on) { this.bgmGain.gain.value = this.cfg.bgmVol; this.startBGM(); }
+    else    { this.bgmGain.gain.value = 0; this.stopBGM(); }
+  },
+  setSfxOn(on) {
+    this.cfg.sfxOn = on; this.saveCfg();
+    if (this.sfxGain) this.sfxGain.gain.value = on ? this.cfg.sfxVol : 0;
+  },
+  setBgmVol(v) { this.cfg.bgmVol = v; this.saveCfg(); if (this.bgmGain && this.cfg.bgmOn) this.bgmGain.gain.value = v; },
+  setSfxVol(v) { this.cfg.sfxVol = v; this.saveCfg(); if (this.sfxGain && this.cfg.sfxOn) this.sfxGain.gain.value = v; },
+};
+
+// ============ 狀態 ============
+let state = null;
+
+function defaultState() {
+  return {
+    activeGhostId: null,
+    coins: 0,
+    ghosts: {},        // { id: { level, exp, spirit, equipped, lastTickAt } }
+    inventory: {},     // { itemId: { count } }
+    equipment: [],     // [{ uid, itemId, rarity, stats, enhance }]
+    drift: null,
+    unlockedZones: ['old_house'],
+    unlockedRecipes: ['r_paperhat', 'r_coppercoin'], // 初始解鎖兩個 common
+  };
+}
+
+// ============ 存取 ============
+function save() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+function load() {
+  const raw = localStorage.getItem(SAVE_KEY);
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+function resetGame() { localStorage.removeItem(SAVE_KEY); state = defaultState(); showScreen('title-screen'); }
+
+// ============ Util ============
+function uid() { return Math.random().toString(36).slice(2,10); }
+function randInt(a,b) { return Math.floor(Math.random()*(b-a+1))+a; }
+function pickWeighted(list, weightFn) {
+  const total = list.reduce((s,x)=>s+weightFn(x),0);
+  let r = Math.random()*total;
+  for (const x of list) { r -= weightFn(x); if (r<=0) return x; }
+  return list[list.length-1];
+}
+function clamp(n,mi,ma){ return Math.max(mi, Math.min(ma, n)); }
+
+function getGhost(id) { return GHOSTS.find(g=>g.id===id); }
+function getZone(id)  { return ZONES.find(z=>z.id===id); }
+function getItem(id)  { return ITEMS[id]; }
+function activeGhost() { return state.activeGhostId ? state.ghosts[state.activeGhostId] : null; }
+function activeGhostDef() { return getGhost(state.activeGhostId); }
+
+// ============ 屬性計算 ============
+function applyEnhanceToStats(stats, enhanceLv) {
+  if (!stats) return {};
+  const mul = 1 + (enhanceLv || 0) * ENHANCE_STAT_PER_LEVEL;
+  const out = {};
+  for (const k of Object.keys(stats)) out[k] = Math.max(1, Math.round(stats[k] * mul));
+  return out;
+}
+
+function ghostTotalStats(ghostId) {
+  const gDef = getGhost(ghostId);
+  const g = state.ghosts[ghostId];
+  if (!gDef || !g) return { luck:0, speed:0, courage:0, sense:0 };
+  const stats = { ...gDef.baseStats };
+  for (const k of Object.keys(stats)) stats[k] += (g.level - 1);
+  for (const slot of Object.keys(g.equipped)) {
+    const eqUid = g.equipped[slot];
+    if (!eqUid) continue;
+    const eq = state.equipment.find(e=>e.uid===eqUid);
+    if (!eq) continue;
+    const enhanced = applyEnhanceToStats(eq.stats, eq.enhance);
+    for (const k of Object.keys(enhanced)) stats[k] = (stats[k]||0) + enhanced[k];
+  }
+  return stats;
+}
+
+// ============ 物品系統 ============
+function addItem(itemId, count = 1, forcedRarity = null) {
+  const def = getItem(itemId);
+  if (!def) return;
+  if (def.type === 'equipment') {
+    const rarity = forcedRarity || rollItemRarity(itemId);
+    for (let i=0; i<count; i++) {
+      state.equipment.push({
+        uid: uid(), itemId, rarity, enhance: 0,
+        stats: scaleStatsByRarity(def.stats || {}, rarity),
+      });
+    }
+  } else {
+    if (!state.inventory[itemId]) state.inventory[itemId] = { count: 0 };
+    state.inventory[itemId].count += count;
+  }
+}
+
+function removeItem(itemId, count = 1) {
+  const inv = state.inventory[itemId];
+  if (!inv || inv.count < count) return false;
+  inv.count -= count;
+  if (inv.count <= 0) delete state.inventory[itemId];
+  return true;
+}
+
+function hasMaterials(matObj) {
+  for (const [id, n] of Object.entries(matObj)) {
+    if (!state.inventory[id] || state.inventory[id].count < n) return false;
+  }
+  return true;
+}
+
+function consumeMaterials(matObj) {
+  for (const [id, n] of Object.entries(matObj)) removeItem(id, n);
+}
+
+function rollItemRarity(itemId, weights = null) {
+  weights = weights || { common: 70, uncommon: 25, rare: 4, epic: 1 };
+  const arr = Object.entries(weights);
+  const total = arr.reduce((s,[,w])=>s+w, 0);
+  let r = Math.random()*total;
+  for (const [k,w] of arr) { r -= w; if (r<=0) return k; }
+  return 'common';
+}
+
+function scaleStatsByRarity(stats, rarity) {
+  const mul = RARITY_STAT_MUL[rarity] || 1;
+  const out = {};
+  for (const k of Object.keys(stats)) out[k] = Math.max(1, Math.round(stats[k] * mul));
+  return out;
+}
+
+function itemValue(itemId, rarity = 'common', enhance = 0) {
+  const def = getItem(itemId);
+  if (!def) return 0;
+  const rMul = RARITY[rarity]?.sellMul || 1;
+  const enhMul = 1 + enhance * 0.3;
+  return Math.floor(def.baseValue * rMul * enhMul);
+}
+
+// ============ 漂流系統 ============
+function startDrift(zoneId) {
+  const zone = getZone(zoneId);
+  if (!zone) return;
+  if (state.drift) { toast('已經有寵物在漂流了'); return; }
+  const g = activeGhost();
+  const gDef = activeGhostDef();
+  if (!g || !gDef) { toast('沒有可用的鬼魂'); return; }
+  if (g.level < zone.minGhostLevel) { toast('鬼魂等級不足'); return; }
+  if (!state.unlockedZones.includes(zoneId)) { toast('地圖未解鎖'); return; }
+  if (g.spirit < zone.spiritCost) { toast(`魂力不足！需要 ${zone.spiritCost}`); return; }
+
+  // 消耗魂力
+  g.spirit = Math.max(0, g.spirit - zone.spiritCost);
+
+  const stats = ghostTotalStats(state.activeGhostId);
+  const speedMul = clamp(1 - stats.speed * 0.02, 0.6, 1);
+  const duration = Math.floor(zone.duration * speedMul);
+
+  state.drift = {
+    ghostId: state.activeGhostId,
+    zoneId, startTime: Date.now(), duration, done: false,
+  };
+  save();
+  closeModal('map-modal');
+  renderMain();
+  Audio.driftStart();
+  toast(`${gDef.name} 出發前往 ${zone.name}！消耗 ${zone.spiritCost} 魂力`);
+}
+
+function driftRemaining() {
+  if (!state.drift) return 0;
+  const elapsed = (Date.now() - state.drift.startTime) / 1000;
+  return Math.max(0, state.drift.duration - elapsed);
+}
+
+function speedupDrift() {
+  if (!state.drift) { toast('沒有正在漂流的寵物'); return; }
+  if (!state.inventory['yin_pill'] || state.inventory['yin_pill'].count <= 0) { toast('沒有陰氣丹'); return; }
+  removeItem('yin_pill', 1);
+  const remain = driftRemaining();
+  state.drift.startTime = Date.now() - (state.drift.duration - remain/2)*1000;
+  save();
+  Audio.speedup();
+  renderMain();
+  toast('使用了陰氣丹！剩餘時間減半');
+}
+
+function rollDriftLoot() {
+  const zone = getZone(state.drift.zoneId);
+  const gDef = getGhost(state.drift.ghostId);
+  const stats = ghostTotalStats(state.drift.ghostId);
+
+  const rarityWeights = { ...zone.rarityWeights };
+  const luckBoost = 1 + stats.luck * 0.03;
+  if (rarityWeights.rare)      rarityWeights.rare      *= luckBoost;
+  if (rarityWeights.epic)      rarityWeights.epic      *= luckBoost * 1.2;
+  if (rarityWeights.legendary) rarityWeights.legendary *= luckBoost * 1.5;
+  if (rarityWeights.mythic)    rarityWeights.mythic    *= luckBoost * 2;
+
+  let itemCount = 3 + Math.floor(stats.sense / 5);
+  if (gDef.bonusDropChance && Math.random() < gDef.bonusDropChance) itemCount += 1;
+
+  const loots = [];
+  for (let i=0; i<itemCount; i++) {
+    const drop = pickWeighted(zone.drops, d=>d.weight);
+    const def = getItem(drop.id);
+    let count = randInt(drop.count[0], drop.count[1]);
+    if (def.type === 'material' && gDef.materialBoost) count = Math.ceil(count * (1 + gDef.materialBoost));
+    let rarity = null;
+    if (def.type === 'equipment') rarity = rollItemRarity(drop.id, rarityWeights);
+    loots.push({ itemId: drop.id, count, rarity });
+  }
+  return loots;
+}
+
+function claimDrift() {
+  if (!state.drift || driftRemaining() > 0) return;
+  const zone = getZone(state.drift.zoneId);
+  const rewards = zoneRewards(zone);
+  const loots = rollDriftLoot();
+  for (const l of loots) addItem(l.itemId, l.count, l.rarity);
+  state.coins += rewards.coins;
+  addExp(state.drift.ghostId, rewards.exp);
+  state.drift = null;
+  save();
+  Audio.driftReturn();
+  // 找最高品質播一次戰利品音效
+  const bestRarity = loots.reduce((best, l) => {
+    const r = l.rarity || 'common';
+    return RARITY_ORDER.indexOf(r) > RARITY_ORDER.indexOf(best) ? r : best;
+  }, 'common');
+  setTimeout(() => Audio.lootByRarity(bestRarity), 350);
+  showLoot(loots, rewards);
+  renderMain();
+}
+
+// ============ 等級 ============
+function addExp(ghostId, amount) {
+  const g = state.ghosts[ghostId];
+  const gDef = getGhost(ghostId);
+  if (!g) return;
+  g.exp += amount;
+  while (g.exp >= expForLevel(g.level)) {
+    g.exp -= expForLevel(g.level);
+    g.level += 1;
+    g.spirit = maxSpirit(g, gDef);
+    Audio.levelUp();
+    toast(`${gDef.name} 升到 Lv.${g.level}！魂力上限提升`);
+  }
+}
+
+// ============ 魂力 ============
+function spiritTick() {
+  const now = Date.now();
+  for (const gid of Object.keys(state.ghosts)) {
+    const g = state.ghosts[gid];
+    const gDef = getGhost(gid);
+    if (!gDef) continue;
+    // 正在漂流的不回復
+    if (state.drift && state.drift.ghostId === gid) { g.lastTickAt = now; continue; }
+    if (!g.lastTickAt) g.lastTickAt = now;
+    const sec = (now - g.lastTickAt) / 1000;
+    if (sec >= 1) {
+      const max = maxSpirit(g, gDef);
+      g.spirit = Math.min(max, g.spirit + sec * SPIRIT_REGEN_PER_SEC);
+      g.lastTickAt = now;
+    }
+  }
+}
+
+// ============ 配方卷軸 ============
+function useScroll(itemId) {
+  const def = getItem(itemId);
+  if (!def || def.type !== 'scroll') return;
+  if (!state.inventory[itemId] || state.inventory[itemId].count <= 0) { toast('沒有這個卷軸'); return; }
+  const recipeId = def.unlocks;
+  if (state.unlockedRecipes.includes(recipeId)) {
+    toast('這個配方已經學過了');
+    return;
+  }
+  removeItem(itemId, 1);
+  state.unlockedRecipes.push(recipeId);
+  save();
+  Audio.levelUp();
+  const r = RECIPES.find(x => x.id === recipeId);
+  const targetDef = r ? getItem(r.result) : null;
+  toast(`✨ 解鎖配方：${targetDef ? targetDef.name : recipeId}！`);
+  renderBag();
+  renderMain();
+}
+
+function hasUnusedScrolls() {
+  for (const [id, data] of Object.entries(state.inventory)) {
+    const def = getItem(id);
+    if (def && def.type === 'scroll' && data.count > 0 && !state.unlockedRecipes.includes(def.unlocks)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function useHealItem(itemId) {
+  const def = getItem(itemId);
+  if (!def || def.effect !== 'heal') return;
+  if (!state.inventory[itemId] || state.inventory[itemId].count <= 0) { toast('沒有這個道具'); return; }
+  const g = activeGhost();
+  const gDef = activeGhostDef();
+  if (!g) return;
+  const max = maxSpirit(g, gDef);
+  if (g.spirit >= max) { toast('魂力已滿'); return; }
+  removeItem(itemId, 1);
+  const before = Math.floor(g.spirit);
+  g.spirit = Math.min(max, g.spirit + def.effectValue);
+  save();
+  Audio.heal();
+  renderMain();
+  toast(`恢復了 ${Math.floor(g.spirit) - before} 魂力`);
+}
+
+// ============ 解鎖 ============
+function unlockGhost(ghostId) {
+  if (state.ghosts[ghostId]) return false;
+  const def = getGhost(ghostId);
+  if (!def) return false;
+  if (state.coins < def.unlockCost) { toast(`需要 ${def.unlockCost} 靈幣`); return false; }
+  state.coins -= def.unlockCost;
+  state.ghosts[ghostId] = {
+    level: 1, exp: 0,
+    spirit: def.baseSpirit,
+    lastTickAt: Date.now(),
+    equipped: { head: null, body: null, weapon: null, accessory: null },
+  };
+  if (!state.activeGhostId) state.activeGhostId = ghostId;
+  save();
+  toast(`解鎖了 ${def.name}！`);
+  return true;
+}
+
+function switchActive(ghostId) {
+  if (!state.ghosts[ghostId]) return;
+  if (state.drift && state.drift.ghostId !== ghostId) { toast('目前有鬼魂在漂流'); return; }
+  state.activeGhostId = ghostId;
+  save();
+  renderMain();
+  toast(`已切換到 ${getGhost(ghostId).name}`);
+}
+
+function unlockZone(zoneId) {
+  const zone = getZone(zoneId);
+  if (!zone || state.unlockedZones.includes(zoneId)) return;
+  if (state.coins < zone.unlockCost) { toast(`需要 ${zone.unlockCost} 靈幣`); return; }
+  state.coins -= zone.unlockCost;
+  state.unlockedZones.push(zoneId);
+  save();
+  toast(`解鎖地圖：${zone.name}`);
+  renderMapList();
+  renderMain();
+}
+
+// ============ 裝備 ============
+function isEquipped(eqUid) {
+  for (const gid of Object.keys(state.ghosts)) {
+    const g = state.ghosts[gid];
+    for (const s of Object.keys(g.equipped)) if (g.equipped[s] === eqUid) return true;
+  }
+  return false;
+}
+
+function equipItem(eqUid) {
+  const eq = state.equipment.find(e=>e.uid===eqUid);
+  if (!eq) return;
+  const def = getItem(eq.itemId);
+  const g = activeGhost();
+  if (!g) return;
+  g.equipped[def.slot] = eq.uid;
+  save();
+  Audio.equip();
+  renderMain();
+  renderGhostModal();
+  closeModal('item-modal');
+  toast(`穿上了 ${def.name}`);
+}
+
+function unequipUid(eqUid) {
+  for (const gid of Object.keys(state.ghosts)) {
+    const g = state.ghosts[gid];
+    for (const s of Object.keys(g.equipped)) if (g.equipped[s] === eqUid) g.equipped[s] = null;
+  }
+  save();
+}
+
+function sellEquipment(eqUid) {
+  const eq = state.equipment.find(e=>e.uid===eqUid);
+  if (!eq) return;
+  if (isEquipped(eqUid)) { toast('正在穿戴的裝備無法賣出'); return; }
+  const value = itemValue(eq.itemId, eq.rarity, eq.enhance);
+  state.coins += value;
+  state.equipment = state.equipment.filter(e=>e.uid!==eqUid);
+  save();
+  Audio.coin();
+  closeModal('item-modal');
+  renderMain();
+  renderBag();
+  toast(`賣出獲得 ${value} 靈幣`);
+}
+
+function dismantleEquipment(eqUid) {
+  const eq = state.equipment.find(e=>e.uid===eqUid);
+  if (!eq) return;
+  if (isEquipped(eqUid)) { toast('正在穿戴的裝備無法分解'); return; }
+  const idx = RARITY_ORDER.indexOf(eq.rarity);
+  const got = {};
+  addItem('ling_stone', 1 + idx); got['靈石'] = 1 + idx;
+  if (idx >= 1) { addItem('soul_fire', idx); got['魂火'] = idx; }
+  if (idx >= 3) { addItem('dark_crystal', 1); got['冥晶'] = 1; }
+  if (idx >= 4) { addItem('memory_shard', 1); got['記憶碎片'] = 1; }
+  // 強化等級加成素材
+  if (eq.enhance > 0) { addItem('soul_fire', eq.enhance); got['魂火'] = (got['魂火']||0) + eq.enhance; }
+  state.equipment = state.equipment.filter(e=>e.uid!==eqUid);
+  save();
+  closeModal('item-modal');
+  renderBag();
+  const matList = Object.entries(got).map(([k,v])=>`${k}×${v}`).join('、');
+  toast(`分解獲得：${matList}`);
+}
+
+function sellMaterial(itemId, n = 1) {
+  const inv = state.inventory[itemId];
+  if (!inv || inv.count < n) return;
+  const value = itemValue(itemId, 'common') * n;
+  state.coins += value;
+  removeItem(itemId, n);
+  save();
+  Audio.coin();
+  renderMain();
+  renderBag();
+  toast(`賣出獲得 ${value} 靈幣`);
+}
+
+// ============ 強化 ============
+function enhanceEquipment(eqUid) {
+  const eq = state.equipment.find(e=>e.uid===eqUid);
+  if (!eq) return;
+  const data = enhanceData(eq.enhance);
+  if (!data) { toast('已達強化上限'); return; }
+  if (!hasMaterials(data.mats)) { toast('素材不足'); return; }
+  if (state.coins < data.coin) { toast(`靈幣不足（需 ${data.coin}）`); return; }
+
+  state.coins -= data.coin;
+  consumeMaterials(data.mats);
+  const success = Math.random() < data.successRate;
+  if (success) {
+    eq.enhance += 1;
+    Audio.forgeSuccess();
+    toast(`強化成功！+${eq.enhance}`);
+  } else {
+    Audio.forgeFail();
+    toast(`強化失敗，材料浪費了…`);
+  }
+  save();
+  renderMain();
+  renderForge();
+  // 若正在查看物品 modal，更新它
+  if (document.getElementById('item-modal').classList.contains('active')) {
+    openItemDetail({ kind:'equipment', eqUid: eq.uid, itemId: eq.itemId, rarity: eq.rarity, icon: getItem(eq.itemId).icon, equipped: isEquipped(eq.uid) });
+  }
+}
+
+// ============ 升階鍛造 ============
+// 同部位 + 同品質 + 3件 → 高一階隨機部位（同部位優先）
+function tierUpCandidates() {
+  // 群組化：rarity -> slot -> [eqUids]
+  const groups = {};
+  for (const eq of state.equipment) {
+    if (isEquipped(eq.uid)) continue;
+    if (eq.rarity === 'mythic') continue;
+    const def = getItem(eq.itemId);
+    if (!groups[eq.rarity]) groups[eq.rarity] = {};
+    if (!groups[eq.rarity][def.slot]) groups[eq.rarity][def.slot] = [];
+    groups[eq.rarity][def.slot].push(eq);
+  }
+  // 找出每組 >= 3 件的
+  const candidates = [];
+  for (const r of Object.keys(groups)) {
+    for (const s of Object.keys(groups[r])) {
+      const arr = groups[r][s];
+      if (arr.length >= TIER_UP_REQUIRED) {
+        candidates.push({ rarity: r, slot: s, items: arr });
+      }
+    }
+  }
+  return candidates;
+}
+
+function performTierUp(candidate) {
+  const cost = TIER_UP_COIN[candidate.rarity] || 1000;
+  if (state.coins < cost) { toast(`需要 ${cost} 靈幣`); return; }
+  state.coins -= cost;
+  // 移除 3 件
+  const removed = candidate.items.slice(0, TIER_UP_REQUIRED);
+  const removedUids = new Set(removed.map(e=>e.uid));
+  state.equipment = state.equipment.filter(e=>!removedUids.has(e.uid));
+
+  // 新品質
+  const idx = RARITY_ORDER.indexOf(candidate.rarity);
+  const newRarity = RARITY_ORDER[idx + 1];
+
+  // 同部位中隨機選一個物品 ID
+  const sameSlotItems = Object.entries(ITEMS).filter(([id,it])=>it.type==='equipment' && it.slot===candidate.slot);
+  const [newItemId] = sameSlotItems[Math.floor(Math.random()*sameSlotItems.length)];
+
+  addItem(newItemId, 1, newRarity);
+  save();
+  Audio.forgeSuccess();
+  setTimeout(() => Audio.lootByRarity(newRarity), 200);
+  renderForge();
+  renderMain();
+  toast(`鍛造成功！獲得 ${RARITY[newRarity].label} 裝備`);
+}
+
+// ============ 配方鍛造 ============
+function craftRecipe(recipeId) {
+  const r = RECIPES.find(x=>x.id===recipeId);
+  if (!r) return;
+  if (!hasMaterials(r.mats)) { toast('素材不足'); return; }
+  if (state.coins < r.coin) { toast(`靈幣不足（需 ${r.coin}）`); return; }
+  state.coins -= r.coin;
+  consumeMaterials(r.mats);
+  addItem(r.result, 1, r.rarity);
+  save();
+  Audio.forgeSuccess();
+  setTimeout(() => Audio.lootByRarity(r.rarity), 200);
+  renderForge();
+  renderMain();
+  toast(`鍛造完成：${getItem(r.result).name} (${RARITY[r.rarity].label})`);
+}
+
+// ============ 素材合成 ============
+function craftMaterial(mrId) {
+  const mr = MATERIAL_RECIPES.find(x=>x.id===mrId);
+  if (!mr) return;
+  if (!hasMaterials(mr.input)) { toast('素材不足'); return; }
+  consumeMaterials(mr.input);
+  for (const [id,n] of Object.entries(mr.output)) addItem(id, n);
+  save();
+  Audio.forgeSuccess();
+  renderForge();
+  renderMain();
+  const outList = Object.entries(mr.output).map(([k,v])=>`${getItem(k).name}×${v}`).join('、');
+  toast(`合成獲得 ${outList}`);
+}
+
+// ============ UI 切換 ============
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function openModal(id)  { document.getElementById(id).classList.add('active'); Audio.modalOpen(); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); Audio.modalClose(); }
+function closeAllModals() { document.querySelectorAll('.modal').forEach(m=>m.classList.remove('active')); }
+
+let toastTimer = null;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+// ============ 渲染：主畫面 ============
+function renderMain() {
+  const ghost = activeGhost();
+  const gDef = activeGhostDef();
+  if (!ghost || !gDef) return;
+
+  // 鍛造按鈕紅點提示（有未學的卷軸）
+  const forgeBtn = document.getElementById('btn-forge');
+  if (forgeBtn) forgeBtn.classList.toggle('has-notif', hasUnusedScrolls());
+
+  document.getElementById('coin-display').textContent = state.coins;
+  document.getElementById('ghost-avatar').textContent = gDef.avatar;
+  document.getElementById('ghost-name').textContent = gDef.name;
+  document.getElementById('ghost-level').textContent = ghost.level;
+
+  const need = expForLevel(ghost.level);
+  document.getElementById('exp-fill').style.width = `${Math.min(100, ghost.exp/need*100)}%`;
+
+  // 魂力條
+  const max = maxSpirit(ghost, gDef);
+  const cur = Math.floor(ghost.spirit);
+  const pct = max > 0 ? (cur/max*100) : 0;
+  document.getElementById('spirit-fill').style.width = `${pct}%`;
+  document.getElementById('spirit-text').textContent = `${cur} / ${max}`;
+
+  const stats = ghostTotalStats(state.activeGhostId);
+  document.getElementById('stat-luck').textContent = stats.luck;
+  document.getElementById('stat-speed').textContent = stats.speed;
+  document.getElementById('stat-courage').textContent = stats.courage;
+  document.getElementById('stat-sense').textContent = stats.sense;
+
+  renderDrift();
+}
+
+function renderDrift() {
+  const empty = document.getElementById('drift-empty');
+  const active = document.getElementById('drift-active');
+  const done = document.getElementById('drift-done');
+
+  if (!state.drift) {
+    empty.classList.remove('hidden');
+    active.classList.add('hidden');
+    done.classList.add('hidden');
+    return;
+  }
+  const remain = driftRemaining();
+  if (remain <= 0) {
+    empty.classList.add('hidden');
+    active.classList.add('hidden');
+    done.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  active.classList.remove('hidden');
+  done.classList.add('hidden');
+
+  const zone = getZone(state.drift.zoneId);
+  const gDef = getGhost(state.drift.ghostId);
+  document.getElementById('drift-msg').textContent = `${gDef.name} 正在 ${zone.name} 漂流...`;
+
+  const progress = 100 - (remain / state.drift.duration * 100);
+  document.getElementById('drift-progress-fill').style.width = `${progress}%`;
+
+  const mm = Math.floor(remain/60).toString().padStart(2,'0');
+  const ss = Math.floor(remain%60).toString().padStart(2,'0');
+  document.getElementById('drift-timer').textContent = `${mm}:${ss}`;
+}
+
+// ============ 渲染：選角 ============
+function renderGhostSelect() {
+  const grid = document.getElementById('ghost-select-grid');
+  grid.innerHTML = '';
+  GHOSTS.forEach(g => {
+    const locked = g.unlockCost > 0;
+    const card = document.createElement('div');
+    card.className = 'ghost-card' + (locked ? ' locked' : '');
+    card.innerHTML = `
+      <div class="ghost-card-avatar">${g.avatar}</div>
+      <div class="ghost-card-name">${g.name}</div>
+      <div class="ghost-card-desc">${g.desc}</div>
+      <div class="ghost-card-skill">${g.skill}</div>
+      ${locked ? `<div class="ghost-card-skill">需 ${g.unlockCost} 靈幣解鎖</div>` : ''}
+    `;
+    if (!locked) {
+      card.onclick = () => {
+        state = defaultState();
+        unlockGhost(g.id);
+        save();
+        showScreen('main-screen');
+        renderMain();
+      };
+    }
+    grid.appendChild(card);
+  });
+}
+
+// ============ 渲染：地圖 ============
+function renderMapList() {
+  const list = document.getElementById('map-list');
+  list.innerHTML = '';
+  ZONES.forEach(z => {
+    const unlocked = state.unlockedZones.includes(z.id);
+    const ghost = activeGhost();
+    const lvOk = ghost && ghost.level >= z.minGhostLevel;
+    const canEnter = unlocked && lvOk;
+
+    const rarityDots = Object.entries(z.rarityWeights)
+      .map(([r])=>`<span class="rarity-dot" style="background:${RARITY[r].color}" title="${RARITY[r].label}"></span>`)
+      .join('');
+
+    const card = document.createElement('div');
+    card.className = 'map-card' + (canEnter ? '' : ' locked');
+    card.innerHTML = `
+      <div class="map-icon">${z.icon}</div>
+      <div class="map-info">
+        <div class="map-name">${z.name}</div>
+        <div class="map-meta">${z.desc}</div>
+        <div class="map-meta">⏱ ${Math.floor(z.duration/60)>0?Math.floor(z.duration/60)+'分':''}${z.duration%60}秒 ・ 需 Lv.${z.minGhostLevel} ・ 消耗 ${z.spiritCost} 魂力</div>
+        <div class="map-loot-preview">${rarityDots}</div>
+        ${!unlocked ? `<div class="map-meta" style="color:var(--accent-glow);margin-top:6px">🔒 ${z.unlockCost} 靈幣解鎖</div>` : ''}
       </div>
-      <button class="action-btn primary" id="btnClaimOffline">領取獎勵</button>
+    `;
+    card.onclick = () => {
+      if (!unlocked) { unlockZone(z.id); return; }
+      if (!lvOk) { toast(`需要鬼魂達到 Lv.${z.minGhostLevel}`); return; }
+      startDrift(z.id);
+    };
+    list.appendChild(card);
+  });
+}
+
+// ============ 渲染：背包 ============
+let currentBagTab = 'all';
+function renderBag() {
+  const grid = document.getElementById('bag-grid');
+  grid.innerHTML = '';
+
+  let entries = [];
+  if (currentBagTab === 'all' || currentBagTab === 'equipment') {
+    for (const eq of state.equipment) {
+      const def = getItem(eq.itemId);
+      entries.push({
+        kind: 'equipment', eqUid: eq.uid, itemId: eq.itemId, rarity: eq.rarity,
+        icon: def.icon, equipped: isEquipped(eq.uid), enhance: eq.enhance,
+      });
+    }
+  }
+  for (const [itemId, data] of Object.entries(state.inventory)) {
+    const def = getItem(itemId);
+    if (!def) continue;
+    if (currentBagTab === 'material'   && def.type !== 'material')   continue;
+    if (currentBagTab === 'consumable' && def.type !== 'consumable' && def.type !== 'scroll') continue;
+    if (currentBagTab === 'equipment') continue;
+    entries.push({ kind: def.type, itemId, count: data.count, rarity: 'common', icon: def.icon });
+  }
+
+  if (!entries.length) {
+    grid.innerHTML = '<div class="empty-hint">背包空空如也...</div>';
+    return;
+  }
+
+  entries.forEach(e => {
+    const slot = document.createElement('div');
+    slot.className = 'item-slot';
+    slot.dataset.rarity = e.rarity;
+    slot.innerHTML = `
+      ${e.icon}
+      ${e.count > 1 ? `<span class="item-count">${e.count}</span>` : ''}
+      ${e.equipped ? `<span class="item-equipped">●</span>` : ''}
+      ${e.enhance > 0 ? `<span class="item-enhance">+${e.enhance}</span>` : ''}
+    `;
+    slot.onclick = () => openItemDetail(e);
+    grid.appendChild(slot);
+  });
+}
+
+// ============ 渲染：物品詳情 ============
+function openItemDetail(entry) {
+  const detail = document.getElementById('item-detail');
+  const actions = document.getElementById('item-actions');
+  const def = getItem(entry.itemId);
+
+  document.getElementById('item-modal-name').textContent = def.name + (entry.enhance ? ` +${entry.enhance}` : '');
+
+  let html = `<div class="item-detail-icon">${def.icon}</div>`;
+  html += `<div class="item-detail-name">${def.name}${entry.enhance ? ` <span style="color:var(--accent-glow)">+${entry.enhance}</span>` : ''}</div>`;
+  if (entry.kind === 'equipment') {
+    html += `<span class="item-rarity-label item-rarity-${entry.rarity}">${RARITY[entry.rarity].label}</span>`;
+  }
+  html += `<div class="item-flavor">「${def.flavor}」</div>`;
+
+  if (entry.kind === 'equipment') {
+    const eq = state.equipment.find(e=>e.uid===entry.eqUid);
+    const slotLabel = { head:'頭飾', body:'身袍', weapon:'法器', accessory:'護符' }[def.slot];
+    html += `<div class="item-stats">`;
+    html += `<div class="item-stat-line"><span>裝備位</span><span class="stat-val">${slotLabel}</span></div>`;
+    const enhanced = applyEnhanceToStats(eq.stats, eq.enhance);
+    for (const [k,v] of Object.entries(enhanced)) {
+      const label = { luck:'🍀 幸運', speed:'💨 速度', courage:'💪 膽量', sense:'👁 感知' }[k];
+      const base = eq.stats[k];
+      const diff = v - base;
+      html += `<div class="item-stat-line"><span>${label}</span><span class="stat-val">+${v}${diff>0?` <small style="opacity:0.7">(基礎 ${base})</small>`:''}</span></div>`;
+    }
+    const value = itemValue(eq.itemId, eq.rarity, eq.enhance);
+    html += `<div class="item-stat-line"><span>賣價</span><span class="stat-val">${value} 靈幣</span></div>`;
+    html += `</div>`;
+  } else {
+    const value = itemValue(entry.itemId, 'common');
+    const typeLabel = entry.kind === 'material' ? '素材'
+                    : entry.kind === 'scroll'   ? '配方卷軸'
+                    : '消耗品';
+    html += `<div class="item-stats">`;
+    html += `<div class="item-stat-line"><span>類型</span><span class="stat-val">${typeLabel}</span></div>`;
+    html += `<div class="item-stat-line"><span>數量</span><span class="stat-val">×${entry.count}</span></div>`;
+    html += `<div class="item-stat-line"><span>單價</span><span class="stat-val">${value} 靈幣</span></div>`;
+    if (def.effect === 'heal') {
+      html += `<div class="item-stat-line"><span>效果</span><span class="stat-val">+${def.effectValue === 9999 ? '滿' : def.effectValue} 魂力</span></div>`;
+    }
+    if (def.type === 'scroll') {
+      const r = RECIPES.find(x => x.id === def.unlocks);
+      const targetDef = r ? getItem(r.result) : null;
+      const learned = state.unlockedRecipes.includes(def.unlocks);
+      html += `<div class="item-stat-line"><span>解鎖</span><span class="stat-val">${targetDef ? targetDef.name : '?'} ${learned ? '（已習得）' : ''}</span></div>`;
+    }
+    html += `</div>`;
+  }
+  detail.innerHTML = html;
+
+  actions.innerHTML = '';
+  if (entry.kind === 'equipment') {
+    if (entry.equipped) {
+      const btn = document.createElement('button');
+      btn.className = 'btn-secondary';
+      btn.textContent = '脫下';
+      btn.onclick = () => { unequipUid(entry.eqUid); closeModal('item-modal'); renderBag(); renderMain(); toast('已脫下'); };
+      actions.appendChild(btn);
+    } else {
+      const btnEq = document.createElement('button');
+      btnEq.className = 'btn-primary';
+      btnEq.textContent = '穿戴';
+      btnEq.onclick = () => equipItem(entry.eqUid);
+      actions.appendChild(btnEq);
+    }
+    // 強化按鈕
+    const eq = state.equipment.find(e=>e.uid===entry.eqUid);
+    const enhData = enhanceData(eq.enhance);
+    if (enhData) {
+      const btnEnh = document.createElement('button');
+      btnEnh.className = 'btn-secondary';
+      const matsStr = Object.entries(enhData.mats).map(([k,v])=>`${getItem(k).name}×${v}`).join('、');
+      btnEnh.innerHTML = `強化 +${eq.enhance + 1}<br><small style="opacity:0.7;font-size:10px">${Math.floor(enhData.successRate*100)}% ・ ${matsStr} ・ ${enhData.coin}💰</small>`;
+      btnEnh.onclick = () => enhanceEquipment(eq.uid);
+      actions.appendChild(btnEnh);
+    }
+    const btnSell = document.createElement('button');
+    btnSell.className = 'btn-secondary';
+    btnSell.textContent = '賣出';
+    btnSell.onclick = () => sellEquipment(entry.eqUid);
+    actions.appendChild(btnSell);
+
+    const btnDis = document.createElement('button');
+    btnDis.className = 'btn-secondary';
+    btnDis.textContent = '分解';
+    btnDis.onclick = () => dismantleEquipment(entry.eqUid);
+    actions.appendChild(btnDis);
+  } else if (def.effect === 'heal') {
+    const btn = document.createElement('button');
+    btn.className = 'btn-primary';
+    btn.textContent = '使用（補充魂力）';
+    btn.onclick = () => { closeModal('item-modal'); useHealItem(entry.itemId); renderBag(); };
+    actions.appendChild(btn);
+    const btnSell = document.createElement('button');
+    btnSell.className = 'btn-secondary';
+    btnSell.textContent = '賣出 1 個';
+    btnSell.onclick = () => sellMaterial(entry.itemId, 1);
+    actions.appendChild(btnSell);
+  } else if (def.type === 'scroll') {
+    const learned = state.unlockedRecipes.includes(def.unlocks);
+    const btn = document.createElement('button');
+    btn.className = 'btn-primary';
+    btn.textContent = learned ? '已習得（無法再學）' : '學習配方';
+    btn.disabled = learned;
+    btn.onclick = () => { closeModal('item-modal'); useScroll(entry.itemId); renderBag(); };
+    actions.appendChild(btn);
+    const btnSell = document.createElement('button');
+    btnSell.className = 'btn-secondary';
+    btnSell.textContent = learned ? `賣出 1 個` : `賣掉（不解鎖）`;
+    btnSell.onclick = () => sellMaterial(entry.itemId, 1);
+    actions.appendChild(btnSell);
+  } else if (entry.itemId === 'yin_pill') {
+    const btnUse = document.createElement('button');
+    btnUse.className = 'btn-primary';
+    btnUse.textContent = '使用（加速漂流）';
+    btnUse.onclick = () => { closeModal('item-modal'); speedupDrift(); };
+    actions.appendChild(btnUse);
+    const btnSell = document.createElement('button');
+    btnSell.className = 'btn-secondary';
+    btnSell.textContent = '賣出 1 個';
+    btnSell.onclick = () => sellMaterial(entry.itemId, 1);
+    actions.appendChild(btnSell);
+  } else {
+    const btn1 = document.createElement('button');
+    btn1.className = 'btn-secondary';
+    btn1.textContent = '賣出 1 個';
+    btn1.onclick = () => sellMaterial(entry.itemId, 1);
+    actions.appendChild(btn1);
+    if (entry.count > 1) {
+      const btnAll = document.createElement('button');
+      btnAll.className = 'btn-secondary';
+      btnAll.textContent = `全部賣出 (${entry.count})`;
+      btnAll.onclick = () => sellMaterial(entry.itemId, entry.count);
+      actions.appendChild(btnAll);
+    }
+  }
+
+  openModal('item-modal');
+}
+
+// ============ 渲染：鬼魂資訊 ============
+function renderGhostModal() {
+  const ghost = activeGhost();
+  const gDef = activeGhostDef();
+  if (!ghost || !gDef) return;
+
+  const stats = ghostTotalStats(state.activeGhostId);
+  const max = maxSpirit(ghost, gDef);
+  const detail = document.getElementById('ghost-detail');
+  detail.innerHTML = `
+    <div class="ghost-detail-avatar">${gDef.avatar}</div>
+    <div class="ghost-detail-info">
+      <div class="ghost-detail-name">${gDef.name}　Lv.${ghost.level}</div>
+      <div class="ghost-detail-skill">${gDef.skill}</div>
+      <div class="ghost-detail-skill">魂力 ${Math.floor(ghost.spirit)}/${max}</div>
+      <div class="ghost-stats">
+        <div class="ghost-stat-line">🍀 幸運<span>${stats.luck}</span></div>
+        <div class="ghost-stat-line">💨 速度<span>${stats.speed}</span></div>
+        <div class="ghost-stat-line">💪 膽量<span>${stats.courage}</span></div>
+        <div class="ghost-stat-line">👁 感知<span>${stats.sense}</span></div>
+      </div>
     </div>
-  </div>
-</div>
+  `;
 
-<!-- ============== Toast ============== -->
-<div id="toastContainer"></div>
+  const slots = [
+    { key: 'head',      label: '頭飾', emptyIcon: '🎩' },
+    { key: 'body',      label: '身袍', emptyIcon: '👘' },
+    { key: 'weapon',    label: '法器', emptyIcon: '🗡️' },
+    { key: 'accessory', label: '護符', emptyIcon: '🪙' },
+  ];
+  const eqGrid = document.getElementById('equip-grid');
+  eqGrid.innerHTML = '';
+  slots.forEach(s => {
+    const eqUid = ghost.equipped[s.key];
+    const eq = eqUid ? state.equipment.find(e=>e.uid===eqUid) : null;
+    const def = eq ? getItem(eq.itemId) : null;
+    const slot = document.createElement('div');
+    slot.className = 'equip-slot' + (eq ? ' has-item' : '');
+    if (eq) slot.dataset.rarity = eq.rarity;
+    slot.innerHTML = `
+      ${eq ? def.icon : `<span style="opacity:0.3">${s.emptyIcon}</span>`}
+      ${eq && eq.enhance > 0 ? `<span class="item-enhance">+${eq.enhance}</span>` : ''}
+      <div class="equip-slot-label">${s.label}</div>
+    `;
+    slot.onclick = () => {
+      if (eq) {
+        openItemDetail({ kind:'equipment', eqUid: eq.uid, itemId: eq.itemId, rarity: eq.rarity, icon: def.icon, equipped: true, enhance: eq.enhance });
+      } else {
+        openModal('bag-modal');
+        currentBagTab = 'equipment';
+        document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab==='equipment'));
+        renderBag();
+      }
+    };
+    eqGrid.appendChild(slot);
+  });
 
-<!-- ============== 拖曳虛影 ============== -->
-<div id="dragGhost" class="hidden"></div>
+  const collection = document.getElementById('ghost-collection');
+  collection.innerHTML = '';
+  GHOSTS.forEach(g => {
+    const owned = !!state.ghosts[g.id];
+    const isActive = state.activeGhostId === g.id;
+    const mini = document.createElement('div');
+    mini.className = 'ghost-mini' + (isActive ? ' active' : '') + (owned ? '' : ' locked');
+    mini.innerHTML = `
+      <div class="ghost-mini-avatar">${g.avatar}</div>
+      <div class="ghost-mini-name">${g.name}</div>
+      ${owned ? `<div class="ghost-mini-name">Lv.${state.ghosts[g.id].level}</div>` : `<div class="ghost-mini-name">${g.unlockCost}💰</div>`}
+    `;
+    mini.onclick = () => {
+      if (owned) switchActive(g.id);
+      else unlockGhost(g.id);
+      renderGhostModal();
+    };
+    collection.appendChild(mini);
+  });
+}
 
-<script src="sound.js"></script>
-<script src="game.js"></script>
+// ============ 渲染：戰利品 ============
+function showLoot(loots, rewards) {
+  const list = document.getElementById('loot-list');
+  list.innerHTML = '';
+  document.getElementById('loot-subtitle').textContent = `獲得 ${rewards.exp} 經驗、${rewards.coins} 靈幣`;
+  loots.forEach(l => {
+    const def = getItem(l.itemId);
+    const rarity = l.rarity || 'common';
+    const item = document.createElement('div');
+    item.className = 'loot-item';
+    item.dataset.rarity = rarity;
+    item.innerHTML = `
+      <div class="loot-icon">${def.icon}</div>
+      <div class="loot-name">${def.name}</div>
+      <div class="loot-count">${l.count > 1 ? `×${l.count}` : RARITY[rarity].label}</div>
+    `;
+    list.appendChild(item);
+  });
+  openModal('loot-modal');
+}
+
+// ============ 渲染：鍛造工坊 ============
+let currentForgeTab = 'recipe';
+function renderForge() {
+  const body = document.getElementById('forge-body');
+  body.innerHTML = '';
+
+  if (currentForgeTab === 'recipe') renderForgeRecipe(body);
+  else if (currentForgeTab === 'enhance') renderForgeEnhance(body);
+  else if (currentForgeTab === 'tierup') renderForgeTierUp(body);
+  else if (currentForgeTab === 'material') renderForgeMaterial(body);
+}
+
+function renderForgeRecipe(body) {
+  const unlocked = RECIPES.filter(r => state.unlockedRecipes.includes(r.id));
+  const locked = RECIPES.filter(r => !state.unlockedRecipes.includes(r.id));
+
+  if (unlocked.length === 0) {
+    body.innerHTML = '<div class="empty-hint">還沒有解鎖任何配方。<br>去漂流尋找配方卷軸吧！</div>';
+  } else {
+    const h1 = document.createElement('div');
+    h1.className = 'forge-section-title';
+    h1.textContent = `📖 已解鎖配方 (${unlocked.length}/${RECIPES.length})`;
+    body.appendChild(h1);
+    unlocked.forEach(r => body.appendChild(buildRecipeCard(r, false)));
+  }
+
+  if (locked.length > 0) {
+    const h2 = document.createElement('div');
+    h2.className = 'forge-section-title';
+    h2.textContent = `🔒 未知配方 (${locked.length})`;
+    body.appendChild(h2);
+    locked.forEach(r => body.appendChild(buildRecipeCard(r, true)));
+  }
+}
+
+function buildRecipeCard(r, isLocked) {
+  const def = getItem(r.result);
+  const can = !isLocked && hasMaterials(r.mats) && state.coins >= r.coin;
+  const card = document.createElement('div');
+  card.className = 'recipe-card' + (can ? '' : ' disabled') + (isLocked ? ' locked' : '');
+
+  if (isLocked) {
+    card.innerHTML = `
+      <div class="recipe-result" data-rarity="${r.rarity}">
+        <div class="recipe-icon">❓</div>
+        <div class="recipe-name">???</div>
+        <span class="item-rarity-label item-rarity-${r.rarity}" style="font-size:10px">${RARITY[r.rarity].label}</span>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-desc">尚未習得此鍛造配方</div>
+        <div class="recipe-meta">找「配方：${def.name}」卷軸解鎖</div>
+      </div>
+    `;
+    return card;
+  }
+
+  const matLines = Object.entries(r.mats).map(([id,n]) => {
+    const have = state.inventory[id]?.count || 0;
+    const ok = have >= n;
+    return `<span class="mat-req ${ok?'ok':'fail'}">${getItem(id).icon}${getItem(id).name} ${have}/${n}</span>`;
+  }).join('');
+  card.innerHTML = `
+    <div class="recipe-result" data-rarity="${r.rarity}">
+      <div class="recipe-icon">${def.icon}</div>
+      <div class="recipe-name">${def.name}</div>
+      <span class="item-rarity-label item-rarity-${r.rarity}" style="font-size:10px">${RARITY[r.rarity].label}</span>
+    </div>
+    <div class="recipe-body">
+      <div class="recipe-desc">${r.desc}</div>
+      <div class="recipe-mats">${matLines}</div>
+      <div class="recipe-meta">需 ${r.coin}💰</div>
+    </div>
+  `;
+  const btn = document.createElement('button');
+  btn.className = 'btn-primary recipe-btn';
+  btn.textContent = '鍛造';
+  btn.disabled = !can;
+  btn.onclick = (e) => { e.stopPropagation(); craftRecipe(r.id); };
+  card.appendChild(btn);
+  return card;
+}
+
+function renderForgeEnhance(body) {
+  // 列出所有裝備（含已穿戴），點擊後跳到物品詳情用強化
+  const eqs = state.equipment.slice().sort((a,b)=> (b.enhance||0)-(a.enhance||0));
+  if (!eqs.length) {
+    body.innerHTML = '<div class="empty-hint">沒有裝備可強化。先去漂流或從配方鍛造取得吧。</div>';
+    return;
+  }
+  body.innerHTML = '<div class="forge-hint">點選裝備進入強化。每件裝備可強化至 +15。</div>';
+  const grid = document.createElement('div');
+  grid.className = 'bag-grid';
+  eqs.forEach(eq => {
+    const def = getItem(eq.itemId);
+    const slot = document.createElement('div');
+    slot.className = 'item-slot';
+    slot.dataset.rarity = eq.rarity;
+    slot.innerHTML = `
+      ${def.icon}
+      ${isEquipped(eq.uid) ? `<span class="item-equipped">●</span>` : ''}
+      ${eq.enhance > 0 ? `<span class="item-enhance">+${eq.enhance}</span>` : ''}
+    `;
+    slot.onclick = () => openItemDetail({
+      kind: 'equipment', eqUid: eq.uid, itemId: eq.itemId, rarity: eq.rarity,
+      icon: def.icon, equipped: isEquipped(eq.uid), enhance: eq.enhance,
+    });
+    grid.appendChild(slot);
+  });
+  body.appendChild(grid);
+}
+
+function renderForgeTierUp(body) {
+  const candidates = tierUpCandidates();
+  if (!candidates.length) {
+    body.innerHTML = '<div class="empty-hint">沒有可升階的組合。<br><br>需要相同部位 + 相同品質 + 3 件以上（且未穿戴）。</div>';
+    return;
+  }
+  body.innerHTML = '<div class="forge-hint">3 件同部位同品質 → 1 件高一階（部位隨機）</div>';
+  candidates.forEach(c => {
+    const nextRarity = RARITY_ORDER[RARITY_ORDER.indexOf(c.rarity)+1];
+    const cost = TIER_UP_COIN[c.rarity] || 1000;
+    const slotLabel = { head:'頭飾', body:'身袍', weapon:'法器', accessory:'護符' }[c.slot];
+    const card = document.createElement('div');
+    card.className = 'recipe-card tierup-card';
+    const itemIcons = c.items.slice(0,3).map(eq => getItem(eq.itemId).icon).join('');
+    card.innerHTML = `
+      <div class="recipe-result" data-rarity="${nextRarity}">
+        <div class="recipe-icon">⚒️</div>
+        <div class="recipe-name">${slotLabel} 升階</div>
+        <span class="item-rarity-label item-rarity-${c.rarity}" style="font-size:10px">${RARITY[c.rarity].label}</span>
+        <span style="margin:0 6px">→</span>
+        <span class="item-rarity-label item-rarity-${nextRarity}" style="font-size:10px">${RARITY[nextRarity].label}</span>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-desc">材料：${itemIcons}（${c.items.length} 件可用）</div>
+        <div class="recipe-meta">需 ${cost}💰</div>
+      </div>
+    `;
+    const btn = document.createElement('button');
+    btn.className = 'btn-primary recipe-btn';
+    btn.textContent = '升階';
+    btn.disabled = state.coins < cost;
+    btn.onclick = (e) => { e.stopPropagation(); performTierUp(c); };
+    card.appendChild(btn);
+    body.appendChild(card);
+  });
+}
+
+function renderForgeMaterial(body) {
+  body.innerHTML = '<div class="forge-hint">把低階素材合成高階素材。</div>';
+  MATERIAL_RECIPES.forEach(mr => {
+    const inputStr = Object.entries(mr.input).map(([k,v]) => {
+      const have = state.inventory[k]?.count || 0;
+      const ok = have >= v;
+      return `<span class="mat-req ${ok?'ok':'fail'}">${getItem(k).icon}${getItem(k).name} ${have}/${v}</span>`;
+    }).join('');
+    const outputStr = Object.entries(mr.output).map(([k,v])=>`${getItem(k).icon} ${getItem(k).name} ×${v}`).join('、');
+    const can = hasMaterials(mr.input);
+    const card = document.createElement('div');
+    card.className = 'recipe-card' + (can ? '' : ' disabled');
+    card.innerHTML = `
+      <div class="recipe-result">
+        <div class="recipe-icon">🌀</div>
+        <div class="recipe-name">${outputStr}</div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-mats">${inputStr}</div>
+      </div>
+    `;
+    const btn = document.createElement('button');
+    btn.className = 'btn-primary recipe-btn';
+    btn.textContent = '合成';
+    btn.disabled = !can;
+    btn.onclick = (e) => { e.stopPropagation(); craftMaterial(mr.id); };
+    card.appendChild(btn);
+    body.appendChild(card);
+  });
+}
+
+// ============ 音效初始化（首次互動） ============
+function ensureAudio() {
+  if (!Audio.ctx) { Audio.init(); Audio.startBGM(); }
+  Audio.resume();
+}
+
+// ============ 事件 ============
+function bindEvents() {
+  // 任何點擊都先確保 AudioContext 已啟動（瀏覽器自動播放政策）
+  document.addEventListener('pointerdown', ensureAudio, { once: false });
+
+  // 全域按鈕點擊音
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('button')) Audio.click();
+  }, true);
+
+  // 標題
+  document.getElementById('btn-new-game').onclick = () => { showScreen('select-screen'); renderGhostSelect(); };
+  document.getElementById('btn-continue').onclick = () => {
+    const saved = load();
+    if (!saved || !saved.activeGhostId) { toast('沒有存檔'); return; }
+    state = saved;
+    // 升級舊存檔：補上魂力欄位
+    for (const gid of Object.keys(state.ghosts)) {
+      const g = state.ghosts[gid];
+      const gDef = getGhost(gid);
+      if (g.spirit === undefined) g.spirit = gDef.baseSpirit;
+      if (!g.lastTickAt) g.lastTickAt = Date.now();
+    }
+    for (const eq of state.equipment) { if (eq.enhance === undefined) eq.enhance = 0; }
+    if (!state.unlockedRecipes) state.unlockedRecipes = ['r_paperhat', 'r_coppercoin'];
+    save();
+    showScreen('main-screen');
+    renderMain();
+  };
+
+  // 主畫面
+  document.getElementById('btn-open-map').onclick = () => { renderMapList(); openModal('map-modal'); };
+  document.getElementById('btn-claim').onclick = claimDrift;
+  document.getElementById('btn-speedup').onclick = speedupDrift;
+  document.getElementById('btn-bag').onclick = () => { currentBagTab = 'all'; document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab==='all')); renderBag(); openModal('bag-modal'); };
+  document.getElementById('btn-ghost-info').onclick = () => { renderGhostModal(); openModal('ghost-modal'); };
+  document.getElementById('btn-forge').onclick = () => { currentForgeTab='recipe'; document.querySelectorAll('#forge-tabs .tab').forEach(t=>t.classList.toggle('active', t.dataset.forgetab==='recipe')); renderForge(); openModal('forge-modal'); };
+  document.getElementById('btn-menu').onclick = () => openModal('menu-modal');
+  document.getElementById('btn-heal').onclick = () => { openHealMenu(); };
+
+  // 戰利品 / 選單
+  document.getElementById('btn-close-loot').onclick = () => closeModal('loot-modal');
+  document.getElementById('btn-save').onclick = () => { save(); toast('已存檔'); };
+  document.getElementById('btn-reset').onclick = () => { if (confirm('確定要重置遊戲嗎？所有進度將消失。')) resetGame(); };
+
+  // 音效設定
+  document.getElementById('btn-audio').onclick = () => { closeModal('menu-modal'); renderAudioSettings(); openModal('audio-modal'); };
+  document.getElementById('audio-bgm-toggle').onchange = (e) => Audio.setBgmOn(e.target.checked);
+  document.getElementById('audio-sfx-toggle').onchange = (e) => Audio.setSfxOn(e.target.checked);
+  document.getElementById('audio-bgm-vol').oninput = (e) => Audio.setBgmVol(parseInt(e.target.value)/100);
+  document.getElementById('audio-sfx-vol').oninput = (e) => { Audio.setSfxVol(parseInt(e.target.value)/100); };
+  document.getElementById('audio-sfx-vol').onchange = () => Audio.tone(660, 0.1, 'sine', 0.2); // 預覽音
+
+  // 關閉
+  document.querySelectorAll('[data-close]').forEach(btn => btn.onclick = () => btn.closest('.modal').classList.remove('active'));
+  document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('active'); }));
+
+  // 背包分頁
+  document.querySelectorAll('#bag-modal .tab').forEach(t => {
+    t.onclick = () => {
+      document.querySelectorAll('#bag-modal .tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      currentBagTab = t.dataset.tab;
+      renderBag();
+    };
+  });
+  // 鍛造分頁
+  document.querySelectorAll('#forge-tabs .tab').forEach(t => {
+    t.onclick = () => {
+      document.querySelectorAll('#forge-tabs .tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      currentForgeTab = t.dataset.forgetab;
+      renderForge();
+    };
+  });
+}
+
+function renderAudioSettings() {
+  document.getElementById('audio-bgm-toggle').checked = Audio.cfg.bgmOn;
+  document.getElementById('audio-sfx-toggle').checked = Audio.cfg.sfxOn;
+  document.getElementById('audio-bgm-vol').value = Math.round(Audio.cfg.bgmVol * 100);
+  document.getElementById('audio-sfx-vol').value = Math.round(Audio.cfg.sfxVol * 100);
+}
+
+// 補血快捷選單
+function openHealMenu() {
+  const healIds = ['paper_money', 'offering', 'revival_pill'];
+  const list = healIds.filter(id => state.inventory[id]?.count > 0);
+  if (!list.length) { toast('沒有補血道具'); return; }
+  // 簡單做法：依序使用最低階；或彈出選單。這裡彈出選單
+  const modal = document.getElementById('heal-modal');
+  const body = document.getElementById('heal-list');
+  body.innerHTML = '';
+  list.forEach(id => {
+    const def = getItem(id);
+    const inv = state.inventory[id];
+    const row = document.createElement('div');
+    row.className = 'heal-row';
+    row.innerHTML = `
+      <div class="heal-icon">${def.icon}</div>
+      <div class="heal-info">
+        <div class="heal-name">${def.name}</div>
+        <div class="heal-meta">+${def.effectValue === 9999 ? '滿' : def.effectValue} 魂力 ・ 剩 ${inv.count}</div>
+      </div>
+    `;
+    const btn = document.createElement('button');
+    btn.className = 'btn-primary';
+    btn.textContent = '使用';
+    btn.style.flex = '0 0 auto';
+    btn.style.padding = '8px 14px';
+    btn.style.margin = '0';
+    btn.style.width = 'auto';
+    btn.onclick = () => { useHealItem(id); openHealMenu(); };
+    row.appendChild(btn);
+    body.appendChild(row);
+  });
+  openModal('heal-modal');
+}
+
+// ============ 主迴圈 ============
+function tick() {
+  if (!state) return;
+  spiritTick();
+  if (state.drift) renderDrift();
+  // 更新魂力 UI
+  if (document.getElementById('main-screen').classList.contains('active')) {
+    const ghost = activeGhost(); const gDef = activeGhostDef();
+    if (ghost && gDef) {
+      const max = maxSpirit(ghost, gDef);
+      const cur = Math.floor(ghost.spirit);
+      const fill = document.getElementById('spirit-fill');
+      const text = document.getElementById('spirit-text');
+      if (fill && text) {
+        fill.style.width = `${max > 0 ? (cur/max*100) : 0}%`;
+        text.textContent = `${cur} / ${max}`;
+      }
+    }
+  }
+}
+
+// ============ 啟動 ============
+function init() {
+  Audio.loadCfg();
+  bindEvents();
+  const saved = load();
+  if (saved && saved.activeGhostId) {
+    state = saved;
+    // 舊存檔遷移
+    for (const gid of Object.keys(state.ghosts)) {
+      const g = state.ghosts[gid];
+      const gDef = getGhost(gid);
+      if (g.spirit === undefined && gDef) g.spirit = gDef.baseSpirit;
+      if (!g.lastTickAt) g.lastTickAt = Date.now();
+    }
+    for (const eq of state.equipment) { if (eq.enhance === undefined) eq.enhance = 0; }
+    if (!state.unlockedRecipes) state.unlockedRecipes = ['r_paperhat', 'r_coppercoin'];
+    showScreen('main-screen');
+    renderMain();
+  } else {
+    state = defaultState();
+    showScreen('title-screen');
+  }
+  setInterval(tick, 500);
+  // 每 10 秒自動存檔
+  setInterval(() => state && save(), 10000);
+}
+
+init();
+
+</script>
 </body>
 </html>

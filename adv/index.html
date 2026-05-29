@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>幽靈漂流記 v0.1</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- 啟動畫面 -->
+<div id="title-screen" class="screen active">
+  <div class="title-stars"></div>
+  <div class="title-content">
+    <h1 class="game-title">幽靈漂流記</h1>
+    <p class="game-subtitle">Ghost Drift Chronicle</p>
+    <p class="title-tagline">「夜深了，該放你出去走走了。」</p>
+    <button id="btn-new-game" class="btn-primary">開始新遊戲</button>
+    <button id="btn-continue" class="btn-secondary">繼續遊戲</button>
+    <p class="version-tag">v0.1 prototype</p>
+  </div>
+</div>
+
+<!-- 選角畫面 -->
+<div id="select-screen" class="screen">
+  <div class="select-header">
+    <h2>選擇你的第一隻幽靈寵物</h2>
+    <p class="hint">其他鬼魂可在遊戲中解鎖</p>
+  </div>
+  <div class="ghost-grid" id="ghost-select-grid"></div>
+</div>
+
+<!-- 主遊戲畫面 -->
+<div id="main-screen" class="screen">
+  <!-- 頂部資訊列 -->
+  <header class="top-bar">
+    <div class="currency">
+      <span class="coin-icon">💰</span>
+      <span id="coin-display">0</span>
+      <span class="coin-label">靈幣</span>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="btn-bag" title="背包">🎒</button>
+      <button class="icon-btn" id="btn-ghost-info" title="鬼魂資訊">📜</button>
+      <button class="icon-btn" id="btn-menu" title="選單">⚙️</button>
+    </div>
+  </header>
+
+  <!-- 主場景：鬼魂展示與漂流狀態 -->
+  <main class="stage">
+    <div class="stage-bg"></div>
+
+    <div class="ghost-display" id="ghost-display">
+      <div class="ghost-avatar floating" id="ghost-avatar">👻</div>
+      <div class="ghost-name" id="ghost-name">飄飄</div>
+      <div class="ghost-level">
+        Lv.<span id="ghost-level">1</span>
+        <div class="exp-bar">
+          <div class="exp-fill" id="exp-fill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 漂流狀態 -->
+    <div class="drift-status" id="drift-status">
+      <div class="drift-empty" id="drift-empty">
+        <p class="drift-msg">寵物正在家裡發呆…</p>
+        <button class="btn-primary" id="btn-open-map">出門漂流</button>
+      </div>
+      <div class="drift-active hidden" id="drift-active">
+        <p class="drift-msg" id="drift-msg">漂流中...</p>
+        <div class="drift-progress">
+          <div class="drift-progress-fill" id="drift-progress-fill"></div>
+        </div>
+        <p class="drift-timer" id="drift-timer">--:--</p>
+        <button class="btn-secondary" id="btn-speedup">使用陰氣丹加速</button>
+      </div>
+      <div class="drift-done hidden" id="drift-done">
+        <p class="drift-msg">寵物回家了！</p>
+        <button class="btn-primary" id="btn-claim">領取戰利品</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- 底部資訊 -->
+  <footer class="bottom-bar">
+    <div class="stat-mini" title="幸運">🍀 <span id="stat-luck">5</span></div>
+    <div class="stat-mini" title="速度">💨 <span id="stat-speed">5</span></div>
+    <div class="stat-mini" title="膽量">💪 <span id="stat-courage">5</span></div>
+    <div class="stat-mini" title="感知">👁 <span id="stat-sense">5</span></div>
+  </footer>
+</div>
+
+<!-- 地圖選擇 Modal -->
+<div id="map-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>選擇漂流地點</h2>
+      <button class="close-btn" data-close>✕</button>
+    </div>
+    <div class="map-list" id="map-list"></div>
+  </div>
+</div>
+
+<!-- 背包 Modal -->
+<div id="bag-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>背包</h2>
+      <button class="close-btn" data-close>✕</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-tab="all">全部</button>
+      <button class="tab" data-tab="equipment">裝備</button>
+      <button class="tab" data-tab="material">素材</button>
+      <button class="tab" data-tab="consumable">消耗品</button>
+    </div>
+    <div class="bag-grid" id="bag-grid"></div>
+  </div>
+</div>
+
+<!-- 物品詳情 Modal -->
+<div id="item-modal" class="modal">
+  <div class="modal-content small">
+    <div class="modal-header">
+      <h2 id="item-modal-name">物品名稱</h2>
+      <button class="close-btn" data-close>✕</button>
+    </div>
+    <div class="item-detail" id="item-detail"></div>
+    <div class="item-actions" id="item-actions"></div>
+  </div>
+</div>
+
+<!-- 鬼魂資訊 Modal -->
+<div id="ghost-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>鬼魂資訊</h2>
+      <button class="close-btn" data-close>✕</button>
+    </div>
+    <div class="ghost-detail" id="ghost-detail"></div>
+    <h3 class="section-title">穿戴裝備</h3>
+    <div class="equip-grid" id="equip-grid"></div>
+    <h3 class="section-title">擁有的鬼魂</h3>
+    <div class="ghost-collection" id="ghost-collection"></div>
+  </div>
+</div>
+
+<!-- 戰利品揭曉 Modal -->
+<div id="loot-modal" class="modal special-modal">
+  <div class="modal-content loot-content">
+    <h2 class="loot-title">🌟 漂流歸來 🌟</h2>
+    <p class="loot-subtitle" id="loot-subtitle">寵物帶回了這些東西…</p>
+    <div class="loot-list" id="loot-list"></div>
+    <button class="btn-primary" id="btn-close-loot">收下</button>
+  </div>
+</div>
+
+<!-- 選單 Modal -->
+<div id="menu-modal" class="modal">
+  <div class="modal-content small">
+    <div class="modal-header">
+      <h2>選單</h2>
+      <button class="close-btn" data-close>✕</button>
+    </div>
+    <div class="menu-actions">
+      <button class="btn-secondary" id="btn-save">手動存檔</button>
+      <button class="btn-secondary" id="btn-reset">重置遊戲</button>
+      <p class="menu-hint">遊戲會自動存檔到瀏覽器</p>
+    </div>
+  </div>
+</div>
+
+<!-- 通知 -->
+<div id="toast" class="toast"></div>
+
+<script src="data.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

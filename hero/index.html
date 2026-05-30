@@ -44,7 +44,8 @@
 
     <div class="hero-info" id="heroInfo">
       <div class="hero-name">
-        幽冥騎士
+        <span id="heroClassName">幽冥騎士</span>
+        <span class="class-btn" id="btnClass" title="切換職業">🎭</span>
         <span class="hero-shield hidden" id="heroShield">🛡 0.0s</span>
       </div>
       <div class="hero-hpbar">
@@ -131,6 +132,17 @@
     <div class="modal-body">
       <div id="dungeonList"></div>
     </div>
+  </div>
+</div>
+
+<!-- ============== 職業選擇 ============== -->
+<div id="classModal" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span>🎭 選擇職業</span>
+      <button class="close-btn" data-close="classModal">✕</button>
+    </div>
+    <div class="modal-body" id="classBody"></div>
   </div>
 </div>
 

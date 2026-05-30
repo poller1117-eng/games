@@ -35,6 +35,41 @@ const ITEM_TYPES = {
 
 const SLOT_ORDER = ['weapon', 'helmet', 'armor', 'boots', 'accessory'];
 
+// ─────────────────────────────────────────────────────────────
+// 主角職業
+// ─────────────────────────────────────────────────────────────
+const CLASSES = {
+  knight: {
+    name: '幽冥騎士', icon: '⚔', desc: '平衡型 · 基準屬性',
+    cost: 0, // 起始
+    mul: { HP: 1.0, ATK: 1.0, DEF: 1.0, SPD: 1.0, CRIT: 1.0 },
+    color: { body: 'rgba(165,205,255,0.72)', glow: '#7eb8f7', eye: '#00e5ff', helm: '#ffd24a', tail: 'rgba(130,180,255,0.5)' },
+    headShape: 'helmet', // helmet / hood / mask / halo
+  },
+  mage: {
+    name: '靈魂法師', icon: '🔥', desc: 'ATK +50% · CRIT +10% · HP -20%',
+    cost: 30,
+    mul: { HP: 0.8, ATK: 1.5, DEF: 0.8, SPD: 1.0, CRIT: 1.1, CRITBONUS: 0.10 },
+    color: { body: 'rgba(220,180,255,0.72)', glow: '#c860ff', eye: '#ff60ff', helm: '#7a30c8', tail: 'rgba(180,120,255,0.55)' },
+    headShape: 'hood',
+  },
+  assassin: {
+    name: '暗影刺客', icon: '🗡', desc: 'SPD +60% · CRIT +15% · HP -25%',
+    cost: 50,
+    mul: { HP: 0.75, ATK: 1.1, DEF: 0.7, SPD: 1.6, CRIT: 1.15, CRITBONUS: 0.15 },
+    color: { body: 'rgba(140,160,180,0.72)', glow: '#a0a0a0', eye: '#ff4040', helm: '#1a1a2a', tail: 'rgba(80,100,120,0.55)' },
+    headShape: 'mask',
+  },
+  paladin: {
+    name: '神聖牧師', icon: '🛡', desc: 'HP +50% · DEF +80% · 補血+50%',
+    cost: 80,
+    mul: { HP: 1.5, ATK: 0.8, DEF: 1.8, SPD: 0.9, CRIT: 1.0, HEALBONUS: 0.5 },
+    color: { body: 'rgba(255,240,200,0.78)', glow: '#ffe080', eye: '#fff0a0', helm: '#fff8e0', tail: 'rgba(255,220,160,0.55)' },
+    headShape: 'halo',
+  },
+};
+const CLASS_IDS = Object.keys(CLASSES);
+
 const RARITY = {
   common:    { name: '普通', color: '#8090a0', dropWeight: 60 },
   rare:      { name: '稀有', color: '#3aff8a', dropWeight: 25 },
@@ -162,6 +197,17 @@ const SKILLS = {
 const SKILL_IDS = Object.keys(SKILLS);
 
 // ─────────────────────────────────────────────────────────────
+// 怪物類型
+// ─────────────────────────────────────────────────────────────
+const ENEMY_TYPES = {
+  warrior:  { name: '戰士', mul: { hp: 1.0, atk: 1.0, spd: 1.0 }, color: '#c8b468', shape: 'body', weapon: 'sword',  size: 1.0,  eyeColor: '#ff4040' },
+  swift:    { name: '迅捷', mul: { hp: 0.6, atk: 0.9, spd: 1.6 }, color: '#80d090', shape: 'slim', weapon: 'dagger', size: 0.9,  eyeColor: '#a0ffa0' },
+  tank:     { name: '堅固', mul: { hp: 2.0, atk: 0.8, spd: 0.6 }, color: '#9090c0', shape: 'thick',weapon: 'shield', size: 1.2,  eyeColor: '#ffd040' },
+  mage:     { name: '法師', mul: { hp: 0.7, atk: 1.4, spd: 0.85 }, color: '#c060c0', shape: 'float',weapon: 'staff', size: 1.0,  eyeColor: '#e040ff' },
+};
+const ENEMY_TYPE_IDS = Object.keys(ENEMY_TYPES);
+
+// ─────────────────────────────────────────────────────────────
 // 地城資料
 // ─────────────────────────────────────────────────────────────
 const DUNGEONS = [
@@ -182,6 +228,8 @@ function newState() {
     equipped: { weapon: { id: 1, type: 'weapon', tier: 1 }, helmet: null, armor: null, boots: null, accessory: null },
     potions: { hpSmall: 3, hpMedium: 0, hpLarge: 0 },
     skillLevels: { soulSlash: 1, whirlwind: 0, drainLife: 0, ghostShield: 0 },
+    heroClass: 'knight',
+    unlockedClasses: { knight: true },
     level: 1,
     exp: 0,
     gold: 50,
@@ -219,7 +267,7 @@ function nextItemId() { return S._itemIdCounter++; }
 // 等級系統
 // ─────────────────────────────────────────────────────────────
 function expForLevel(lv) {
-  return Math.round(50 * Math.pow(1.45, lv - 1));
+  return Math.round(60 * Math.pow(1.55, lv - 1));
 }
 
 function gainExp(amount) {
@@ -244,9 +292,9 @@ function gainExp(amount) {
 }
 
 function levelBonus() {
-  // 每等級給：+5 ATK, +25 HP, +0.5 DEF
+  // 每等級給：+2 ATK, +12 HP, +0.2 DEF
   const lv = S.level - 1;
-  return { ATK: 5 * lv, HP: 25 * lv, DEF: 0.5 * lv };
+  return { ATK: 2 * lv, HP: 12 * lv, DEF: 0.2 * lv };
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -412,13 +460,28 @@ function sortInventory() {
   invalidateStats();
 }
 
+function itemSellPrice(item) {
+  if (!item) return 0;
+  return Math.round(15 * Math.pow(1.65, item.tier - 1));
+}
+
+function sellAt(invIdx) {
+  const item = S.inventory[invIdx];
+  if (!item) return 0;
+  const price = itemSellPrice(item);
+  S.gold += price;
+  S.inventory[invIdx] = null;
+  if (typeof SOUND !== 'undefined') SOUND.coin();
+  return price;
+}
+
 function sellLowTier() {
   // 賣掉所有 tier 1-3 普通裝備
   let gold = 0, count = 0;
   for (let i = 0; i < CFG.INV_SIZE; i++) {
     const it = S.inventory[i];
     if (it && it.tier <= 3) {
-      gold += Math.round(20 * tierMul(it.tier));
+      gold += itemSellPrice(it);
       S.inventory[i] = null;
       count++;
     }
@@ -432,17 +495,45 @@ function sellLowTier() {
 // ─────────────────────────────────────────────────────────────
 function computeStats() {
   const lb = levelBonus();
-  const base = { HP: 100 + lb.HP, ATK: 5 + lb.ATK, DEF: 0 + lb.DEF, SPD: 1.0, CRIT: 0.05 };
+  const cls = CLASSES[S.heroClass] || CLASSES.knight;
+  const m = cls.mul;
+  let base = { HP: 100 + lb.HP, ATK: 5 + lb.ATK, DEF: 0 + lb.DEF, SPD: 1.0, CRIT: 0.05 };
   for (const slot of SLOT_ORDER) {
     const item = S.equipped[slot];
     if (!item) continue;
     const st = itemStats(item);
     for (const k in st) base[k] = (base[k] || 0) + st[k];
   }
+  // 套用職業倍率
+  base.HP = base.HP * m.HP;
+  base.ATK = base.ATK * m.ATK;
+  base.DEF = base.DEF * m.DEF;
+  base.SPD = base.SPD * m.SPD;
+  base.CRIT = base.CRIT * m.CRIT + (m.CRITBONUS || 0);
   if (base.SPD > 5) base.SPD = 5;
   if (base.CRIT > 1) base.CRIT = 1;
   base.DPS = base.ATK * base.SPD * (1 + base.CRIT * 0.6);
   return base;
+}
+
+function changeClass(id) {
+  if (!CLASSES[id]) return false;
+  if (!S.unlockedClasses[id]) {
+    const cost = CLASSES[id].cost;
+    if (S.crystal < cost) {
+      showToast(`需要 ${cost} 靈晶解鎖`, 'warn');
+      if (typeof SOUND !== 'undefined') SOUND.error();
+      return false;
+    }
+    S.crystal -= cost;
+    S.unlockedClasses[id] = true;
+    showToast(`🎉 解鎖職業：${CLASSES[id].name}`, 'success');
+    if (typeof SOUND !== 'undefined') SOUND.levelUp();
+  }
+  S.heroClass = id;
+  invalidateStats();
+  if (typeof SOUND !== 'undefined') SOUND.equip();
+  return true;
 }
 
 function getStats() {
@@ -524,40 +615,54 @@ function upgradeSkill(id) {
 // ─────────────────────────────────────────────────────────────
 // 戰鬥
 // ─────────────────────────────────────────────────────────────
-function enemyHPFor(dungeon, stage, isBoss) {
-  const stageMul = Math.pow(1.20, stage - 1);
-  const dungMul = Math.pow(3, dungeon - 1);
-  let hp = 60 * stageMul * dungMul;
-  if (isBoss) hp *= 10;
+function enemyHPFor(dungeon, stage, isBoss, mulOverride) {
+  const stageMul = Math.pow(1.32, stage - 1);
+  const dungMul = Math.pow(4.5, dungeon - 1);
+  const typeMul = mulOverride && mulOverride.hp ? mulOverride.hp : 1;
+  let hp = 80 * stageMul * dungMul * typeMul;
+  if (isBoss) hp *= 18;
   return Math.round(hp);
 }
 
-function enemyATKFor(dungeon, stage, isBoss) {
-  const stageMul = Math.pow(1.18, stage - 1);
-  const dungMul = Math.pow(2.6, dungeon - 1);
-  let atk = 3 * stageMul * dungMul;
-  if (isBoss) atk *= 1.4;
+function enemyATKFor(dungeon, stage, isBoss, mulOverride) {
+  const stageMul = Math.pow(1.28, stage - 1);
+  const dungMul = Math.pow(3.2, dungeon - 1);
+  const typeMul = mulOverride && mulOverride.atk ? mulOverride.atk : 1;
+  let atk = 4 * stageMul * dungMul * typeMul;
+  if (isBoss) atk *= 1.7;
   return atk;
 }
 
+function enemySPDFor(dungeon, isBoss, mulOverride) {
+  const base = 0.7 + dungeon * 0.03;
+  const typeMul = mulOverride && mulOverride.spd ? mulOverride.spd : 1;
+  return base * typeMul * (isBoss ? 1.2 : 1);
+}
+
 function enemyExpFor(dungeon, stage, isBoss) {
-  return Math.round((isBoss ? 50 : 8) * Math.pow(1.18, stage - 1) * Math.pow(1.8, dungeon - 1));
+  return Math.round((isBoss ? 40 : 6) * Math.pow(1.22, stage - 1) * Math.pow(1.7, dungeon - 1));
 }
 
 function spawnEnemy() {
   const dg = DUNGEONS[S.dungeon - 1];
   const isBoss = S.stage === 10;
-  const name = isBoss ? dg.boss : dg.enemies[Math.floor(Math.random() * dg.enemies.length)];
-  const hp = enemyHPFor(S.dungeon, S.stage, isBoss);
-  const atk = enemyATKFor(S.dungeon, S.stage, isBoss);
+  // 隨機怪物類型；BOSS 用 tank 樣式但放大
+  const typeId = isBoss ? 'tank' : ENEMY_TYPE_IDS[Math.floor(Math.random() * ENEMY_TYPE_IDS.length)];
+  const type = ENEMY_TYPES[typeId];
+  const name = isBoss ? dg.boss : (type.name + dg.enemies[Math.floor(Math.random() * dg.enemies.length)]);
+  const hp = enemyHPFor(S.dungeon, S.stage, isBoss, type.mul);
+  const atk = enemyATKFor(S.dungeon, S.stage, isBoss, type.mul);
+  const spd = enemySPDFor(S.dungeon, isBoss, type.mul);
   RT.enemy = {
-    name, isBoss,
+    name, isBoss, typeId,
+    type, // 引用
     hp, maxHp: hp,
-    atk, spd: 0.7,
-    atkCooldown: 1.4,
+    atk, spd,
+    atkCooldown: 1 / spd,
     hurtTime: 0,
     bobPhase: Math.random() * Math.PI,
-    color: dg.enemyColor,
+    color: type.color,
+    dungeonColor: dg.enemyColor,
   };
   if (typeof SOUND !== 'undefined') {
     if (isBoss) SOUND.bossAppear();
@@ -1009,6 +1114,9 @@ function refreshHeroInfo() {
   const pct = (RT.hero.hp / RT.hero.maxHP) * 100;
   document.getElementById('heroHPFill').style.width = pct + '%';
   document.getElementById('heroHPText').textContent = formatNum(RT.hero.hp) + ' / ' + formatNum(RT.hero.maxHP);
+  const cls = CLASSES[S.heroClass] || CLASSES.knight;
+  const cn = document.getElementById('heroClassName');
+  if (cn) cn.textContent = cls.icon + ' ' + cls.name;
   const shieldEl = document.getElementById('heroShield');
   if (RT.hero.shieldTime > 0) {
     shieldEl.classList.remove('hidden');
@@ -1016,6 +1124,43 @@ function refreshHeroInfo() {
   } else {
     shieldEl.classList.add('hidden');
   }
+}
+
+function openClassModal() {
+  const body = document.getElementById('classBody');
+  body.innerHTML = '';
+  for (const id of CLASS_IDS) {
+    const cls = CLASSES[id];
+    const unlocked = S.unlockedClasses[id];
+    const current = S.heroClass === id;
+    const row = document.createElement('div');
+    row.className = 'class-item' + (current ? ' current' : '') + (unlocked ? '' : ' locked');
+    row.innerHTML = `
+      <div class="class-icon">${cls.icon}</div>
+      <div class="class-info">
+        <div class="class-name">${cls.name}</div>
+        <div class="class-desc">${cls.desc}</div>
+      </div>
+      <div class="class-action">
+        ${current ? '<span class="class-badge current">使用中</span>' :
+          unlocked ? '<button class="class-btn-switch">切換</button>' :
+          `<button class="class-btn-unlock">${cls.cost} 💎</button>`}
+      </div>
+    `;
+    if (!current) {
+      const btn = row.querySelector('button');
+      if (btn) {
+        btn.onclick = () => {
+          if (changeClass(id)) {
+            refreshAllUI();
+            openClassModal();
+          }
+        };
+      }
+    }
+    body.appendChild(row);
+  }
+  document.getElementById('classModal').classList.remove('hidden');
 }
 
 function refreshActions() {
@@ -1085,7 +1230,8 @@ function refreshInventory() {
     el.dataset.idx = i;
     makeItemSlot(S.inventory[i], el);
     if (S.inventory[i]) {
-      el.title = itemDescription(S.inventory[i]) + '\n（雙擊穿戴）';
+      const price = itemSellPrice(S.inventory[i]);
+      el.title = itemDescription(S.inventory[i]) + `\n雙擊穿戴 · 長按賣出 ${formatNum(price)} 💰`;
     }
   }
 }
@@ -1177,6 +1323,8 @@ function setupBattleCanvas() {
 }
 
 function drawHero(ctx, x, y, t, stats) {
+  const cls = CLASSES[S.heroClass] || CLASSES.knight;
+  const col = cls.color;
   const bob = Math.sin(t * 1.8) * 4;
   const gi = (Math.sin(t * 2.5) + 1) / 2;
   const hurt = RT.hero.hurtTime > 0;
@@ -1199,78 +1347,207 @@ function drawHero(ctx, x, y, t, stats) {
     ctx.stroke();
   }
 
-  // 靈光
-  const g = ctx.createRadialGradient(x, y, 4, x, y, 50);
-  g.addColorStop(0, `rgba(80,150,255,${0.25 + gi * 0.05})`);
-  g.addColorStop(1, 'rgba(80,150,255,0)');
+  // 職業靈光
+  const g = ctx.createRadialGradient(x, y, 4, x, y, 55);
+  const glowRGB = hexToRgb(col.glow);
+  g.addColorStop(0, `rgba(${glowRGB.r},${glowRGB.g},${glowRGB.b},${0.3 + gi * 0.08})`);
+  g.addColorStop(1, `rgba(${glowRGB.r},${glowRGB.g},${glowRGB.b},0)`);
   ctx.fillStyle = g;
-  ctx.fillRect(x - 50, y - 50, 100, 100);
+  ctx.fillRect(x - 55, y - 55, 110, 110);
 
-  if (Math.random() < 0.3) {
+  // 飄逸粒子（依職業顏色）
+  if (Math.random() < 0.35) {
     RT.particles.push({
       kind: 'wisp', x: x + (Math.random() - 0.5) * 30,
-      y: y + 20, vx: (Math.random() - 0.5) * 0.5, vy: -0.8,
-      life: 1.0, color: 'rgba(126,184,247,0.6)', size: 1.5,
+      y: y + 20, vx: (Math.random() - 0.5) * 0.6, vy: -0.9,
+      life: 1.2, color: col.glow, size: 1.6,
     });
   }
 
   ctx.save();
   if (attacking) ctx.translate(8, -2);
   if (hurt) ctx.globalAlpha = 0.5;
-  ctx.fillStyle = 'rgba(165,205,255,0.72)';
+
+  // 身體（橢圓 + 細節）
+  ctx.fillStyle = col.body;
   ctx.beginPath();
-  ctx.ellipse(x, y, 20, 24, 0, 0, Math.PI * 2);
+  ctx.ellipse(x, y, 21, 25, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // 身體內部陰影
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.beginPath();
+  ctx.ellipse(x - 5, y - 8, 8, 10, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = '#ffd24a';
-  ctx.fillRect(x - 12, y - 30, 24, 9);
-  ctx.fillRect(x - 5, y - 36, 10, 7);
-  ctx.fillStyle = '#a07020';
-  ctx.fillRect(x - 12, y - 22, 24, 2);
+  // 頭飾 (依職業)
+  drawHeadGear(ctx, x, y, cls.headShape, col.helm, t);
 
-  ctx.fillStyle = 'rgba(130,180,255,0.5)';
+  // 尾巴
+  ctx.fillStyle = col.tail;
   ctx.beginPath();
-  ctx.moveTo(x - 14, y + 18);
+  ctx.moveTo(x - 15, y + 19);
   ctx.bezierCurveTo(
-    x - 8, y + 30 + Math.sin(t * 2) * 4,
-    x + 8, y + 30 + Math.cos(t * 2) * 4,
-    x + 14, y + 18
+    x - 9, y + 32 + Math.sin(t * 2) * 4,
+    x + 9, y + 32 + Math.cos(t * 2) * 4,
+    x + 15, y + 19
   );
   ctx.fill();
+  // 尾巴細節（飄絲）
+  ctx.strokeStyle = col.tail;
+  ctx.lineWidth = 1.5;
+  for (let i = -1; i <= 1; i++) {
+    ctx.beginPath();
+    ctx.moveTo(x + i * 6, y + 22);
+    ctx.quadraticCurveTo(x + i * 8, y + 28 + Math.sin(t * 3 + i) * 3, x + i * 10, y + 32);
+    ctx.stroke();
+  }
 
-  ctx.shadowColor = '#00e5ff';
-  ctx.shadowBlur = 8 + gi * 5;
-  ctx.fillStyle = '#00e5ff';
+  // 眼睛 (職業專屬顏色)
+  ctx.shadowColor = col.eye;
+  ctx.shadowBlur = 9 + gi * 5;
+  ctx.fillStyle = col.eye;
   ctx.beginPath();
-  ctx.ellipse(x - 7, y - 5, 3, 4.5, 0, 0, Math.PI * 2);
+  ctx.ellipse(x - 7, y - 4, 3.2, 4.8, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.ellipse(x + 7, y - 5, 3, 4.5, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + 7, y - 4, 3.2, 4.8, 0, 0, Math.PI * 2);
   ctx.fill();
+  // 眼睛高光
+  ctx.fillStyle = '#ffffff';
   ctx.shadowBlur = 0;
+  ctx.beginPath(); ctx.ellipse(x - 6, y - 5, 1, 1.4, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x + 8, y - 5, 1, 1.4, 0, 0, Math.PI * 2); ctx.fill();
 
+  // 攻擊動畫 (劍光/法術/匕首/聖光)
   if (attacking) {
     const p = RT.hero.attackAnim / 0.18;
+    drawWeaponSlash(ctx, x, y, p, S.heroClass);
+  }
+  ctx.restore();
+}
+
+function hexToRgb(hex) {
+  const m = hex.match(/^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i);
+  if (!m) return { r: 126, g: 184, b: 247 };
+  return { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) };
+}
+
+function drawHeadGear(ctx, x, y, shape, color, t) {
+  if (shape === 'helmet') {
+    // 騎士金頭盔
+    ctx.fillStyle = color;
+    ctx.fillRect(x - 13, y - 31, 26, 10);
+    ctx.fillRect(x - 5, y - 38, 10, 8);
+    ctx.fillStyle = '#a07020';
+    ctx.fillRect(x - 13, y - 22, 26, 2);
+    // 羽飾
+    ctx.fillStyle = '#ff4040';
+    ctx.fillRect(x - 2, y - 44, 4, 7);
+  } else if (shape === 'hood') {
+    // 法師尖頂帽
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x - 14, y - 25);
+    ctx.lineTo(x + 14, y - 25);
+    ctx.lineTo(x + 4, y - 45);
+    ctx.closePath();
+    ctx.fill();
+    // 帽尖星星
+    ctx.fillStyle = '#ffd700';
+    ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 6;
+    ctx.beginPath();
+    ctx.arc(x + 4, y - 45, 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    // 帽底邊
+    ctx.fillStyle = '#3a1a6a';
+    ctx.fillRect(x - 15, y - 27, 30, 4);
+  } else if (shape === 'mask') {
+    // 刺客面罩
+    ctx.fillStyle = color;
+    ctx.fillRect(x - 14, y - 32, 28, 14);
+    // 兜帽
+    ctx.beginPath();
+    ctx.moveTo(x - 16, y - 18);
+    ctx.bezierCurveTo(x - 12, y - 40, x + 12, y - 40, x + 16, y - 18);
+    ctx.closePath();
+    ctx.fill();
+    // 眼縫
+    ctx.fillStyle = '#000';
+    ctx.fillRect(x - 12, y - 26, 8, 3);
+    ctx.fillRect(x + 4, y - 26, 8, 3);
+  } else if (shape === 'halo') {
+    // 牧師光環
+    const gi = (Math.sin(t * 2) + 1) / 2;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.shadowColor = color; ctx.shadowBlur = 10 + gi * 6;
+    ctx.beginPath();
+    ctx.ellipse(x, y - 30, 15, 5, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    // 內環光
+    ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(x, y - 30, 11, 3.5, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+}
+
+function drawWeaponSlash(ctx, x, y, p, classId) {
+  if (classId === 'mage') {
+    // 法師：火球
+    const dist = (1 - p) * 70;
+    const fr = ctx.createRadialGradient(x + 24 + dist, y, 2, x + 24 + dist, y, 14);
+    fr.addColorStop(0, `rgba(255,200,80,${p})`);
+    fr.addColorStop(0.5, `rgba(255,100,30,${p * 0.6})`);
+    fr.addColorStop(1, 'rgba(255,80,0,0)');
+    ctx.fillStyle = fr;
+    ctx.fillRect(x + 10 + dist, y - 14, 28, 28);
+  } else if (classId === 'assassin') {
+    // 刺客：雙匕首
+    ctx.strokeStyle = `rgba(255,200,200,${p})`;
+    ctx.lineWidth = 2;
+    ctx.shadowColor = '#ff8080'; ctx.shadowBlur = 8;
+    for (let i = -1; i <= 1; i += 2) {
+      ctx.beginPath();
+      ctx.moveTo(x + 22, y + i * 6);
+      ctx.lineTo(x + 22 + (1 - p) * 60, y + i * 12 - (1 - p) * 8);
+      ctx.stroke();
+    }
+    ctx.shadowBlur = 0;
+  } else if (classId === 'paladin') {
+    // 牧師：聖光
+    ctx.strokeStyle = `rgba(255,240,180,${p})`;
+    ctx.lineWidth = 6;
+    ctx.shadowColor = '#fff0a0'; ctx.shadowBlur = 16;
+    ctx.beginPath();
+    ctx.arc(x + 30, y, 24, -Math.PI * 0.5 - p, -Math.PI * 0.5 + p);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  } else {
+    // 騎士：劍光
     ctx.strokeStyle = `rgba(220,240,255,${p})`;
     ctx.lineWidth = 4;
-    ctx.shadowColor = '#7eb8f7';
-    ctx.shadowBlur = 14;
+    ctx.shadowColor = '#7eb8f7'; ctx.shadowBlur = 14;
     ctx.beginPath();
     ctx.moveTo(x + 24, y - 14);
     ctx.lineTo(x + 24 + (1 - p) * 70, y + 14 - (1 - p) * 25);
     ctx.stroke();
     ctx.shadowBlur = 0;
   }
-  ctx.restore();
 }
 
 function drawEnemy(ctx, x, y, t, enemy) {
   if (!enemy) return;
-  const bob = Math.sin(enemy.bobPhase) * 3;
-  y += bob;
-  const hurt = enemy.hurtTime > 0;
+  const type = enemy.type || ENEMY_TYPES.warrior;
   const isBoss = enemy.isBoss;
-  const scale = isBoss ? 1.5 : 1;
+  const scale = (isBoss ? 1.6 : 1) * type.size;
+  const bob = Math.sin(enemy.bobPhase) * (type.shape === 'float' ? 5 : 3);
+  if (type.shape === 'float') y -= 8 + bob;
+  else y += bob;
+  const hurt = enemy.hurtTime > 0;
 
   ctx.save();
   if (hurt) {
@@ -1278,61 +1555,209 @@ function drawEnemy(ctx, x, y, t, enemy) {
     ctx.translate((Math.random() - 0.5) * 4, 0);
   }
 
-  ctx.fillStyle = 'rgba(0,0,0,0.4)';
+  // 影子
+  ctx.fillStyle = 'rgba(0,0,0,0.45)';
   ctx.beginPath();
-  ctx.ellipse(x, y + 32 * scale, 16 * scale, 4, 0, 0, Math.PI * 2);
+  ctx.ellipse(x, y + 32 * scale, 17 * scale, 4.5, 0, 0, Math.PI * 2);
   ctx.fill();
 
   const c = enemy.color || '#c8b468';
+  const dark = darken(c, 0.45);
   const flash = hurt ? '#ffffff' : c;
 
-  ctx.fillStyle = flash;
-  ctx.beginPath();
-  ctx.ellipse(x, y - 20 * scale, 14 * scale, 15 * scale, 0, 0, Math.PI * 2);
-  ctx.fill();
+  // BOSS 紅色光環
+  if (isBoss) {
+    const ag = ctx.createRadialGradient(x, y, 12, x, y, 80);
+    ag.addColorStop(0, 'rgba(255,60,60,0.25)');
+    ag.addColorStop(1, 'rgba(255,60,60,0)');
+    ctx.fillStyle = ag;
+    ctx.fillRect(x - 80, y - 80, 160, 160);
+  }
 
-  ctx.fillStyle = isBoss ? '#ff2020' : '#101020';
-  ctx.beginPath();
-  ctx.ellipse(x - 5 * scale, y - 22 * scale, 3 * scale, 4 * scale, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(x + 5 * scale, y - 22 * scale, 3 * scale, 4 * scale, 0, 0, Math.PI * 2);
-  ctx.fill();
+  // 法師類：飄浮 + 光環
+  if (type.shape === 'float') {
+    const fg = ctx.createRadialGradient(x, y, 8, x, y, 35);
+    fg.addColorStop(0, `rgba(${hexToRgb(c).r},${hexToRgb(c).g},${hexToRgb(c).b},0.3)`);
+    fg.addColorStop(1, `rgba(${hexToRgb(c).r},${hexToRgb(c).g},${hexToRgb(c).b},0)`);
+    ctx.fillStyle = fg;
+    ctx.fillRect(x - 35, y - 35, 70, 70);
+  }
 
+  // 不同身型
+  if (type.shape === 'slim') {
+    // 瘦長刺客
+    drawEnemyBody(ctx, x, y, scale, flash, dark, 11, 14, 8, 24);
+  } else if (type.shape === 'thick') {
+    // 矮胖坦克
+    drawEnemyBody(ctx, x, y, scale, flash, dark, 17, 13, 14, 18);
+  } else if (type.shape === 'float') {
+    // 法師飄浮
+    drawEnemyBody(ctx, x, y, scale, flash, dark, 12, 16, 11, 12, true);
+  } else {
+    // 平衡戰士
+    drawEnemyBody(ctx, x, y, scale, flash, dark, 14, 15, 10, 22);
+  }
+
+  // 眼睛 (依類型發光顏色)
+  const eyeColor = isBoss ? '#ff4040' : type.eyeColor;
+  ctx.shadowColor = eyeColor;
+  ctx.shadowBlur = 6 + Math.sin(t * 3) * 3;
+  ctx.fillStyle = eyeColor;
+  const ey = y - 22 * scale;
+  const ex = 5 * scale;
+  ctx.beginPath();
+  ctx.ellipse(x - ex, ey, 3 * scale, 4 * scale, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(x + ex, ey, 3 * scale, 4 * scale, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // BOSS 角
   if (isBoss) {
     ctx.fillStyle = '#3a2818';
     ctx.beginPath();
     ctx.moveTo(x - 12 * scale, y - 30 * scale);
-    ctx.lineTo(x - 18 * scale, y - 45 * scale);
+    ctx.lineTo(x - 20 * scale, y - 50 * scale);
     ctx.lineTo(x - 8 * scale, y - 33 * scale);
     ctx.fill();
     ctx.beginPath();
     ctx.moveTo(x + 12 * scale, y - 30 * scale);
-    ctx.lineTo(x + 18 * scale, y - 45 * scale);
+    ctx.lineTo(x + 20 * scale, y - 50 * scale);
     ctx.lineTo(x + 8 * scale, y - 33 * scale);
     ctx.fill();
+    // 王冠
+    ctx.fillStyle = '#ffd700';
+    ctx.fillRect(x - 8 * scale, y - 35 * scale, 16 * scale, 4 * scale);
+    for (let i = -1; i <= 1; i++) {
+      ctx.beginPath();
+      ctx.moveTo(x + i * 6 * scale - 2, y - 35 * scale);
+      ctx.lineTo(x + i * 6 * scale, y - 40 * scale);
+      ctx.lineTo(x + i * 6 * scale + 2, y - 35 * scale);
+      ctx.fill();
+    }
   }
 
-  ctx.fillStyle = flash;
-  ctx.fillRect(x - 10 * scale, y - 6 * scale, 20 * scale, 22 * scale);
-  ctx.fillRect(x - 19 * scale, y - 6 * scale, 9 * scale, 5 * scale);
-  ctx.fillRect(x + 10 * scale, y - 6 * scale, 9 * scale, 5 * scale);
-  ctx.fillRect(x - 9 * scale, y + 16 * scale, 6 * scale, 15 * scale);
-  ctx.fillRect(x + 3 * scale, y + 16 * scale, 6 * scale, 15 * scale);
-
-  ctx.fillStyle = '#808090';
-  ctx.fillRect(x + 18 * scale, y - 22 * scale, 3 * scale, 30 * scale);
-  ctx.fillRect(x + 12 * scale, y - 24 * scale, 14 * scale, 4 * scale);
-
-  if (isBoss) {
-    const ag = ctx.createRadialGradient(x, y, 10, x, y, 60);
-    ag.addColorStop(0, 'rgba(255,80,80,0.15)');
-    ag.addColorStop(1, 'rgba(255,80,80,0)');
-    ctx.fillStyle = ag;
-    ctx.fillRect(x - 60, y - 60, 120, 120);
-  }
+  // 武器
+  drawEnemyWeapon(ctx, x, y, scale, type.weapon, t);
 
   ctx.restore();
+}
+
+function darken(hex, amt) {
+  const c = hexToRgb(hex);
+  return `rgb(${Math.floor(c.r * (1 - amt))},${Math.floor(c.g * (1 - amt))},${Math.floor(c.b * (1 - amt))})`;
+}
+
+function drawEnemyBody(ctx, x, y, scale, light, dark, headW, headH, bodyW, bodyH, isFloat) {
+  // 頭
+  ctx.fillStyle = light;
+  ctx.beginPath();
+  ctx.ellipse(x, y - 20 * scale, headW * scale, headH * scale, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // 頭部陰影
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  ctx.beginPath();
+  ctx.ellipse(x + 3 * scale, y - 18 * scale, headW * 0.6 * scale, headH * 0.5 * scale, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 軀幹
+  ctx.fillStyle = light;
+  ctx.beginPath();
+  ctx.roundRect(x - bodyW * scale, y - 6 * scale, bodyW * 2 * scale, bodyH * scale, 4);
+  ctx.fill();
+  // 軀幹陰影
+  ctx.fillStyle = dark;
+  ctx.fillRect(x - bodyW * scale, y - 6 * scale + bodyH * scale * 0.55, bodyW * 2 * scale, bodyH * scale * 0.45);
+
+  // 護甲飾邊
+  ctx.strokeStyle = dark;
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(x - bodyW * scale, y - 6 * scale, bodyW * 2 * scale, bodyH * scale);
+
+  // 手臂
+  ctx.fillStyle = light;
+  ctx.fillRect(x - (bodyW + 8) * scale, y - 4 * scale, 8 * scale, 5 * scale);
+  ctx.fillRect(x + bodyW * scale, y - 4 * scale, 8 * scale, 5 * scale);
+
+  if (!isFloat) {
+    // 腿
+    ctx.fillStyle = dark;
+    ctx.fillRect(x - (bodyW - 3) * scale, y + (bodyH - 6) * scale, 5 * scale, 14 * scale);
+    ctx.fillRect(x + (bodyW - 8) * scale, y + (bodyH - 6) * scale, 5 * scale, 14 * scale);
+    // 腳
+    ctx.fillStyle = '#202028';
+    ctx.fillRect(x - (bodyW - 2) * scale, y + (bodyH + 6) * scale, 6 * scale, 3 * scale);
+    ctx.fillRect(x + (bodyW - 9) * scale, y + (bodyH + 6) * scale, 6 * scale, 3 * scale);
+  } else {
+    // 飄浮：尾巴
+    ctx.fillStyle = `rgba(${hexToRgb(light.startsWith('rgb') ? '#c060c0' : light).r},${hexToRgb(light.startsWith('rgb') ? '#c060c0' : light).g},${hexToRgb(light.startsWith('rgb') ? '#c060c0' : light).b},0.5)`;
+    ctx.beginPath();
+    ctx.moveTo(x - bodyW * scale, y + bodyH * scale - 6);
+    ctx.bezierCurveTo(
+      x - 3, y + (bodyH + 14) * scale,
+      x + 3, y + (bodyH + 14) * scale,
+      x + bodyW * scale, y + bodyH * scale - 6
+    );
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawEnemyWeapon(ctx, x, y, scale, weapon, t) {
+  if (weapon === 'sword') {
+    ctx.fillStyle = '#c0c0c8';
+    ctx.fillRect(x + 18 * scale, y - 22 * scale, 3 * scale, 30 * scale);
+    ctx.fillStyle = '#808090';
+    ctx.fillRect(x + 12 * scale, y - 24 * scale, 14 * scale, 4 * scale);
+    // 劍尖反光
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x + 19 * scale, y - 22 * scale, 1, 4 * scale);
+  } else if (weapon === 'dagger') {
+    // 雙匕首
+    for (let s = -1; s <= 1; s += 2) {
+      ctx.fillStyle = '#a0a0a8';
+      ctx.fillRect(x + s * 16 * scale, y - 10 * scale, 2 * scale, 14 * scale);
+      ctx.fillStyle = '#404048';
+      ctx.fillRect(x + s * 16 * scale - 2, y + 4 * scale, 6 * scale, 3 * scale);
+    }
+  } else if (weapon === 'shield') {
+    // 大盾
+    ctx.fillStyle = '#80807a';
+    ctx.beginPath();
+    ctx.ellipse(x - 16 * scale, y, 8 * scale, 16 * scale, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#5a5a52';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // 盾紋
+    ctx.fillStyle = '#a0a098';
+    ctx.beginPath();
+    ctx.arc(x - 16 * scale, y, 3 * scale, 0, Math.PI * 2);
+    ctx.fill();
+    // 劍
+    ctx.fillStyle = '#c0c0c8';
+    ctx.fillRect(x + 18 * scale, y - 18 * scale, 3 * scale, 24 * scale);
+  } else if (weapon === 'staff') {
+    // 法杖
+    ctx.fillStyle = '#604030';
+    ctx.fillRect(x + 16 * scale, y - 30 * scale, 3 * scale, 40 * scale);
+    // 法球（脈動）
+    const orb = 4 + Math.sin(t * 4) * 1.5;
+    const og = ctx.createRadialGradient(x + 17 * scale, y - 32 * scale, 1, x + 17 * scale, y - 32 * scale, orb * scale * 2);
+    og.addColorStop(0, '#ff80ff');
+    og.addColorStop(0.6, '#c040c0');
+    og.addColorStop(1, 'rgba(200,80,200,0)');
+    ctx.fillStyle = og;
+    ctx.fillRect(x + 17 * scale - orb * scale * 2, y - 32 * scale - orb * scale * 2, orb * scale * 4, orb * scale * 4);
+    // 法球核心
+    ctx.shadowColor = '#ff80ff'; ctx.shadowBlur = 8;
+    ctx.fillStyle = '#ffd0ff';
+    ctx.beginPath();
+    ctx.arc(x + 17 * scale, y - 32 * scale, orb * scale * 0.6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
 }
 
 function drawSkillFx(ctx, fx, dt) {
@@ -1524,6 +1949,8 @@ function setupInventoryInput() {
   let touchStartXY = null;
   let dragging = false;
   let lastTap = 0, lastTapIdx = -1;
+  let longPressTimer = null;
+  let longPressTriggered = false;
 
   function getIdxFromEvent(e) {
     const x = e.touches ? e.touches[0].clientX : (e.changedTouches ? e.changedTouches[0].clientX : e.clientX);
@@ -1563,7 +1990,24 @@ function setupInventoryInput() {
     touchStartIdx = idx;
     touchStartXY = e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
     dragging = false;
+    longPressTriggered = false;
     grid.children[idx].classList.add('dragging');
+    // 長按 600ms 觸發賣出
+    if (longPressTimer) clearTimeout(longPressTimer);
+    longPressTimer = setTimeout(() => {
+      if (touchStartIdx === idx && !dragging) {
+        longPressTriggered = true;
+        const item = S.inventory[idx];
+        if (!item) return;
+        const price = itemSellPrice(item);
+        const rar = RARITY[tierToRarity(item.tier)].name;
+        if (confirm(`賣出 ${rar} ${ITEM_TYPES[item.type].name} T${item.tier}？\n獲得 ${formatNum(price)} 靈幣`)) {
+          sellAt(idx);
+          showToast(`💰 賣出 +${formatNum(price)}`, 'success');
+          refreshAllUI();
+        }
+      }
+    }, 600);
   }
 
   function moveDrag(e) {
@@ -1584,6 +2028,7 @@ function setupInventoryInput() {
       }
     }
     if (dragging) {
+      if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
       ghost.style.left = x + 'px';
       ghost.style.top = y + 'px';
       const overIdx = getIdxFromEvent(e);
@@ -1593,7 +2038,18 @@ function setupInventoryInput() {
   }
 
   function endDrag(e) {
+    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
     if (touchStartIdx < 0) return;
+    if (longPressTriggered) {
+      // 長按已處理
+      Array.from(grid.children).forEach(c => c.classList.remove('dragging'));
+      ghost.classList.add('hidden');
+      clearHighlight();
+      touchStartIdx = -1;
+      dragging = false;
+      longPressTriggered = false;
+      return;
+    }
     if (dragging) {
       const dstIdx = getIdxFromEvent(e);
       if (dstIdx >= 0 && dstIdx !== touchStartIdx) {
@@ -1924,6 +2380,11 @@ function bindUI() {
   document.getElementById('btnSummon10').onclick = () => { sfx(); doSummon(10); };
   document.getElementById('btnDungeon').onclick = () => { sfx(); openDungeonModal(); };
   document.getElementById('btnShop').onclick = () => { sfx(); openShop(); };
+  document.getElementById('btnClass').onclick = (e) => {
+    e.stopPropagation();
+    sfx();
+    openClassModal();
+  };
   document.getElementById('btnMenu').onclick = () => {
     sfx();
     document.getElementById('menuModal').classList.remove('hidden');

@@ -241,9 +241,14 @@ html,body{
   flex:1;
   display:grid;
   grid-template-columns:repeat(5,1fr);
-  grid-template-rows:repeat(4,1fr);
-  gap:4px;min-height:0;
+  gap:5px;
+  overflow-y:auto;
+  align-content:start;
+  min-height:0;
+  padding-right:2px;
 }
+#inventoryGrid::-webkit-scrollbar{width:4px}
+#inventoryGrid::-webkit-scrollbar-thumb{background:#3a4a78;border-radius:2px}
 .slot{
   position:relative;aspect-ratio:1;
   background:rgba(10,14,28,0.7);
@@ -403,6 +408,44 @@ html,body{
 .dungeon-item .d-badge{font-size:9px;padding:3px 8px;border-radius:10px;background:#2a3a64;color:#7eb8f7}
 .dungeon-item.current .d-badge{background:#7eb8f7;color:#06060f}
 .dungeon-item.cleared .d-badge{background:#3aff8a;color:#06060f}
+
+/* 職業 */
+.class-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:18px;height:18px;border-radius:50%;
+  background:rgba(154,106,247,0.3);
+  border:1px solid #9a6af7;
+  font-size:11px;cursor:pointer;
+  margin-left:4px;
+}
+.class-btn:active{transform:scale(0.92)}
+.class-item{
+  display:flex;align-items:center;gap:10px;
+  padding:12px;
+  background:rgba(20,28,52,0.7);
+  border:1px solid #2a3a64;border-radius:8px;
+}
+.class-item.current{border-color:#7eb8f7;background:rgba(126,184,247,0.15);box-shadow:0 0 8px rgba(126,184,247,0.2)}
+.class-item.locked{opacity:0.7}
+.class-icon{font-size:30px;line-height:1;width:40px;text-align:center}
+.class-info{flex:1;min-width:0}
+.class-name{font-size:13px;color:#c8d8ff;letter-spacing:1px}
+.class-desc{font-size:10px;color:#7090b0;margin-top:3px;line-height:1.4}
+.class-action{flex-shrink:0}
+.class-badge{
+  font-size:10px;padding:4px 10px;
+  background:#7eb8f7;color:#06060f;border-radius:10px;
+}
+.class-btn-switch, .class-btn-unlock{
+  background:rgba(80,50,160,0.4);
+  border:1px solid #9a6af7;
+  color:#c8a0ff;
+  padding:6px 12px;border-radius:6px;
+  cursor:pointer;font-size:11px;font-weight:bold;
+  font-family:inherit;
+}
+.class-btn-unlock{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.15)}
+.class-btn-switch:active, .class-btn-unlock:active{transform:scale(0.94)}
 
 /* 商店 */
 .shop-section{

@@ -586,7 +586,7 @@
     <p style="font-size:11px;color:#ffd83a;margin-top:4px;">🔥 連續擊殺累積「連擊」，倍率最高 ×3 金幣！</p>
     <p style="font-size:10px;color:#6fffa0;margin-top:2px;">💚 補血手段：治療術法術 · 點英雄花金幣補血 · 波次間自動回血 · 奇瓦瓦治療光環</p>
     <p style="font-size:10px;color:#9fd0ff;margin-top:2px;">⚠ 注意特殊貓貓：✚長毛貓治療隊友 · 🛡三花貓護盾減傷 · 橘貓死亡分裂 · 👹Boss咆哮全軍加速</p>
-    <p style="font-size:10px;color:#d0a0ff;margin-top:2px;">✦ 點英雄可施放專屬大招 · 🤝特定組合觸發武將羈絆加成 · ♾️通關後挑戰無盡模式</p>
+    <p style="font-size:10px;color:#d0a0ff;margin-top:2px;">✦ 大招就緒時狗狗會發光、頭頂出現✦ → 戰鬥中點狗狗即可發動（各有冷卻）· 🤝武將羈絆加成 · ♾️無盡模式</p>
     <p style="font-size:11px;color:#c060ff;margin-top:4px;">🎲 初始英雄：臘腸盾衛・哈士奇・巴哥衛兵<br>其他英雄用 🦴 在「轉蛋」召喚台解鎖<br>重複抽到會升級（攻擊↑血量↑）· 稀有度越高越強</p>
     <div id="mapSelect" style="margin: 14px 0 10px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
       <button class="map-btn active" data-map="0">🌲 翠林古道<br><small style="font-weight:normal;font-size:10px;color:#c4a878;">S 型林間路</small></button>
@@ -1016,10 +1016,8 @@ let imgsLoaded = 0;
 const IMG_KEYS = Object.keys(HERO_TYPES);
 IMG_KEYS.forEach(key => {
   const img = new Image();
-  img.onload = () => {
-    imgsLoaded++;
-    try { HERO_SPRITE[key] = removeWhiteBg(img); } catch (e) {}
-  };
+  // PNG 已離線去背為透明，直接使用
+  img.onload = () => { imgsLoaded++; HERO_SPRITE[key] = img; };
   img.src = `heroes/${key}.png`;
   HERO_IMGS[key] = img;
 });
@@ -1208,7 +1206,8 @@ function removeWhiteBg(img) {
   for (const key of Object.keys(ENEMY_TYPES)) {
     ENEMY_FALLBACK[key] = genCatCanvas(key);
     const img = new Image();
-    img.onload = () => { try { ENEMY_SPRITE[key] = removeWhiteBg(img); } catch (e) {} };
+    // PNG 已離線去背為透明，直接使用（不在執行時讀像素，避免 file:// 限制）
+    img.onload = () => { ENEMY_SPRITE[key] = img; };
     img.src = `enemies/${key}.png`;
   }
 })();
@@ -1903,7 +1902,20 @@ function getCanvasXY(evt) {
 canvas.addEventListener('pointerdown', (e) => {
   const {x, y} = getCanvasXY(e);
   const c = Math.floor(x / TILE), r = Math.floor(y / TILE);
-  // 先檢查是否點到既有英雄
+  // ① 先檢查是否點到「就緒大招」的頭頂 ✦ 符號 → 發動技能
+  const ultHit = state.heroes.find(h =>
+    ULTS[h.typeKey] && (h.ultCd || 0) <= 0 &&
+    Math.abs(h.x - x) < 16 && y > h.y - 72 && y < h.y - 42
+  );
+  if (ultHit && !state.gameOver) {
+    const ult = ULTS[ultHit.typeKey];
+    ult.cast(ultHit);
+    ultHit.ultCd = ult.cd;
+    state.effects.push({type:'explode', x:ultHit.x, y:ultHit.y - 10, r:26, life:0.4, maxLife:0.4, color:'#d0a0ff'});
+    // 只發動技能，不選取、不彈出面板
+    return;
+  }
+  // ② 點到狗狗身體 → 選取 / 開面板（不發動技能）
   const hit = state.heroes.find(h => Math.hypot(h.x - x, h.y - y) < 24);
   if (hit) {
     state.selectedHero = hit;
@@ -3375,16 +3387,58 @@ function render() {
       ctx.beginPath(); ctx.arc(hx, hy, 22, 0, Math.PI*2); ctx.stroke();
     }
 
-    // 大招就緒指示（頭頂紫色光環 + ✦）
-    if (ULTS[h.typeKey] && (h.ultCd || 0) <= 0) {
-      const tw = (Math.sin(nowMs / 200) + 1) / 2;
-      ctx.save();
-      ctx.globalAlpha = 0.5 + tw * 0.5;
-      ctx.fillStyle = '#d0a0ff';
-      ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText('✦', h.x, h.y - 56);
-      ctx.globalAlpha = 1;
-      ctx.restore();
+    // 大招狀態指示
+    const _ult = ULTS[h.typeKey];
+    if (_ult) {
+      const cd = h.ultCd || 0;
+      if (cd <= 0) {
+        // 就緒：發光環（加法混色）+ 頭頂跳動符號
+        const tw = (Math.sin(nowMs / 220) + 1) / 2;
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = 0.22 + tw * 0.30;
+        const gg = ctx.createRadialGradient(h.x, h.y - 8, 4, h.x, h.y - 8, 30);
+        gg.addColorStop(0, 'rgba(220,170,255,0.95)');
+        gg.addColorStop(1, 'rgba(220,170,255,0)');
+        ctx.fillStyle = gg;
+        ctx.beginPath(); ctx.arc(h.x, h.y - 8, 30, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+        // 旋轉光點環
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        for (let k = 0; k < 3; k++) {
+          const a = nowMs/400 + k * Math.PI*2/3;
+          const rx = h.x + Math.cos(a) * 24, ry = (h.y - 8) + Math.sin(a) * 12;
+          ctx.fillStyle = 'rgba(255,240,180,0.8)';
+          ctx.beginPath(); ctx.arc(rx, ry, 2.2, 0, Math.PI*2); ctx.fill();
+        }
+        ctx.restore();
+        // 頭頂跳動 ✦ 按鈕（圓底盤 + 雙層描邊，提示可點擊）
+        const symCy = h.y - 56 - tw * 4;
+        ctx.save();
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        // 按鈕底盤（脈動外光圈）
+        ctx.beginPath(); ctx.arc(h.x, symCy, 11 + tw * 1.5, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(120,60,170,${0.55 + tw*0.25})`; ctx.fill();
+        ctx.lineWidth = 1.5; ctx.strokeStyle = `rgba(220,170,255,${0.7 + tw*0.3})`; ctx.stroke();
+        // ✦ 符號
+        ctx.font = 'bold 15px sans-serif'; ctx.fillStyle = '#fff0c0';
+        ctx.fillText('✦', h.x, symCy + 0.5);
+        ctx.restore();
+        ctx.textBaseline = 'alphabetic';
+      } else {
+        // 冷卻中：頭頂小型倒數進度環 + 秒數
+        const frac = Math.max(0, Math.min(1, 1 - cd / _ult.cd));
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.strokeStyle = 'rgba(40,30,55,0.7)'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(h.x, h.y - 50, 7.5, 0, Math.PI*2); ctx.stroke();
+        ctx.strokeStyle = '#b08aff'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(h.x, h.y - 50, 7.5, -Math.PI/2, -Math.PI/2 + Math.PI*2*frac); ctx.stroke();
+        ctx.fillStyle = '#e0d0ff'; ctx.font = 'bold 8px sans-serif';
+        ctx.fillText(Math.ceil(cd), h.x, h.y - 47);
+        ctx.restore();
+      }
     }
 
     // 等級星星（盾頂緞帶）

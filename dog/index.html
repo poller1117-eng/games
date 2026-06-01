@@ -112,7 +112,21 @@
     color: #fff5d4; font-weight: bold; font-size: 12px; text-align: center;
   }
   #infoPanel .act-btn.up { background: linear-gradient(180deg, #2f8f3a, #1a5520); border-color: #6fdf78; }
+  #infoPanel .act-btn.heal { background: linear-gradient(180deg, #2f8f7a, #1a5548); border-color: #6fffc0; }
+  #infoPanel .act-btn.ult { background: linear-gradient(180deg, #7e3eaf, #4a1f70); border-color: #c08eff; }
+  #infoPanel .act-btn.ult:not(:disabled) { animation: pulse 1.3s infinite; }
   #infoPanel .act-btn.sell { background: linear-gradient(180deg, #8c2c2c, #5a1818); border-color: #d04040; }
+
+  /* 武將羈絆面板 */
+  #bondPanel {
+    position: absolute; right: 8px; top: 8px;
+    background: rgba(30,18,48,0.9);
+    border: 1px solid #c08eff; border-radius: 8px;
+    padding: 6px 10px; z-index: 26; max-width: 160px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+  #bondPanel .bond-title { font-size: 11px; color: #d0a0ff; font-weight: bold; margin-bottom: 3px; }
+  #bondPanel .bond-item { font-size: 11px; color: #ffd83a; line-height: 1.5; }
   #infoPanel .act-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
   /* Overlay - win/lose/start */
@@ -138,6 +152,12 @@
     border: 2px solid #ff6040; border-radius: 6px;
     color: #fff; font-size: 16px; font-weight: bold;
     cursor: pointer;
+  }
+  #overlay .big-btn:active { transform: translateY(1px); }
+  #overlay .big-btn.alt {
+    margin-left: 8px;
+    background: linear-gradient(180deg, #3a6a8c, #1e3a55);
+    border-color: #5a9ed0;
   }
   #overlay .small { font-size: 11px; color: #8c7050; margin-top: 8px; }
 
@@ -229,12 +249,234 @@
   }
   .map-btn.active { border-color: #ffd83a; box-shadow: 0 0 10px rgba(255,216,58,0.5); }
   .map-btn:hover { filter: brightness(1.2); }
+
+  /* Gacha button */
+  #hud .btn.gacha-btn {
+    background: linear-gradient(180deg, #7030a0, #401060);
+    border-color: #c060ff;
+    color: #f0d0ff;
+    animation: gachaPulse 2s infinite;
+  }
+  @keyframes gachaPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(192,96,255,0.5); }
+    50% { box-shadow: 0 0 12px 3px rgba(192,96,255,0.25); }
+  }
+
+  /* Lock overlay */
+  .hero-card .lock-overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.62); border-radius: 4px;
+    font-size: 22px; pointer-events: none;
+  }
+  .hero-card.locked { opacity: 0.75; }
+  .hero-card .rarity-stars { font-size: 8px; line-height: 1; margin-bottom: 1px; }
+
+  /* ============== Gacha Modal ============== */
+  #gachaModal {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.88);
+    display: none; align-items: center; justify-content: center;
+    z-index: 80; padding: 12px;
+  }
+  #gachaModal.show { display: flex; }
+  .gacha-panel {
+    background: linear-gradient(160deg, #2a1a40, #1a0e28);
+    border: 2px solid #c060ff; border-radius: 14px;
+    padding: 20px; width: 100%; max-width: 480px;
+    box-shadow: 0 0 40px rgba(192,96,255,0.35);
+    position: relative; max-height: 90vh; overflow-y: auto;
+  }
+  .gacha-panel h2 { color: #e0a0ff; font-size: 20px; margin-bottom: 4px; text-align: center; }
+  .gacha-sub { color: #a080c0; font-size: 11px; text-align: center; margin-bottom: 10px; }
+  .gacha-close {
+    position: absolute; top: 12px; right: 14px;
+    background: none; border: none; color: #c060ff;
+    font-size: 18px; cursor: pointer;
+  }
+  .gacha-cost-row { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px; }
+  .gacha-cost-tag {
+    padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: bold;
+    border: 1px solid;
+  }
+  .gacha-cost-tag.common { color:#8a8a8a; border-color:#8a8a8a; }
+  .gacha-cost-tag.rare   { color:#4da3ff; border-color:#4da3ff; }
+  .gacha-cost-tag.elite  { color:#c060ff; border-color:#c060ff; }
+  .gacha-cost-tag.legend { color:#ffd83a; border-color:#ffd83a; }
+  .gacha-btns { display: flex; gap: 10px; justify-content: center; margin-bottom: 14px; }
+  .gacha-pull-btn {
+    flex: 1; padding: 10px 8px; border-radius: 8px;
+    background: linear-gradient(180deg, #7030a0, #401060);
+    border: 2px solid #c060ff; color: #f0d0ff;
+    font-size: 14px; font-weight: bold; cursor: pointer;
+    text-align: center; line-height: 1.3;
+    transition: filter 0.15s;
+  }
+  .gacha-pull-btn.ten { background: linear-gradient(180deg, #a050d0, #602090); border-color: #ffd83a; color: #fff8e0; }
+  .gacha-pull-btn:hover { filter: brightness(1.15); }
+  .gacha-pull-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .gacha-pull-btn small { font-size: 10px; color: #ffd83a; }
+
+  /* Result cards */
+  .gacha-result { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 12px; min-height: 10px; }
+  .gacha-result-card {
+    width: 68px; border-radius: 8px; padding: 6px 4px 5px;
+    text-align: center; border: 2px solid;
+    background: rgba(0,0,0,0.5);
+    animation: cardReveal 0.4s ease-out both;
+  }
+  @keyframes cardReveal {
+    from { opacity:0; transform: scale(0.6) rotate(-8deg); }
+    to   { opacity:1; transform: scale(1) rotate(0deg); }
+  }
+  .gacha-result-card img { width: 44px; height: 44px; object-fit: contain; display: block; margin: 0 auto 3px; }
+  .gacha-result-card .rc-name { font-size: 9px; font-weight: bold; }
+  .gacha-result-card .rc-stars { font-size: 8px; }
+  .gacha-result-card .rc-new { font-size: 9px; color: #ffd83a; font-weight: bold; }
+
+  /* Pool grid */
+  .gacha-pool-title { color: #a080c0; font-size: 12px; margin-bottom: 8px; text-align: center; border-top: 1px solid #4a2a70; padding-top: 10px; }
+  .gacha-pool { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .gacha-pool-card {
+    width: 60px; border-radius: 6px; padding: 5px 3px 4px;
+    text-align: center; border: 1.5px solid;
+    background: rgba(0,0,0,0.4); position: relative;
+  }
+  .gacha-pool-card img { width: 38px; height: 38px; object-fit: contain; display: block; margin: 0 auto 2px; }
+  .gacha-pool-card .pc-name { font-size: 8px; }
+  .gacha-pool-card .pc-stars { font-size: 7px; }
+  .gacha-pool-card .pc-lock {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.6); border-radius: 5px; font-size: 16px;
+  }
+  .gacha-pool-card .pc-coll { font-size: 7px; color: #c4a878; margin-top: 1px; }
+
+  /* Gacha 抽卡結果狀態 */
+  .gacha-result-card .rc-lvup { font-size: 9px; color: #6fdf78; font-weight: bold; }
+  .gacha-result-card .rc-dup  { font-size: 8px; color: #8aa0c0; }
+
+  /* 商店卡片收藏徽章 + ℹ 按鈕 */
+  .hero-card .coll-badge {
+    position: absolute; top: -6px; left: -6px;
+    background: linear-gradient(180deg, #4a8030, #2a5018);
+    color: #d8ffc0; font-size: 8px; font-weight: bold;
+    border: 1px solid #6fdf78; border-radius: 8px; padding: 0 4px;
+    z-index: 2;
+  }
+  .hero-card .card-info-btn {
+    position: absolute; bottom: 2px; right: 2px;
+    width: 16px; height: 16px; padding: 0;
+    background: rgba(40,30,60,0.85); color: #c0a0ff;
+    border: 1px solid #8060c0; border-radius: 50%;
+    font-size: 10px; line-height: 1; cursor: pointer; z-index: 3;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-card .card-info-btn:active { transform: scale(0.9); }
+
+  /* ============== 角色詳情彈窗 ============== */
+  #heroDetailModal {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none; align-items: center; justify-content: center;
+    z-index: 90; padding: 12px;
+  }
+  #heroDetailModal.show { display: flex; }
+  .hd-panel {
+    background: linear-gradient(160deg, #2a2018, #160e08);
+    border: 2px solid #b58040; border-radius: 14px;
+    padding: 20px; width: 100%; max-width: 420px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.7);
+    position: relative; max-height: 90vh; overflow-y: auto;
+  }
+  .hd-close {
+    position: absolute; top: 12px; right: 14px;
+    background: none; border: none; color: #b58040;
+    font-size: 18px; cursor: pointer;
+  }
+  .hd-header { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
+  .hd-img {
+    width: 72px; height: 72px; object-fit: contain;
+    background: radial-gradient(circle, rgba(255,216,58,0.12), transparent 70%);
+    border-radius: 10px; flex: 0 0 auto;
+  }
+  .hd-head-info { flex: 1; }
+  .hd-name { font-size: 18px; font-weight: bold; margin-bottom: 3px; }
+  .hd-rarity { font-size: 12px; margin-bottom: 3px; }
+  .hd-coll { font-size: 12px; }
+  .hd-progress-wrap { margin-bottom: 12px; }
+  .hd-progress-label { font-size: 10px; color: #c4a878; margin-bottom: 4px; }
+  .hd-progress-bar {
+    height: 7px; background: #2a1a0c; border-radius: 4px;
+    overflow: hidden; border: 1px solid #5a3818;
+  }
+  .hd-progress-fill { height: 100%; width: 0%; border-radius: 4px; transition: width 0.4s; }
+  .hd-quote { color: #c4a878; font-style: italic; font-size: 12px; margin-bottom: 10px; text-align: center; }
+  .hd-stats { margin-bottom: 12px; }
+  .hd-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+  .hd-stat {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(0,0,0,0.35); border: 1px solid #4a3420;
+    border-radius: 5px; padding: 5px 8px; font-size: 12px;
+  }
+  .hd-stat .hd-k { color: #c4a878; }
+  .hd-stat .hd-v { color: #f9d77a; font-weight: bold; }
+  .hd-stat-row.next {
+    display: flex; justify-content: space-between;
+    font-size: 11px; padding: 6px 8px; margin-bottom: 8px;
+    background: rgba(40,80,30,0.2); border: 1px dashed #4a8030;
+    border-radius: 5px; color: #a0c090;
+  }
+  .hd-desc { font-size: 11px; color: #c4a878; }
+  .hd-story {
+    font-size: 11px; color: #9a8060; font-style: italic;
+    line-height: 1.5; border-top: 1px solid #4a3420; padding-top: 10px;
+  }
+
+  /* 暫停按鈕啟用態 */
+  #hud .btn.paused-active {
+    background: linear-gradient(180deg, #2f8f3a, #1a5520);
+    border-color: #6fdf78; animation: pulse 1.2s infinite;
+  }
+  /* 暫停遮罩 */
+  #pauseOverlay {
+    position: absolute; inset: 0;
+    background: rgba(10,8,4,0.55);
+    display: none; align-items: center; justify-content: center;
+    z-index: 28; backdrop-filter: blur(1px);
+  }
+  #pauseOverlay.show { display: flex; }
+  #pauseOverlay .pause-box {
+    background: rgba(20,12,6,0.92);
+    border: 2px solid #6fdf78; border-radius: 12px;
+    padding: 18px 32px; text-align: center;
+    color: #f9d77a; font-size: 24px; font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+  }
+  #pauseOverlay .pause-hint { font-size: 13px; color: #c4a878; margin-top: 6px; font-weight: normal; }
+
+  /* 連擊顯示 */
+  #comboBox {
+    position: absolute; top: 14px; right: 16px;
+    font-weight: bold; font-size: 22px;
+    color: #ffd83a; text-shadow: 2px 2px 0 #000, 0 0 8px rgba(255,150,40,0.6);
+    opacity: 0; transform-origin: right top;
+    transition: opacity 0.15s, transform 0.12s, color 0.2s;
+    pointer-events: none; z-index: 27; font-style: italic;
+  }
+  #comboBox.show { opacity: 1; }
+  #comboBox .combo-label { font-size: 13px; font-style: normal; }
+  #comboBox #comboMult { font-size: 16px; }
+
+  /* 結算星級 */
+  .result-stars { font-size: 34px; margin: 8px 0; letter-spacing: 4px; }
+  .result-stats { font-size: 12px; color: #c4a878; margin: 8px 0; line-height: 1.7; }
 </style>
 </head>
 <body>
 <div id="app">
   <div id="hud">
-    <div class="stat"><span class="icon">🦴</span><span id="goldText">200</span></div>
+    <div class="stat"><span class="icon">🦴</span><span id="goldText">500</span></div>
     <div class="stat"><span class="icon">❤️</span><span id="livesText">20</span></div>
     <div class="title">汪汪紀元：中古傳奇</div>
     <div class="stat"><span class="icon">🌊</span><span id="waveText">0/10</span></div>
@@ -243,19 +485,26 @@
       <span id="nextWaveInfo" style="font-size:11px;letter-spacing:0;">-</span>
     </div>
     <button id="startBtn" class="btn go ready">出戰</button>
+    <button id="pauseBtn" class="btn" title="暫停 / 繼續">⏸</button>
     <button id="speedBtn" class="btn">x1</button>
+    <button id="gachaBtn" class="btn gacha-btn">🎲 轉蛋</button>
     <button id="audioBtn" class="btn" title="音效開關" style="padding:4px 8px;font-size:14px;">🔊</button>
   </div>
 
   <div id="canvasWrap">
     <canvas id="game" width="900" height="540"></canvas>
     <div id="waveBanner"></div>
+    <div id="pauseOverlay"><div class="pause-box">⏸ 已暫停<div class="pause-hint">點 ▶ 繼續遊戲</div></div></div>
+    <div id="comboBox"><span id="comboNum">0</span> <span class="combo-label">連擊</span><span id="comboMult"></span></div>
+    <div id="bondPanel" style="display:none;"></div>
     <div id="infoPanel">
       <h3 id="ipName">英雄</h3>
       <div class="quote" id="ipQuote"></div>
       <div class="stats" id="ipStats"></div>
       <div class="actions">
+        <button class="act-btn ult" id="ipUlt">✦ 技能</button>
         <button class="act-btn up" id="ipUp">升級</button>
+        <button class="act-btn heal" id="ipHeal">補血</button>
         <button class="act-btn sell" id="ipSell">售出</button>
         <button class="act-btn" id="ipClose">關閉</button>
       </div>
@@ -266,6 +515,7 @@
     <button class="spell-btn ready" id="spell-freeze"><span class="slabel">🌀 石化 60🦴</span><span class="cd-bar" id="cd-freeze" style="width:100%"></span></button>
     <button class="spell-btn ready" id="spell-fire"><span class="slabel">🔥 業火 80🦴</span><span class="cd-bar" id="cd-fire" style="width:100%"></span></button>
     <button class="spell-btn ready" id="spell-buff"><span class="slabel">💛 號令 100🦴</span><span class="cd-bar" id="cd-buff" style="width:100%"></span></button>
+    <button class="spell-btn ready" id="spell-heal"><span class="slabel">💚 治療 90🦴</span><span class="cd-bar" id="cd-heal" style="width:100%"></span></button>
   </div>
   <div id="shop"></div>
 </div>
@@ -279,12 +529,65 @@
   </div>
 </div>
 
+<!-- =============== 轉蛋商城 =============== -->
+<div id="gachaModal">
+  <div class="gacha-panel">
+    <button class="gacha-close" id="gachaClose">✕</button>
+    <h2>🎲 召喚台</h2>
+    <p class="gacha-sub" id="gachaPityText">保底進度：0 / 10（下次稀有以上保底）</p>
+    <div class="gacha-cost-row">
+      <span class="gacha-cost-tag common">⭐ 普通 60%</span>
+      <span class="gacha-cost-tag rare">⭐⭐ 稀有 30%</span>
+      <span class="gacha-cost-tag elite">⭐⭐⭐ 精英 8%</span>
+      <span class="gacha-cost-tag legend">⭐⭐⭐⭐ 傳說 2%</span>
+    </div>
+    <div class="gacha-btns">
+      <button class="gacha-pull-btn" id="gachaPull1">單抽 150🦴</button>
+      <button class="gacha-pull-btn ten" id="gachaPull10">十連 1350🦴<br><small>省 150🦴</small></button>
+    </div>
+    <div id="gachaResult" class="gacha-result"></div>
+    <div class="gacha-pool-title">英雄圖鑑（點擊查看狀態）</div>
+    <div class="gacha-pool" id="gachaPool"></div>
+    <div style="text-align:center;margin-top:14px;border-top:1px solid #4a2a70;padding-top:10px;">
+      <span style="font-size:10px;color:#6a5a80;">💾 進度自動存檔於本機</span>
+      <button id="wipeSaveBtn" style="margin-left:10px;font-size:10px;padding:3px 8px;background:none;border:1px solid #80506a;border-radius:6px;color:#c08aa0;cursor:pointer;">🗑 清除進度</button>
+    </div>
+  </div>
+</div>
+
+<!-- =============== 角色詳情 =============== -->
+<div id="heroDetailModal">
+  <div class="hd-panel">
+    <button class="hd-close" id="hdClose">✕</button>
+    <div class="hd-header">
+      <img class="hd-img" id="hdImg" src="" alt="">
+      <div class="hd-head-info">
+        <div class="hd-name" id="hdName">英雄</div>
+        <div class="hd-rarity" id="hdRarity"></div>
+        <div class="hd-coll" id="hdColl"></div>
+      </div>
+    </div>
+    <div class="hd-progress-wrap">
+      <div class="hd-progress-label" id="hdProgLabel"></div>
+      <div class="hd-progress-bar"><div class="hd-progress-fill" id="hdProgFill"></div></div>
+    </div>
+    <div class="hd-quote" id="hdQuote"></div>
+    <div class="hd-stats" id="hdStats"></div>
+    <div class="hd-story" id="hdStory"></div>
+  </div>
+</div>
+
 <div id="overlay" class="show">
   <div class="panel" id="overlayPanel">
     <h1>汪汪紀元：中古傳奇</h1>
     <h2>英雄派駐式塔防</h2>
     <p>「招募汪汪猛將，抵抗狡詐貓貓軍團，<br>在中古大陸成就屬於你的傳說。」</p>
-    <p style="font-size:11px;color:#8c7050;">點擊地圖部署英雄 · 拖動職業卡到位置 · 點英雄可升級/出售<br>共 10 波，守住終點即可獲勝</p>
+    <p style="font-size:11px;color:#8c7050;">點擊地圖部署英雄 · 點英雄可升級/出售<br>共 15 波，守住終點即可獲勝（依剩餘生命評 ⭐1~3）</p>
+    <p style="font-size:11px;color:#ffd83a;margin-top:4px;">🔥 連續擊殺累積「連擊」，倍率最高 ×3 金幣！</p>
+    <p style="font-size:10px;color:#6fffa0;margin-top:2px;">💚 補血手段：治療術法術 · 點英雄花金幣補血 · 波次間自動回血 · 奇瓦瓦治療光環</p>
+    <p style="font-size:10px;color:#9fd0ff;margin-top:2px;">⚠ 注意特殊貓貓：✚長毛貓治療隊友 · 🛡三花貓護盾減傷 · 橘貓死亡分裂 · 👹Boss咆哮全軍加速</p>
+    <p style="font-size:10px;color:#d0a0ff;margin-top:2px;">✦ 點英雄可施放專屬大招 · 🤝特定組合觸發武將羈絆加成 · ♾️通關後挑戰無盡模式</p>
+    <p style="font-size:11px;color:#c060ff;margin-top:4px;">🎲 初始英雄：臘腸盾衛・哈士奇・巴哥衛兵<br>其他英雄用 🦴 在「轉蛋」召喚台解鎖<br>重複抽到會升級（攻擊↑血量↑）· 稀有度越高越強</p>
     <div id="mapSelect" style="margin: 14px 0 10px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
       <button class="map-btn active" data-map="0">🌲 翠林古道<br><small style="font-weight:normal;font-size:10px;color:#c4a878;">S 型林間路</small></button>
       <button class="map-btn" data-map="1">🏜️ 荒漠險途<br><small style="font-weight:normal;font-size:10px;color:#c4a878;">U 型沙漠路</small></button>
@@ -386,7 +689,9 @@ function switchMap(mapDef) {
 const HERO_TYPES = {
   changchang: {
     name: '臘腸盾衛', cls: 'tank', emoji: '🐕', color: '#a86b3a',
+    rarity: 'common',
     quote: '固執守備，防禦心極強。',
+    story: '出身南疆小村的老兵後代，幼年便以廢盾抵擋了整村的貓貓入侵。雖然身形矮小，但臥於陣前時無一貓貓得以突破。村人稱他「活城牆」，他只說：「我不動，前線就不動。」',
     maxHp: 400,
     cost: 80,
     range: 90, damage: 18, fireRate: 1.0, splash: 0,
@@ -398,7 +703,9 @@ const HERO_TYPES = {
   },
   baga: {
     name: '巴哥衛兵', cls: 'tank', emoji: '🐶', color: '#c89860',
+    rarity: 'common',
     quote: '鎧面無私，揮拳速碎粉碎岩石。',
+    story: '帝國皇家禁衛軍出身，以一拳擊碎玄武岩而聞名，卻因打碎了皇帝的茶壺被迫退役。如今流落江湖，仍以那雙重錘拳頭維護弱小。「拳頭夠硬，敵人就會變懂事。」',
     maxHp: 450,
     cost: 120,
     range: 110, damage: 38, fireRate: 0.75, splash: 30,
@@ -410,7 +717,9 @@ const HERO_TYPES = {
   },
   bulldog: {
     name: '鬥牛犬鐵匠', cls: 'tank', emoji: '🐶', color: '#7a5a3a',
+    rarity: 'rare',
     quote: '鐵鎚帶來希望與毀滅。',
+    story: '在熔岩礦脈旁長大，自幼以火鍛鐵，沒有任何鎧甲能阻擋他的鐵錘。他加入義軍不為金錢，只因「打仗比打鐵更爽，而且敵人也不會退款。」',
     maxHp: 500,
     cost: 160,
     range: 130, damage: 55, fireRate: 1.0, splash: 50,
@@ -422,7 +731,9 @@ const HERO_TYPES = {
   },
   husky: {
     name: '哈士奇巡林者', cls: 'dps', emoji: '🐺', color: '#7a8ca4',
+    rarity: 'common',
     quote: '自信亂吼，木箭精準得驚人。',
+    story: '本是深山信使，因方向感奇差而每次都迷路。卻在迷路中練就了一手能射中任何移動目標的弓術。「我不知道自己在哪，但箭矢自己知道。」',
     maxHp: 200,
     cost: 100,
     range: 200, damage: 22, fireRate: 1.6, splash: 0,
@@ -434,7 +745,9 @@ const HERO_TYPES = {
   },
   shiba: {
     name: '柴犬武士', cls: 'dps', emoji: '🦊', color: '#d68040',
+    rarity: 'rare',
     quote: '孤傲劍客，追求極限一閃。',
+    story: '武士道修行者，以「一刀必中」為信念。曾拒絕侍奉四位領主，說「忠誠不是賣的」，最終選擇遊俠之路。每次出刀前都會先冥想三秒，讓對手誤以為機器故障。',
     maxHp: 180,
     cost: 140,
     range: 140, damage: 70, fireRate: 0.9, splash: 0,
@@ -447,7 +760,9 @@ const HERO_TYPES = {
   },
   chihuahua: {
     name: '奇瓦瓦僧侶', cls: 'mage', emoji: '🐕‍🦺', color: '#dca860',
+    rarity: 'rare',
     quote: '聖光無比堅定的小太陽。',
+    story: '聖廟最年輕的住持，聖光鐘聲震裂過三十六面銅牆。雖然身形似一顆橘子，但信仰的力量讓他面對任何敵人都面不改色。「大小無礙，信念夠強便是山。」',
     maxHp: 150,
     cost: 90,
     range: 130, damage: 12, fireRate: 1.6, splash: 0,
@@ -460,7 +775,9 @@ const HERO_TYPES = {
   },
   poodle: {
     name: '聖伯納療癒師', cls: 'mage', emoji: '🐩', color: '#e8d4a0',
+    rarity: 'elite',
     quote: '有他在的地方就沒有死亡。',
+    story: '出身魔法學院最古老的藥劑師系，虹彩魔法球的配方是她花三年研究的傑作。她說她來前線是為了「田野試驗」，但其實是因為她把學院的噴泉噴成了彩虹而被驅逐。「美麗且致命，這才是完美的魔法。」',
     maxHp: 160,
     cost: 110,
     range: 160, damage: 8, fireRate: 1.2, splash: 60,
@@ -472,7 +789,9 @@ const HERO_TYPES = {
   },
   butterfly: {
     name: '蝴蝶犬神偷', cls: 'ctrl', emoji: '🐕', color: '#b890d8',
+    rarity: 'elite',
     quote: '動作輕盈，敵人未察錢已落袋。',
+    story: '出身神秘的青刃公會，每次任務後都把零錢悄悄捐給孤兒院。沒人見過她的臉，只見過消失前飄落的一片金葉。「取之有道，予之有義。」',
     maxHp: 170,
     cost: 130,
     range: 180, damage: 15, fireRate: 2.0, splash: 0,
@@ -484,7 +803,9 @@ const HERO_TYPES = {
   },
   shepherd: {
     name: '德牧隊長', cls: 'ctrl', emoji: '🐺', color: '#604020',
+    rarity: 'legend',
     quote: '一聲軍令激發戰士潛能。',
+    story: '前帝國軍官，因公開反對不義戰爭而被冠以叛軍之名。如今率義軍守護平民，以一聲令下激發所有戰士的潛能。「真正的戰士，打的是值得打的仗。」',
     maxHp: 250,
     cost: 180,
     range: 150, damage: 25, fireRate: 1.1, splash: 0,
@@ -497,19 +818,72 @@ const HERO_TYPES = {
 };
 
 // =====================================================================
+// 稀有度系統
+// =====================================================================
+const RARITY_CONFIG = {
+  common: { color:'#8a8a8a', stars:1, label:'普通', weight:60, glowColor:'rgba(138,138,138,0.4)', borderCSS:'#8a8a8a' },
+  rare:   { color:'#4da3ff', stars:2, label:'稀有', weight:30, glowColor:'rgba(77,163,255,0.5)',  borderCSS:'#4da3ff' },
+  elite:  { color:'#c060ff', stars:3, label:'精英', weight:8,  glowColor:'rgba(192,96,255,0.5)',  borderCSS:'#c060ff' },
+  legend: { color:'#ffd83a', stars:4, label:'傳說', weight:2,  glowColor:'rgba(255,216,58,0.6)',  borderCSS:'#ffd83a' }
+};
+
+// =====================================================================
+// 英雄成長系統
+// =====================================================================
+// 收藏等級：每升一級需要的【累計副本數】
+// Lv1=1張, Lv2=2張, Lv3=4張, Lv4=8張, Lv5=15張
+const COLL_LV_THRESHOLDS = [1, 2, 4, 8, 15];
+const COLL_LV_MAX = 5;
+
+// 收藏等級 → 攻擊/HP 倍率（相對 Lv1 基礎值）
+const COLL_LV_ATK = [1.00, 1.25, 1.55, 2.00, 2.60];
+const COLL_LV_HP  = [1.00, 1.30, 1.70, 2.20, 3.00];
+
+// 稀有度基礎倍率（決定同星等下，傳說比普通強多少）
+const RARITY_BASE_MULT = {
+  common: { atk: 1.00, hp: 1.00 },
+  rare:   { atk: 1.30, hp: 1.30 },
+  elite:  { atk: 1.75, hp: 1.75 },
+  legend: { atk: 2.50, hp: 2.50 }
+};
+
+// 計算英雄部署時的有效屬性（稀有度 × 收藏等級）
+function getHeroBaseStats(typeKey) {
+  const t  = HERO_TYPES[typeKey];
+  const coll = (state.heroCollection && state.heroCollection[typeKey]) || { lv: 1 };
+  const rM = RARITY_BASE_MULT[t.rarity] || RARITY_BASE_MULT.common;
+  const aM = COLL_LV_ATK[coll.lv - 1] || 1;
+  const hM = COLL_LV_HP [coll.lv - 1] || 1;
+  return {
+    damage:   Math.round(t.damage   * rM.atk * aM),
+    maxHp:    Math.round(t.maxHp    * rM.hp  * hM),
+    range:    t.range,
+    fireRate: t.fireRate,
+    splash:   t.splash || 0
+  };
+}
+
+// 取得下一等級所需副本數（0 = 已滿）
+function copiesForNextLv(typeKey) {
+  const coll = (state.heroCollection && state.heroCollection[typeKey]) || { lv: 1, copies: 1 };
+  if (coll.lv >= COLL_LV_MAX) return 0;
+  return COLL_LV_THRESHOLDS[coll.lv] - coll.copies; // 還差幾張
+}
+
+// =====================================================================
 // 敵人定義 — 對應 PDF 貓貓軍團
 // =====================================================================
 const ENEMY_TYPES = {
-  blackcat:  { name:'黑貓潛行者', emoji:'🐈‍⬛', color:'#2c2c2c', hp:130,  maxHp:130,  speed:90,  gold:6,   size:14, atkDmg:8,   atkRange:40, atkRate:1.2 },
-  tabby:     { name:'虎斑棍棒手', emoji:'🐈',   color:'#a88060', hp:220,  maxHp:220,  speed:60,  gold:8,   size:16, atkDmg:15,  atkRange:38, atkRate:0.8 },
-  white:     { name:'白貓弩手',   emoji:'🐈',   color:'#e8d8c4', hp:160,  maxHp:160,  speed:75,  gold:7,   size:14, atkDmg:10,  atkRange:55, atkRate:1.0 },
-  orange:    { name:'橘貓掠奪者', emoji:'🐈',   color:'#d88030', hp:350,  maxHp:350,  speed:55,  gold:12,  size:18, atkDmg:25,  atkRange:42, atkRate:0.7 },
-  longhair:  { name:'長毛貓巫師', emoji:'🐈',   color:'#a890c8', hp:500,  maxHp:500,  speed:65,  gold:18,  size:18, elite:true,  atkDmg:20,  atkRange:80, atkRate:1.5 },
-  leopard:   { name:'豹貓狂戰士', emoji:'🐅',   color:'#c88040', hp:700,  maxHp:700,  speed:80,  gold:22,  size:20, elite:true,  atkDmg:45,  atkRange:42, atkRate:0.8 },
-  calico:    { name:'三花戰術家', emoji:'🐈',   color:'#e8a070', hp:600,  maxHp:600,  speed:60,  gold:20,  size:18, elite:true,  atkDmg:30,  atkRange:60, atkRate:0.9 },
-  siamese:   { name:'暹羅刺客',   emoji:'🐈',   color:'#7060c0', hp:350,  maxHp:350,  speed:130, gold:25,  size:14, elite:true,  atkDmg:35,  atkRange:45, atkRate:1.2 },
-  mainecoon: { name:'緬因貓步兵', emoji:'🦁',   color:'#604020', hp:4500, maxHp:4500, speed:40,  gold:80,  size:28, boss:true,   atkDmg:80,  atkRange:55, atkRate:0.5 },
-  sphynx:    { name:'無毛貓領主', emoji:'👹',   color:'#a07060', hp:12000,maxHp:12000,speed:50,  gold:200, size:32, boss:true,   atkDmg:150, atkRange:65, atkRate:0.6 }
+  blackcat:  { name:'黑貓潛行者', emoji:'🐈‍⬛', color:'#2c2c2c', hp:85,   maxHp:85,   speed:90,  gold:8,   size:14, atkDmg:4,   atkRange:40, atkRate:1.0 },
+  tabby:     { name:'虎斑棍棒手', emoji:'🐈',   color:'#a88060', hp:150,  maxHp:150,  speed:60,  gold:11,  size:16, atkDmg:8,   atkRange:38, atkRate:0.7 },
+  white:     { name:'白貓弩手',   emoji:'🐈',   color:'#e8d8c4', hp:110,  maxHp:110,  speed:75,  gold:9,   size:14, atkDmg:5,   atkRange:55, atkRate:0.9 },
+  orange:    { name:'橘貓掠奪者', emoji:'🐈',   color:'#d88030', hp:240,  maxHp:240,  speed:55,  gold:16,  size:18, atkDmg:13,  atkRange:42, atkRate:0.6, ability:'split', splitInto:'blackcat', splitCount:2 },
+  longhair:  { name:'長毛貓巫師', emoji:'🐈',   color:'#a890c8', hp:330,  maxHp:330,  speed:65,  gold:24,  size:18, elite:true,  atkDmg:11,  atkRange:80, atkRate:1.3, ability:'heal', healAmt:22, healRange:110, healRate:2.6 },
+  leopard:   { name:'豹貓狂戰士', emoji:'🐅',   color:'#c88040', hp:470,  maxHp:470,  speed:80,  gold:28,  size:20, elite:true,  atkDmg:24,  atkRange:42, atkRate:0.7 },
+  calico:    { name:'三花戰術家', emoji:'🐈',   color:'#e8a070', hp:400,  maxHp:400,  speed:60,  gold:26,  size:18, elite:true,  atkDmg:16,  atkRange:60, atkRate:0.8, ability:'shield', shieldDR:0.35, shieldRate:7, shieldDur:2 },
+  siamese:   { name:'暹羅刺客',   emoji:'🐈',   color:'#7060c0', hp:240,  maxHp:240,  speed:120, gold:30,  size:14, elite:true,  atkDmg:18,  atkRange:45, atkRate:1.0 },
+  mainecoon: { name:'緬因貓步兵', emoji:'🦁',   color:'#604020', hp:2600, maxHp:2600, speed:40,  gold:110, size:28, boss:true,   atkDmg:44,  atkRange:55, atkRate:0.4, ability:'roar', roarRate:9, roarRange:150, roarSpeed:1.35, roarDur:2.5 },
+  sphynx:    { name:'無毛貓領主', emoji:'👹',   color:'#a07060', hp:7000, maxHp:7000, speed:50,  gold:260, size:32, boss:true,   atkDmg:80,  atkRange:65, atkRate:0.5, ability:'roar', roarRate:8, roarRange:180, roarSpeed:1.45, roarDur:3 }
 };
 
 // =====================================================================
@@ -564,7 +938,7 @@ const UPGRADE_BRANCHES = {
   ],
   chihuahua: [
     { name:'神聖共鳴', sub:'鐘響範圍 +40，減速效果 +15%', apply: h => { h.range += 40; } },
-    { name:'虔誠禱告', sub:'每 8 秒自動回復附近英雄 10 點氣血', apply: h => { h._healAura = true; } },
+    { name:'虔誠禱告', sub:'每 6 秒治療範圍內友軍（回復其 12% 血量＋15）', apply: h => { h._healAura = true; } },
   ],
   poodle: [
     { name:'虹彩爆炸', sub:'法球爆炸半徑 +25，可連鎖 1 次', apply: h => { h.splash += 25; h._chain = true; } },
@@ -601,6 +975,13 @@ function applyLevelUp(hero) {
   hero.range  += u.range  || 0;
   hero.fireRate = Math.max(0.2, hero.fireRate - (u.fireRate || 0));
   hero.splash = (hero.splash || 0) + (u.splash || 0);
+  // HP 隨等級擴展：Lv2 ×1.4，Lv3 ×2.0
+  const hpScale = hero.level >= 3 ? 2.0 : 1.4;
+  const newMaxHp = Math.round(hero.type.maxHp * hpScale);
+  const heal = Math.round(hero.type.maxHp * 0.5);
+  hero.maxHp = newMaxHp;
+  hero.hp = Math.min(hero.hp + heal, newMaxHp);
+  if (typeof recomputeBonds === 'function') recomputeBonds();
 }
 
 document.getElementById('branchA').addEventListener('click', () => {
@@ -630,27 +1011,213 @@ document.getElementById('branchB').addEventListener('click', () => {
 // 英雄圖片預載
 // =====================================================================
 const HERO_IMGS = {};
+const HERO_SPRITE = {};   // 去背後的全身 canvas
 let imgsLoaded = 0;
 const IMG_KEYS = Object.keys(HERO_TYPES);
 IMG_KEYS.forEach(key => {
   const img = new Image();
+  img.onload = () => {
+    imgsLoaded++;
+    try { HERO_SPRITE[key] = removeWhiteBg(img); } catch (e) {}
+  };
   img.src = `heroes/${key}.png`;
-  img.onload = () => { imgsLoaded++; };
   HERO_IMGS[key] = img;
 });
 
-const ENEMY_IMGS = {};
-Object.keys(ENEMY_TYPES).forEach(key => {
-  const img = new Image();
-  img.src = `enemies/${key}.png`;
-  ENEMY_IMGS[key] = img;
-});
+// =====================================================================
+// 貓咪圖片程序化生成 — Canvas 2D（零外部依賴）
+// =====================================================================
+const CAT_CONFIGS = {
+  blackcat:  { fur:'#1a1a2e', furHi:'#2c2c50', eyeCol:'#c8b020', eyeRing:'#ffd700', pupil:'#000010', earIn:'#3a1520', mark:'blackcat_rings' },
+  tabby:     { fur:'#c8843a', furHi:'#e0a860', eyeCol:'#3a8020', eyeRing:'#7adf48', pupil:'#1a0800', earIn:'#e06050', mark:'tabby_stripes' },
+  white:     { fur:'#f0ece8', furHi:'#ffffff',  eyeCol:'#3880e0', eyeRing:'#70d0ff', pupil:'#101840', earIn:'#ffb0c8', mark:'white_puffs' },
+  orange:    { fur:'#d87030', furHi:'#f0a850', eyeCol:'#c08018', eyeRing:'#ffd060', pupil:'#180800', earIn:'#e06030', mark:'orange_m' },
+  longhair:  { fur:'#a078c8', furHi:'#c0a0e8', eyeCol:'#b040ff', eyeRing:'#e080ff', pupil:'#200028', earIn:'#d078ff', mark:'longhair_rune' },
+  leopard:   { fur:'#c89040', furHi:'#e0b060', eyeCol:'#b81818', eyeRing:'#ff4828', pupil:'#1c0000', earIn:'#c85820', mark:'leopard_spots' },
+  calico:    { fur:'#f0e4d8', furHi:'#ffffff',  eyeCol:'#309828', eyeRing:'#58d038', pupil:'#080808', earIn:'#ffb090', mark:'calico_patches' },
+  siamese:   { fur:'#e8d8c0', furHi:'#f5f0e8', eyeCol:'#2858c8', eyeRing:'#5080ff', pupil:'#080c20', earIn:'#b89870', mark:'siamese_points' },
+  mainecoon: { fur:'#a07840', furHi:'#c09860', eyeCol:'#c07818', eyeRing:'#ffc038', pupil:'#1c0800', earIn:'#884018', mark:'mainecoon_crown', boss:true },
+  sphynx:    { fur:'#e0a888', furHi:'#f0c8b0', eyeCol:'#b81818', eyeRing:'#ff3818', pupil:'#280000', earIn:'#c07058', mark:'sphynx_skull', boss:true }
+};
+
+function _shadeHex(hex, amt) {
+  const n = parseInt(hex.replace('#',''), 16);
+  const r = Math.min(255, Math.max(0, ((n>>16)&0xff) + amt));
+  const g = Math.min(255, Math.max(0, ((n>>8)&0xff) + amt));
+  const b = Math.min(255, Math.max(0, (n&0xff) + amt));
+  return `rgb(${r},${g},${b})`;
+}
+
+function genCatCanvas(typeKey) {
+  const c = CAT_CONFIGS[typeKey];
+  if (!c) return null;
+  const SZ = 64, H = SZ/2;
+  const oc = document.createElement('canvas');
+  oc.width = SZ; oc.height = SZ;
+  const cx = oc.getContext('2d');
+
+  // BOSS glow background
+  if (c.boss) {
+    const g = cx.createRadialGradient(H, H+2, 0, H, H+2, 30);
+    g.addColorStop(0, 'rgba(255,100,30,0.55)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    cx.fillStyle = g; cx.fillRect(0, 0, SZ, SZ);
+  }
+
+  // Ears (behind head)
+  cx.fillStyle = c.fur;
+  cx.beginPath(); cx.moveTo(H-14,H-12); cx.lineTo(H-23,H-29); cx.lineTo(H-3,H-21); cx.closePath(); cx.fill();
+  cx.beginPath(); cx.moveTo(H+14,H-12); cx.lineTo(H+23,H-29); cx.lineTo(H+3,H-21); cx.closePath(); cx.fill();
+  cx.fillStyle = c.earIn;
+  cx.beginPath(); cx.moveTo(H-13,H-14); cx.lineTo(H-19,H-26); cx.lineTo(H-5,H-21); cx.closePath(); cx.fill();
+  cx.beginPath(); cx.moveTo(H+13,H-14); cx.lineTo(H+19,H-26); cx.lineTo(H+5,H-21); cx.closePath(); cx.fill();
+
+  // Head base
+  const hg = cx.createRadialGradient(H-6, H-6, 3, H, H+2, 22);
+  hg.addColorStop(0, c.furHi); hg.addColorStop(0.55, c.fur); hg.addColorStop(1, _shadeHex(c.fur,-42));
+  cx.fillStyle = hg;
+  cx.beginPath(); cx.ellipse(H, H+2, 20, 19, 0, 0, Math.PI*2); cx.fill();
+  cx.strokeStyle = _shadeHex(c.fur,-52); cx.lineWidth = 1;
+  cx.beginPath(); cx.ellipse(H, H+2, 20, 19, 0, 0, Math.PI*2); cx.stroke();
+
+  // Eyes
+  const eyeY = H-2;
+  for (const ex of [H-8, H+8]) {
+    cx.fillStyle = _shadeHex(c.eyeCol, 50);
+    cx.beginPath(); cx.ellipse(ex, eyeY, 5.5, 4.5, 0, 0, Math.PI*2); cx.fill();
+    cx.fillStyle = c.eyeCol;
+    cx.beginPath(); cx.ellipse(ex, eyeY, 4.5, 4, 0, 0, Math.PI*2); cx.fill();
+    // Slit pupil
+    cx.fillStyle = c.pupil;
+    cx.beginPath(); cx.ellipse(ex, eyeY, 1.4, 3.6, 0, 0, Math.PI*2); cx.fill();
+    // Highlight
+    cx.fillStyle = 'rgba(255,255,255,0.75)';
+    cx.beginPath(); cx.ellipse(ex-1.5, eyeY-1.5, 1.6, 1.1, Math.PI/5, 0, Math.PI*2); cx.fill();
+    cx.strokeStyle = c.eyeRing; cx.lineWidth = 0.9;
+    cx.beginPath(); cx.ellipse(ex, eyeY, 4.5, 4, 0, 0, Math.PI*2); cx.stroke();
+  }
+
+  // Nose
+  cx.fillStyle = '#e06878';
+  cx.beginPath(); cx.moveTo(H,H+5); cx.lineTo(H-3,H+3); cx.lineTo(H+3,H+3); cx.closePath(); cx.fill();
+
+  // Whiskers
+  cx.strokeStyle = 'rgba(255,252,240,0.8)'; cx.lineWidth = 0.85;
+  for (const [sx,ex,wy,slant] of [[H-6,H-22,H+4,-2],[H-6,H-22,H+8,2],[H+6,H+22,H+4,-2],[H+6,H+22,H+8,2]]) {
+    cx.beginPath(); cx.moveTo(sx, wy); cx.lineTo(ex, wy+slant); cx.stroke();
+  }
+
+  // Markings
+  cx.save();
+  switch (c.mark) {
+    case 'blackcat_rings':
+      cx.strokeStyle = '#ffd700'; cx.lineWidth = 1.2;
+      for (const ex of [H-8, H+8]) { cx.beginPath(); cx.ellipse(ex, eyeY, 6, 5.5, 0, 0, Math.PI*2); cx.stroke(); }
+      break;
+    case 'tabby_stripes':
+      cx.strokeStyle = _shadeHex(c.fur,-38); cx.lineWidth = 1.6;
+      for (const xo of [-4, 0, 4]) { cx.beginPath(); cx.moveTo(H+xo,H-15); cx.lineTo(H+xo,H-7); cx.stroke(); }
+      break;
+    case 'white_puffs':
+      cx.fillStyle = 'rgba(255,255,255,0.45)';
+      cx.beginPath(); cx.ellipse(H-17,H+6,7,4.5,-0.3,0,Math.PI*2); cx.fill();
+      cx.beginPath(); cx.ellipse(H+17,H+6,7,4.5,0.3,0,Math.PI*2); cx.fill();
+      break;
+    case 'orange_m':
+      cx.strokeStyle = _shadeHex(c.fur,-40); cx.lineWidth = 1.6;
+      cx.beginPath(); cx.moveTo(H-8,H-14); cx.lineTo(H-5,H-10); cx.lineTo(H,H-13); cx.lineTo(H+5,H-10); cx.lineTo(H+8,H-14); cx.stroke();
+      break;
+    case 'longhair_rune':
+      cx.strokeStyle = c.eyeRing; cx.lineWidth = 0.9;
+      cx.beginPath(); cx.arc(H, H-11, 5, 0, Math.PI*2); cx.stroke();
+      cx.fillStyle = c.eyeRing; cx.font = '7px serif'; cx.textAlign='center'; cx.fillText('✦', H, H-9);
+      break;
+    case 'leopard_spots':
+      cx.fillStyle = _shadeHex(c.fur,-48);
+      for (const [sx,sy] of [[-10,-8],[8,-5],[-6,5],[10,8],[0,-2]]) {
+        cx.beginPath(); cx.ellipse(H+sx, H+sy, 2.5, 2, 0, 0, Math.PI*2); cx.fill();
+      }
+      break;
+    case 'calico_patches':
+      cx.fillStyle = 'rgba(200,95,18,0.6)';
+      cx.beginPath(); cx.ellipse(H-10,H-4,6,7,-0.5,0,Math.PI*2); cx.fill();
+      cx.fillStyle = 'rgba(20,15,8,0.48)';
+      cx.beginPath(); cx.ellipse(H+10,H+4,5,6,0.4,0,Math.PI*2); cx.fill();
+      break;
+    case 'siamese_points':
+      cx.fillStyle = 'rgba(95,55,25,0.52)';
+      cx.beginPath(); cx.ellipse(H, H+6, 7, 6, 0, 0, Math.PI*2); cx.fill();
+      cx.fillStyle = 'rgba(70,45,18,0.48)';
+      cx.beginPath(); cx.moveTo(H-15,H-14); cx.lineTo(H-23,H-28); cx.lineTo(H-4,H-21); cx.closePath(); cx.fill();
+      cx.beginPath(); cx.moveTo(H+15,H-14); cx.lineTo(H+23,H-28); cx.lineTo(H+4,H-21); cx.closePath(); cx.fill();
+      break;
+    case 'mainecoon_crown':
+      cx.strokeStyle = _shadeHex(c.fur,-36); cx.lineWidth = 1.6;
+      for (const xo of [-5, 0, 5]) { cx.beginPath(); cx.moveTo(H+xo,H-18); cx.lineTo(H+xo,H-9); cx.stroke(); }
+      cx.font = '12px serif'; cx.textAlign='center'; cx.fillText('👑', H, H-22);
+      break;
+    case 'sphynx_skull':
+      cx.strokeStyle = _shadeHex(c.fur,-32); cx.lineWidth = 0.9;
+      for (let i=0;i<3;i++) { const wy=H-14+i*3; cx.beginPath(); cx.moveTo(H-7,wy); cx.quadraticCurveTo(H,wy-1,H+7,wy); cx.stroke(); }
+      cx.font = '10px serif'; cx.textAlign='center'; cx.fillText('💀', H, H-20);
+      break;
+  }
+  cx.restore();
+  return oc;
+}
+
+// 載入真實貓貓圖片（enemies/*.png），自動去除白色/灰色背景；失敗則用程序生成後備
+const ENEMY_SPRITE = {};    // 去背後的 canvas
+const ENEMY_FALLBACK = {};  // 程序生成後備
+const ENEMY_IMGS = ENEMY_SPRITE; // 對外相容別名
+
+// 從四邊 flood-fill 清除「連通的近白/灰背景」，保留貓身上未連到邊緣的白色
+function removeWhiteBg(img) {
+  const W = img.naturalWidth, H = img.naturalHeight;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+  let id;
+  try { id = x.getImageData(0, 0, W, H); } catch (e) { return c; } // 跨域保護
+  const d = id.data;
+  const isBg = (i) => {
+    const r = d[i], g = d[i+1], b = d[i+2];
+    const mn = Math.min(r, g, b), mx = Math.max(r, g, b);
+    return mn >= 188 && (mx - mn) <= 28;   // 夠亮且接近灰白（含淺灰漸層背景）
+  };
+  const seen = new Uint8Array(W * H);
+  const stack = [];
+  for (let xx = 0; xx < W; xx++) { stack.push(xx); stack.push((H-1)*W + xx); }
+  for (let yy = 0; yy < H; yy++) { stack.push(yy*W); stack.push(yy*W + (W-1)); }
+  while (stack.length) {
+    const p = stack.pop();
+    if (seen[p]) continue; seen[p] = 1;
+    const i = p * 4;
+    if (!isBg(i)) continue;
+    d[i+3] = 0;                       // 設為透明
+    const px = p % W, py = (p / W) | 0;
+    if (px > 0) stack.push(p - 1);
+    if (px < W-1) stack.push(p + 1);
+    if (py > 0) stack.push(p - W);
+    if (py < H-1) stack.push(p + W);
+  }
+  x.putImageData(id, 0, 0);
+  return c;
+}
+
+(function initEnemyImages() {
+  for (const key of Object.keys(ENEMY_TYPES)) {
+    ENEMY_FALLBACK[key] = genCatCanvas(key);
+    const img = new Image();
+    img.onload = () => { try { ENEMY_SPRITE[key] = removeWhiteBg(img); } catch (e) {} };
+    img.src = `enemies/${key}.png`;
+  }
+})();
 
 // =====================================================================
 // 遊戲狀態
 // =====================================================================
 const state = {
-  gold: 250,
+  gold: 500,
   lives: 20,
   wave: 0,
   waveActive: false,
@@ -666,8 +1233,94 @@ const state = {
   won: false,
   paused: true,
   earlyBonus: 0,
-  earlyTimer: 0
+  earlyTimer: 0,
+  unlockedHeroes: new Set(['changchang', 'husky', 'baga']),
+  gachaPity: 0,   // 保底計數，10 抽必出稀有以上
+  gachaPulls: 0,  // 累計抽數
+  // 收藏系統：每位英雄的等級與累計副本數
+  heroCollection: {
+    changchang: { lv: 1, copies: 1 },
+    husky:      { lv: 1, copies: 1 },
+    baga:       { lv: 1, copies: 1 }
+  },
+  // 連殺連擊系統
+  combo: 0, comboTimer: 0, comboBest: 0,
+  // 螢幕震動
+  shake: 0,
+  // 本局統計（結算用）
+  killCount: 0, goldEarned: 0,
+  // 各地圖最佳星數（存檔用）
+  bestStars: {},
+  // 武將羈絆
+  activeBonds: [], bondBuff: { dmg:1, hp:1, haste:1 },
+  // 無盡模式
+  endless: false, endlessWave: 0,
+  bestEndless: {}
 };
+
+// =====================================================================
+// 存檔系統（localStorage 永久保存養成進度）
+// =====================================================================
+const SAVE_KEY = 'dogTD_save_v1';
+const STARTER_HEROES = ['changchang', 'husky', 'baga'];
+
+function saveProgress() {
+  try {
+    const data = {
+      v: 1,
+      unlocked: [...state.unlockedHeroes],
+      collection: state.heroCollection,
+      gachaPity: state.gachaPity,
+      gachaPulls: state.gachaPulls,
+      bestStars: state.bestStars || {},
+      bestEndless: state.bestEndless || {}
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+  } catch (e) { /* 無痕模式或容量滿，忽略 */ }
+}
+
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (raw) {
+      const d = JSON.parse(raw);
+      if (d.collection && typeof d.collection === 'object') state.heroCollection = d.collection;
+      if (Array.isArray(d.unlocked)) state.unlockedHeroes = new Set(d.unlocked);
+      if (typeof d.gachaPity === 'number') state.gachaPity = d.gachaPity;
+      if (typeof d.gachaPulls === 'number') state.gachaPulls = d.gachaPulls;
+      if (d.bestStars && typeof d.bestStars === 'object') state.bestStars = d.bestStars;
+      if (d.bestEndless && typeof d.bestEndless === 'object') state.bestEndless = d.bestEndless;
+    }
+  } catch (e) { /* 存檔毀損，忽略改用預設 */ }
+  // 確保 3 隻初始英雄永遠存在且已解鎖（即使存檔缺漏）
+  for (const k of STARTER_HEROES) {
+    if (!state.heroCollection[k]) state.heroCollection[k] = { lv: 1, copies: 1 };
+    state.unlockedHeroes.add(k);
+  }
+}
+
+function wipeProgress() {
+  try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
+  state.heroCollection = {};
+  state.unlockedHeroes = new Set();
+  state.gachaPity = 0;
+  state.gachaPulls = 0;
+  state.bestStars = {};
+  state.bestEndless = {};
+  for (const k of STARTER_HEROES) {
+    state.heroCollection[k] = { lv: 1, copies: 1 };
+    state.unlockedHeroes.add(k);
+  }
+  saveProgress();
+}
+
+// 連擊倍率：每 5 連 +0.25，上限 3x
+function comboMult() {
+  return Math.min(3, 1 + Math.floor(state.combo / 5) * 0.25);
+}
+function addShake(amt) {
+  state.shake = Math.min(14, state.shake + amt);
+}
 
 // =====================================================================
 // Canvas 設定 + RWD
@@ -723,8 +1376,156 @@ const SPELLS = {
       sfxSpellBuff();
       spawnFloat(canvas.width/2, canvas.height/2, '💛 全軍號令！', '#ffd83a');
     }
+  },
+  heal: { name:'治療', cost: 90, cd: 20, cdLeft: 0,
+    label: () => `💚 治療`,
+    use() {
+      // 回復全體英雄 50% 最大氣血
+      for (const h of state.heroes) {
+        const mx = effMaxHp(h);
+        const amt = Math.round(mx * 0.5);
+        const before = h.hp;
+        h.hp = Math.min(mx, h.hp + amt);
+        const real = Math.round(h.hp - before);
+        if (real > 0) {
+          spawnFloat(h.x, h.y - 16, `+${real}`, '#6fffa0');
+          state.effects.push({type:'healpulse', x:h.x, y:h.y, r:36, life:0.5, maxLife:0.5});
+        }
+      }
+      sfxHeal();
+      spawnFloat(canvas.width/2, canvas.height/2, '💚 全軍治療！', '#6fffa0');
+    }
   }
 };
+
+// =====================================================================
+// 主動英雄技能（大招）— 點選英雄手動釋放，各武將專屬
+// =====================================================================
+const ULTS = {
+  changchang: { name:'鋼骨咆哮', cd:14, desc:'範圍內敵人重度減速3秒，自身回復40%血量',
+    cast(h){
+      const now=performance.now();
+      for(const e of state.enemies){ if(Math.hypot(e.x-h.x,e.y-h.y)<=h.range*1.3){ e.slowFactor=0.3; e.slowUntil=now+3000; } }
+      h.hp=Math.min(h._effMaxHp||h.maxHp, h.hp+(h._effMaxHp||h.maxHp)*0.4);
+      state.effects.push({type:'bellring',x:h.x,y:h.y,r:h.range*1.3,life:0.6,maxLife:0.6,color:'#7fdfff'});
+      state.effects.push({type:'healpulse',x:h.x,y:h.y,r:36,life:0.5,maxLife:0.5});
+      spawnFloat(h.x,h.y-20,'🛡 鋼骨咆哮！','#7fdfff');
+    }},
+  baga: { name:'大地重錘', cd:13, desc:'範圍內敵人暈眩2秒並受到3倍攻擊傷害',
+    cast(h){
+      const now=performance.now();
+      for(const e of state.enemies){ if(Math.hypot(e.x-h.x,e.y-h.y)<=h.range){ e.stunUntil=now+2000; applyDamage(e,effDamage(h)*3,{color:'#ffd060'}); } }
+      state.effects.push({type:'shock',x:h.x,y:h.y,life:0.45,maxLife:0.45});
+      addShake(6); spawnFloat(h.x,h.y-20,'🔨 大地重錘！','#ffd060');
+    }},
+  bulldog: { name:'熔岩爆發', cd:15, desc:'範圍內敵人受到4倍火焰傷害並減速',
+    cast(h){
+      const now=performance.now();
+      for(const e of state.enemies){ if(Math.hypot(e.x-h.x,e.y-h.y)<=h.range*1.4){ applyDamage(e,effDamage(h)*4,{color:'#ff6020'}); e.slowFactor=0.6; e.slowUntil=now+1500; state.effects.push({type:'lava',x:e.x,y:e.y,particles:6,seed:(e.x*7)|0,life:0.5,maxLife:0.5}); } }
+      addShake(7); spawnFloat(h.x,h.y-20,'🌋 熔岩爆發！','#ff7020');
+    }},
+  husky: { name:'箭雨', cd:12, desc:'範圍內所有敵人受到2倍箭矢傷害',
+    cast(h){
+      for(const e of state.enemies){ if(Math.hypot(e.x-h.x,e.y-h.y)<=h.range){ applyDamage(e,effDamage(h)*2,{color:'#fff0a0'}); state.effects.push({type:'hit',x:e.x,y:e.y,life:0.2,maxLife:0.2,color:'#fff0a0'}); } }
+      spawnFloat(h.x,h.y-20,'🏹 箭雨！','#fff0a0');
+    }},
+  shiba: { name:'必殺居合', cd:13, desc:'對範圍內最強敵人造成6倍斬擊',
+    cast(h){
+      let best=null,bestHp=-1;
+      for(const e of state.enemies){ if(Math.hypot(e.x-h.x,e.y-h.y)<=h.range && e.hp>bestHp){bestHp=e.hp;best=e;} }
+      if(best){ applyDamage(best,effDamage(h)*6,{color:'#ff5544'}); state.effects.push({type:'slash',x:h.x,y:h.y,angle:Math.atan2(best.y-h.y,best.x-h.x),reach:h.range,life:0.32,maxLife:0.32,color:'#ff5544'}); addShake(4); }
+      spawnFloat(h.x,h.y-20,'⚔ 必殺居合！','#ff5544');
+    }},
+  chihuahua: { name:'聖光普照', cd:16, desc:'治療全體英雄35%血量，範圍敵人受3倍傷害',
+    cast(h){
+      for(const ally of state.heroes){ const mx=ally._effMaxHp||ally.maxHp; if(ally.hp<mx){ ally.hp=Math.min(mx,ally.hp+mx*0.35); state.effects.push({type:'healpulse',x:ally.x,y:ally.y,r:30,life:0.45,maxLife:0.45}); } }
+      for(const e of state.enemies){ if(Math.hypot(e.x-h.x,e.y-h.y)<=h.range){ applyDamage(e,effDamage(h)*3,{color:'#fff0c0'}); } }
+      sfxHeal(); spawnFloat(h.x,h.y-20,'✨ 聖光普照！','#fff0c0');
+    }},
+  poodle: { name:'虹彩風暴', cd:14, desc:'範圍內敵人受3倍範圍傷害並減速',
+    cast(h){
+      const now=performance.now();
+      for(const e of state.enemies){ if(Math.hypot(e.x-h.x,e.y-h.y)<=h.range*1.3){ applyDamage(e,effDamage(h)*3,{color:'#ff80c0'}); e.slowFactor=0.6; e.slowUntil=now+1500; } }
+      state.effects.push({type:'explode',x:h.x,y:h.y,r:h.range*1.3,life:0.4,maxLife:0.4,color:'#ff80c0'});
+      spawnFloat(h.x,h.y-20,'🌈 虹彩風暴！','#ff80c0');
+    }},
+  butterfly: { name:'千金亂舞', cd:12, desc:'範圍敵人受2倍傷害，每命中一隻+8骨頭',
+    cast(h){
+      let cnt=0;
+      for(const e of state.enemies){ if(Math.hypot(e.x-h.x,e.y-h.y)<=h.range){ applyDamage(e,effDamage(h)*2,{color:'#b890d8'}); cnt++; } }
+      const g=cnt*8; state.gold+=g; if(g>0){ spawnFloat(h.x,h.y-20,`💰 +${g}🦴`,'#ffd83a'); }
+      spawnFloat(h.x,h.y+4,'🗡 千金亂舞！','#b890d8'); updateHud();
+    }},
+  shepherd: { name:'全軍衝鋒', cd:18, desc:'全體英雄獲得攻擊強化7秒（傷害+攻速）',
+    cast(h){
+      const until=performance.now()+7000;
+      for(const ally of state.heroes){ ally._buffUntil=until; ally._chargeUntil=until; }
+      sfxSpellBuff(); state.effects.push({type:'bellring',x:canvas.width/2,y:canvas.height/2,r:600,life:0.6,maxLife:0.6,color:'#ffd83a'});
+      spawnFloat(h.x,h.y-20,'⚔ 全軍衝鋒！','#ffd83a');
+    }}
+};
+
+// =====================================================================
+// 武將羈絆系統 — 特定組合同場部署觸發加成
+// =====================================================================
+const BONDS = [
+  { id:'taoyuan', name:'桃園結義', heroes:['changchang','husky','baga'],
+    desc:'三位初始義士並肩作戰：全體 +12% 攻擊、+12% 血量',
+    apply:b => { b.dmg*=1.12; b.hp*=1.12; } },
+  { id:'ironwall', name:'鋼鐵防線', heroes:['changchang','baga','bulldog'],
+    desc:'三犬坦克鎮守：全體 +25% 血量',
+    apply:b => { b.hp*=1.25; } },
+  { id:'gale', name:'疾風雙煞', heroes:['husky','shiba'],
+    desc:'雙弓劍客：全體 +18% 攻速',
+    apply:b => { b.haste*=1.18; } },
+  { id:'temple', name:'聖殿祝福', heroes:['chihuahua','poodle'],
+    desc:'雙法療奏鳴：全體 +15% 攻擊、+10% 血量',
+    apply:b => { b.dmg*=1.15; b.hp*=1.10; } },
+  { id:'command', name:'王者號令', heroes:['shepherd'], minHeroes:4,
+    desc:'德牧隊長坐鎮且至少4名英雄：全體 +15% 攻擊',
+    apply:b => { b.dmg*=1.15; } },
+];
+
+// 重新計算生效羈絆，並把加成寫入每位英雄
+function recomputeBonds() {
+  const present = new Set(state.heroes.map(h => h.typeKey));
+  const buff = { dmg:1, hp:1, haste:1 };
+  state.activeBonds = [];
+  for (const bd of BONDS) {
+    const ok = bd.heroes.every(k => present.has(k)) && (!bd.minHeroes || state.heroes.length >= bd.minHeroes);
+    if (ok) { bd.apply(buff); state.activeBonds.push(bd); }
+  }
+  state.bondBuff = buff;
+  // 套到每位英雄（HP 依比例調整以免突然滿/空血）
+  for (const h of state.heroes) {
+    h._bondDmgMult = buff.dmg;
+    h._bondHaste = buff.haste;
+    const newMax = Math.round(h.maxHp * buff.hp);
+    const oldMax = h._effMaxHp || h.maxHp;
+    const ratio = h.hp / oldMax;
+    h._effMaxHp = newMax;
+    h.hp = Math.min(newMax, Math.max(1, Math.round(newMax * ratio)));
+  }
+  renderBondPanel();
+}
+
+// 有效攻擊力（基礎 × 羈絆 × 衝鋒大招）
+function effDamage(h) {
+  let d = h.damage * (h._bondDmgMult || 1);
+  if (h._chargeUntil && h._chargeUntil > performance.now()) d *= 1.3;
+  return d;
+}
+function effMaxHp(h) { return h._effMaxHp || h.maxHp; }
+
+function renderBondPanel() {
+  const el = document.getElementById('bondPanel');
+  if (!el) return;
+  const bonds = state.activeBonds || [];
+  if (!bonds.length) { el.style.display='none'; el.innerHTML=''; return; }
+  el.style.display='block';
+  el.innerHTML = '<div class="bond-title">🤝 生效羈絆</div>' +
+    bonds.map(b => `<div class="bond-item" title="${b.desc}">✦ ${b.name}</div>`).join('');
+}
 
 function updateSpells(dt) {
   for (const [key, sp] of Object.entries(SPELLS)) {
@@ -762,17 +1563,43 @@ function initSpells() {
 function buildShop() {
   const shop = document.getElementById('shop');
   shop.innerHTML = '';
+  const clsLabel = {tank:'坦',dps:'攻',mage:'法',ctrl:'術'};
   for (const [key, h] of Object.entries(HERO_TYPES)) {
+    const rCfg = RARITY_CONFIG[h.rarity] || RARITY_CONFIG.common;
+    const unlocked = state.unlockedHeroes.has(key);
+    const stars = '⭐'.repeat(rCfg.stars);
     const card = document.createElement('div');
     card.className = 'hero-card';
     card.dataset.type = key;
+    card.style.borderColor = rCfg.borderCSS;
+    if (h.rarity !== 'common') card.style.boxShadow = `0 0 8px ${rCfg.glowColor}`;
+    const coll = state.heroCollection[key];
+    const collBadge = (unlocked && coll)
+      ? `<div class="coll-badge">${coll.lv >= COLL_LV_MAX ? 'MAX' : 'Lv.'+coll.lv}</div>`
+      : '';
     card.innerHTML = `
-      <div class="tag ${h.cls}">${ {tank:'坦',dps:'攻',mage:'法',ctrl:'術'}[h.cls] }</div>
+      <div class="tag ${h.cls}">${clsLabel[h.cls]}</div>
+      <div class="rarity-stars" style="color:${rCfg.color};font-size:8px;">${stars}</div>
+      ${collBadge}
+      <button class="card-info-btn" title="查看狀態">ℹ</button>
       <img class="hero-img" src="heroes/${key}.png" alt="${h.name}">
-      <div class="name">${h.name}</div>
-      <div class="cost">🦴 ${h.cost}</div>
+      <div class="name" style="color:${rCfg.color};">${h.name}</div>
+      <div class="cost">${unlocked ? `🦴 ${h.cost}` : '🔒 轉蛋'}</div>
+      ${!unlocked ? '<div class="lock-overlay">🔒</div>' : ''}
     `;
+    // ℹ 按鈕 → 開啟角色詳情（解鎖才有效）
+    const infoBtn = card.querySelector('.card-info-btn');
+    infoBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (unlocked) showHeroDetail(key);
+      else openGachaModal();
+    });
     card.addEventListener('click', () => {
+      if (!unlocked) {
+        // 開啟轉蛋商城
+        openGachaModal();
+        return;
+      }
       if (state.gold < h.cost) return;
       if (state.selectedType === key) state.selectedType = null;
       else state.selectedType = key;
@@ -788,31 +1615,91 @@ function updateShop() {
   document.querySelectorAll('.hero-card').forEach(card => {
     const t = card.dataset.type;
     const h = HERO_TYPES[t];
+    const unlocked = state.unlockedHeroes.has(t);
     card.classList.toggle('selected', state.selectedType === t);
-    card.classList.toggle('disabled', state.gold < h.cost);
+    card.classList.toggle('disabled', unlocked && state.gold < h.cost);
+    card.classList.toggle('locked', !unlocked);
   });
 }
 
 function showInfo(hero) {
   const panel = document.getElementById('infoPanel');
-  document.getElementById('ipName').innerHTML = `<img src="heroes/${hero.typeKey}.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:4px;">${hero.type.name} Lv.${hero.level}`;
+  const rCfg = RARITY_CONFIG[hero.type.rarity] || RARITY_CONFIG.common;
+  const stars = '⭐'.repeat(rCfg.stars);
+  document.getElementById('ipName').innerHTML =
+    `<img src="heroes/${hero.typeKey}.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:4px;">`
+    + `<span style="color:${rCfg.color};">${hero.type.name}</span>`
+    + ` <span style="font-size:10px;color:${rCfg.color};">${stars} ${rCfg.label}</span>`
+    + ` <span style="color:#c4a878;font-size:11px;">Lv.${hero.level}</span>`;
   document.getElementById('ipQuote').textContent = `「${hero.type.quote}」`;
   const stats = document.getElementById('ipStats');
+  const hmax = effMaxHp(hero);
+  const hpFrac = hero.hp / hmax;
+  const hpColor = hpFrac > 0.5 ? '#4ef04e' : hpFrac > 0.25 ? '#ffd83a' : '#ff5040';
+  const effDmg = Math.round(effDamage(hero));
+  const dmgBoosted = effDmg > Math.round(hero.damage);
+  const hpBoosted = hmax > hero.maxHp;
   stats.innerHTML = `
-    <div>傷害: ${Math.round(hero.damage)}</div>
+    <div>傷害: ${effDmg}${dmgBoosted?' <span style="color:#6fdf78;font-size:10px;">↑羈絆</span>':''}</div>
     <div>射程: ${Math.round(hero.range)}</div>
     <div>射速: ${(1/hero.fireRate).toFixed(2)}/s</div>
     <div>濺射: ${Math.round(hero.splash || 0)}</div>
+    <div style="grid-column:1/3;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+        <span>HP:</span>
+        <div style="flex:1;height:5px;background:#400;border-radius:3px;">
+          <div style="width:${(hpFrac*100).toFixed(0)}%;height:100%;background:${hpColor};border-radius:3px;transition:width 0.3s;"></div>
+        </div>
+        <span style="font-size:10px;">${Math.round(hero.hp)}/${hmax}${hpBoosted?' <span style="color:#6fdf78;">↑</span>':''}</span>
+      </div>
+    </div>
     <div style="grid-column:1/3;color:#c4a878;">特性: ${hero.type.desc}</div>
+    <div style="grid-column:1/3;color:#c08eff;font-size:11px;">✦ 大招：${ULTS[hero.typeKey] ? ULTS[hero.typeKey].name+'（'+ULTS[hero.typeKey].desc+'）' : '無'}</div>
+    ${hero.type.story ? `<div style="grid-column:1/3;color:#9a8060;font-size:10px;font-style:italic;line-height:1.4;margin-top:4px;">${hero.type.story}</div>` : ''}
   `;
   const up = document.getElementById('ipUp');
   const upgradeCost = hero.type.upgrade.cost * hero.level;
   up.textContent = hero.level >= 3 ? '已滿級' : `升級 (🦴${upgradeCost})`;
   up.disabled = hero.level >= 3 || state.gold < upgradeCost;
+  // 補血按鈕：費用依損失血量比例計算
+  const healBtn = document.getElementById('ipHeal');
+  const missing = effMaxHp(hero) - hero.hp;
+  const healCost = healCostFor(hero);
+  if (missing <= 0) {
+    healBtn.textContent = '滿血';
+    healBtn.disabled = true;
+  } else {
+    healBtn.textContent = `補血 (🦴${healCost})`;
+    healBtn.disabled = state.gold < healCost;
+  }
+  // 大招按鈕
+  const ultBtn = document.getElementById('ipUlt');
+  const ult = ULTS[hero.typeKey];
+  if (ult) {
+    ultBtn.style.display = '';
+    const cdLeft = hero.ultCd || 0;
+    if (cdLeft > 0) {
+      ultBtn.textContent = `技能 (${Math.ceil(cdLeft)}s)`;
+      ultBtn.disabled = true;
+    } else {
+      ultBtn.textContent = `✦ ${ult.name}`;
+      ultBtn.disabled = false;
+    }
+  } else {
+    ultBtn.style.display = 'none';
+  }
   const sell = document.getElementById('ipSell');
   const refund = Math.floor((hero.type.cost + (hero.upgradesPaid || 0)) * 0.7);
   sell.textContent = `售出 (🦴${refund})`;
   panel.classList.add('show');
+}
+
+// 單體補血費用：依損失血量比例，最低 10🦴
+function healCostFor(hero) {
+  const mx = effMaxHp(hero);
+  const missing = mx - hero.hp;
+  if (missing <= 0) return 0;
+  return Math.max(10, Math.ceil(missing / mx * 80));
 }
 function hideInfo() {
   document.getElementById('infoPanel').classList.remove('show');
@@ -830,8 +1717,34 @@ document.getElementById('ipSell').addEventListener('click', () => {
   state.heroes = state.heroes.filter(x => x !== h);
   state.selectedHero = null;
   hideInfo();
+  recomputeBonds();
   updateHud();
   spawnFloat(h.x, h.y, `+${refund}🦴`);
+});
+document.getElementById('ipUlt').addEventListener('click', () => {
+  if (!state.selectedHero) return;
+  const h = state.selectedHero;
+  const ult = ULTS[h.typeKey];
+  if (!ult) return;
+  if ((h.ultCd || 0) > 0) return;
+  ult.cast(h);
+  h.ultCd = ult.cd;
+  showInfo(h);
+});
+document.getElementById('ipHeal').addEventListener('click', () => {
+  if (!state.selectedHero) return;
+  const h = state.selectedHero;
+  if (h.hp >= effMaxHp(h)) return;
+  const cost = healCostFor(h);
+  if (state.gold < cost) return;
+  state.gold -= cost;
+  const before = h.hp;
+  h.hp = effMaxHp(h);
+  spawnFloat(h.x, h.y - 16, `+${Math.round(h.hp - before)}`, '#6fffa0');
+  state.effects.push({type:'healpulse', x:h.x, y:h.y, r:36, life:0.5, maxLife:0.5});
+  sfxHeal();
+  updateHud();
+  showInfo(h);
 });
 document.getElementById('ipUp').addEventListener('click', () => {
   if (!state.selectedHero) return;
@@ -856,42 +1769,115 @@ document.getElementById('ipUp').addEventListener('click', () => {
 
 document.getElementById('startBtn').addEventListener('click', () => {
   if (state.waveActive) return;
-  if (state.wave >= WAVES.length) return;
+  if (!state.endless && state.wave >= WAVES.length) return;
   startWave();
 });
 document.getElementById('speedBtn').addEventListener('click', () => {
   state.speed = state.speed === 1 ? 2 : state.speed === 2 ? 4 : 1;
   document.getElementById('speedBtn').textContent = `x${state.speed}`;
 });
-document.querySelectorAll('.map-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.map-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    switchMap(MAP_DEFS[parseInt(btn.dataset.map)]);
+document.getElementById('pauseBtn').addEventListener('click', () => {
+  if (state.gameOver) return;
+  state.paused = !state.paused;
+  const btn = document.getElementById('pauseBtn');
+  btn.textContent = state.paused ? '▶' : '⏸';
+  btn.classList.toggle('paused-active', state.paused);
+  document.getElementById('pauseOverlay').classList.toggle('show', state.paused);
+  if (state.paused) bgmStop(); else if (!audioMuted && state.wave > 0) bgmStart();
+});
+// 保存開始畫面原始 HTML，供通關後重選關卡時還原
+const START_PANEL_HTML = document.getElementById('overlayPanel').innerHTML;
+
+// 綁定開始畫面的地圖選擇 + 開始按鈕（可重複呼叫，還原 HTML 後重新綁定）
+function bindStartScreen() {
+  document.querySelectorAll('.map-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.map-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      switchMap(MAP_DEFS[parseInt(btn.dataset.map)]);
+    });
   });
-});
-document.getElementById('startGame').addEventListener('click', () => {
-  document.getElementById('overlay').classList.remove('show');
-  state.paused = false;
-  resetGame();
-});
+  document.getElementById('startGame').addEventListener('click', () => {
+    document.getElementById('overlay').classList.remove('show');
+    state.paused = false;
+    resetGame();
+  });
+}
+bindStartScreen();
+
+// 在地圖選擇按鈕上顯示各地圖最佳星數
+function refreshMapStars() {
+  document.querySelectorAll('.map-btn').forEach(btn => {
+    const idx = parseInt(btn.dataset.map);
+    const def = MAP_DEFS[idx];
+    if (!def) return;
+    const best = (state.bestStars && state.bestStars[def.id]) || 0;
+    let starEl = btn.querySelector('.map-stars');
+    if (!starEl) {
+      starEl = document.createElement('div');
+      starEl.className = 'map-stars';
+      starEl.style.cssText = 'font-size:11px;margin-top:2px;letter-spacing:1px;';
+      btn.appendChild(starEl);
+    }
+    starEl.innerHTML = best > 0
+      ? `<span style="color:#ffd83a;">${'⭐'.repeat(best)}</span><span style="color:#5a4a30;">${'☆'.repeat(3-best)}</span>`
+      : `<span style="color:#5a4a30;">☆☆☆</span>`;
+  });
+}
+
+// 回到開始畫面（含地圖選擇）
+function showStartScreen() {
+  const panel = document.getElementById('overlayPanel');
+  panel.innerHTML = START_PANEL_HTML;
+  // 還原目前選中的地圖高亮
+  const idx = MAP_DEFS.indexOf(currentMapDef);
+  panel.querySelectorAll('.map-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.map) === idx);
+  });
+  bindStartScreen();
+  refreshMapStars();
+  document.getElementById('overlay').classList.add('show');
+  state.paused = true;
+}
 
 function updateHud() {
   document.getElementById('goldText').textContent = state.gold;
   document.getElementById('livesText').textContent = state.lives;
-  document.getElementById('waveText').textContent = `${state.wave}/${WAVES.length}`;
+  document.getElementById('waveText').textContent = state.endless
+    ? `♾️ ${state.endlessWave}`
+    : `${state.wave}/${WAVES.length}`;
+  // 連擊顯示（≥3 才出現）
+  const cb = document.getElementById('comboBox');
+  if (cb) {
+    if (state.combo >= 3) {
+      const mult = comboMult();
+      document.getElementById('comboNum').textContent = state.combo;
+      const cm = document.getElementById('comboMult');
+      cm.textContent = mult > 1 ? ` ×${mult.toFixed(2)}` : '';
+      cb.classList.add('show');
+      // 連擊越高字體越大、越紅
+      const scale = Math.min(1.6, 1 + state.combo * 0.02);
+      cb.style.transform = `scale(${scale})`;
+      cb.style.color = mult >= 2.5 ? '#ff5040' : mult >= 1.75 ? '#ff9030' : mult > 1 ? '#ffd83a' : '#fff5d4';
+    } else {
+      cb.classList.remove('show');
+    }
+  }
   const sb = document.getElementById('startBtn');
-  sb.classList.toggle('ready', !state.waveActive && state.wave < WAVES.length);
-  sb.textContent = state.wave === 0 ? '出戰' : state.waveActive ? '進行中' : (state.wave >= WAVES.length ? '完成' : '下一波');
-  if (!state.waveActive && state.wave > 0 && state.wave < WAVES.length && state.earlyBonus > 0) {
+  const canStart = state.endless || state.wave < WAVES.length;
+  sb.classList.toggle('ready', !state.waveActive && canStart);
+  sb.textContent = state.waveActive ? '進行中' : state.endless ? '下一波' : (state.wave === 0 ? '出戰' : (state.wave >= WAVES.length ? '完成' : '下一波'));
+  if (!state.waveActive && state.wave > 0 && canStart && state.earlyBonus > 0) {
     sb.textContent = `出戰 +${state.earlyBonus}🦴`;
   }
-  sb.disabled = state.waveActive || state.wave >= WAVES.length;
+  sb.disabled = state.waveActive || !canStart;
   updateShop();
   // 下一波預覽
   const nwIdx = state.wave; // wave 是已完成波次，nwIdx 是下一波的 index
   const nwInfoEl = document.getElementById('nextWaveInfo');
-  if (nwIdx < WAVES.length) {
+  if (state.endless) {
+    nwInfoEl.textContent = `無盡 ${state.endlessWave + 1} 波`;
+  } else if (nwIdx < WAVES.length) {
     const nw = WAVES[nwIdx];
     const counts = {};
     for (const [type, count] of nw.enemies) counts[type] = (counts[type]||0) + count;
@@ -928,6 +1914,7 @@ canvas.addEventListener('pointerdown', (e) => {
   }
   if (state.selectedType) {
     const h = HERO_TYPES[state.selectedType];
+    if (!state.unlockedHeroes.has(state.selectedType)) { openGachaModal(); return; }
     if (state.gold < h.cost) return;
     if (blocked.has(`${c},${r}`)) { spawnFloat(x, y, '路徑上不可部署', '#ff6040'); return; }
     if (state.heroes.some(hh => hh.cell === `${c},${r}`)) { spawnFloat(x, y, '此格已有英雄', '#ff6040'); return; }
@@ -943,19 +1930,25 @@ canvas.addEventListener('pointerdown', (e) => {
 
 function placeHero(type, c, r) {
   const t = HERO_TYPES[type];
+  const base = getHeroBaseStats(type);
   state.gold -= t.cost;
+  const coll = state.heroCollection[type] || { lv: 1 };
   const hero = {
     type: t, typeKey: type, level: 1,
     c, r, cell: `${c},${r}`,
     x: px(c), y: py(r),
     cooldown: 0,
-    damage: t.damage, range: t.range, fireRate: t.fireRate, splash: t.splash || 0,
-    hp: t.maxHp || 200, maxHp: t.maxHp || 200,
-    upgradesPaid: 0
+    damage: base.damage, range: base.range, fireRate: base.fireRate, splash: base.splash,
+    hp: base.maxHp, maxHp: base.maxHp, _effMaxHp: base.maxHp,
+    collLv: coll.lv,  // 記錄部署時的收藏等級（供展示用）
+    upgradesPaid: 0,
+    ultCd: 0          // 大招冷卻（部署即可用）
   };
   state.heroes.push(hero);
+  recomputeBonds();   // 重算羈絆
   sfxPlace();
-  spawnFloat(hero.x, hero.y, `部署！${t.name}`, '#ffd83a');
+  const lvLabel = coll.lv > 1 ? ` Lv.${coll.lv}` : '';
+  spawnFloat(hero.x, hero.y, `部署！${t.name}${lvLabel}`, '#ffd83a');
   updateHud();
 }
 
@@ -971,14 +1964,21 @@ function startWave() {
   }
   state.earlyBonus = 0;
   state.earlyTimer = 0;
-  const w = WAVES[state.wave];
+  let w;
+  if (state.endless) {
+    state.endlessWave += 1;
+    w = genEndlessWave(state.endlessWave);
+  } else {
+    w = WAVES[state.wave];
+  }
   state.wave += 1;
   state.waveActive = true;
   state.spawnQueue = [];
   let t = 0;
-  for (const [type, count, gap] of w.enemies) {
+  for (const def of w.enemies) {
+    const type = def[0], count = def[1], gap = def[2], hpScale = def[3] || 1;
     for (let i = 0; i < count; i++) {
-      state.spawnQueue.push({ at: t, type });
+      state.spawnQueue.push({ at: t, type, hpScale });
       t += gap;
     }
   }
@@ -991,20 +1991,49 @@ function startWave() {
   updateHud();
 }
 
-function spawnEnemy(typeKey) {
+// 無盡模式波次生成：難度隨波數遞增
+function genEndlessWave(n) {
+  const hpScale = 1 + n * 0.22;          // 血量逐波放大
+  const baseCount = 6 + Math.floor(n * 1.3);
+  const gap = Math.max(0.25, 0.7 - n * 0.02);
+  const pool = ['blackcat','tabby','white','orange','siamese','leopard','calico','longhair'];
+  const enemies = [];
+  // 主力雜兵
+  const t1 = pool[n % pool.length];
+  const t2 = pool[(n * 3 + 2) % pool.length];
+  enemies.push([t1, Math.ceil(baseCount * 0.6), gap, hpScale]);
+  enemies.push([t2, Math.ceil(baseCount * 0.4), gap * 1.2, hpScale]);
+  // 每 3 波加精英潮
+  if (n % 3 === 0) enemies.push(['leopard', 2 + Math.floor(n/3), 1.0, hpScale]);
+  // 每 5 波出 Boss（交替）
+  if (n % 5 === 0) {
+    const boss = (n % 10 === 0) ? 'sphynx' : 'mainecoon';
+    enemies.push([boss, 1 + Math.floor(n/10), 3.0, hpScale * 0.9]);
+  }
+  return { name: `無盡第 ${n} 波`, enemies };
+}
+
+function spawnEnemy(typeKey, opts) {
   const t = ENEMY_TYPES[typeKey];
+  opts = opts || {};
   const e = {
     type: t, typeKey,
-    hp: t.hp, maxHp: t.hp,
+    hp: t.hp * (opts.hpScale || 1), maxHp: t.hp * (opts.hpScale || 1),
     speed: t.speed,
-    pathIndex: 0,
-    x: PATH_POINTS[0].x - 30,
-    y: PATH_POINTS[0].y,
+    pathIndex: opts.pathIndex != null ? opts.pathIndex : 0,
+    x: opts.x != null ? opts.x : PATH_POINTS[0].x - 30,
+    y: opts.y != null ? opts.y : PATH_POINTS[0].y,
     slowUntil: 0, slowFactor: 1,
     stunUntil: 0,
-    atkCooldown: 0
+    atkCooldown: 0,
+    // 特殊能力狀態
+    abilityCd: t.ability ? (1 + Math.random()) : 0,  // 首次觸發隨機錯開
+    shieldUntil: 0,
+    enrageUntil: 0,
+    sizeScale: opts.sizeScale || 1
   };
   state.enemies.push(e);
+  return e;
 }
 
 // =====================================================================
@@ -1047,7 +2076,7 @@ function fire(hero, target) {
         let diff = Math.abs(ea - ang);
         if (diff > Math.PI) diff = Math.PI*2 - diff;
         if (diff > Math.PI/3) continue; // 60° 扇形（左右各 60°）
-        let dmg = hero.damage;
+        let dmg = effDamage(hero);
         if (Math.random() < 0.3) {
           dmg *= 2;
           state.effects.push({type:'crit', x: e.x, y: e.y, life: 0.5, maxLife: 0.5});
@@ -1074,7 +2103,7 @@ function fire(hero, target) {
         if (e.dead || e.hp <= 0) continue;
         const d = Math.hypot(e.x - hero.x, e.y - hero.y);
         if (d > hero.range) continue;
-        let dmg = hero.damage;
+        let dmg = effDamage(hero);
         if (hero._buffUntil > now) dmg *= 1.2;
         applyDamage(e, dmg, { color: '#ffe680' });
         // 聖光減速
@@ -1088,7 +2117,7 @@ function fire(hero, target) {
   const b = {
     x: hero.x, y: hero.y,
     target, speed: 480,
-    damage: hero.damage,
+    damage: effDamage(hero),
     splash: hero.splash || 0,
     color: hero.type.color,
     special: hero.type.special,
@@ -1139,7 +2168,8 @@ function update(dt) {
   if (state.spawnQueue.length) {
     state.spawnQueue.forEach(s => s.at -= dt);
     while (state.spawnQueue.length && state.spawnQueue[0].at <= 0) {
-      spawnEnemy(state.spawnQueue.shift().type);
+      const s = state.spawnQueue.shift();
+      spawnEnemy(s.type, { hpScale: s.hpScale || 1 });
     }
   }
 
@@ -1148,7 +2178,8 @@ function update(dt) {
   for (const e of state.enemies) {
     if (e.stunUntil > now) continue;
     const factor = e.slowUntil > now ? e.slowFactor : 1;
-    let remain = e.speed * factor * dt;
+    const enrage = e.enrageUntil > now ? (e.type.roarSpeed || 1.5) : 1;
+    let remain = e.speed * factor * enrage * dt;
     while (remain > 0 && e.pathIndex < PATH_POINTS.length - 1) {
       const target = PATH_POINTS[e.pathIndex + 1];
       const dx = target.x - e.x, dy = target.y - e.y;
@@ -1168,6 +2199,51 @@ function update(dt) {
       state.lives -= 1;
       e.dead = true;
       if (state.lives <= 0) endGame(false);
+    }
+  }
+
+  // 敵人特殊能力
+  for (const e of state.enemies) {
+    const ab = e.type.ability;
+    if (!ab || e.stunUntil > now) continue;
+    e.abilityCd = Math.max(0, e.abilityCd - dt);
+    if (e.abilityCd > 0) continue;
+    if (ab === 'heal') {
+      // 治療：回復範圍內其他貓貓（不含自己以避免無敵）
+      let healed = 0;
+      for (const o of state.enemies) {
+        if (o === e || o.dead || o.hp <= 0) continue;
+        if (Math.hypot(o.x - e.x, o.y - e.y) <= e.type.healRange && o.hp < o.maxHp) {
+          o.hp = Math.min(o.maxHp, o.hp + e.type.healAmt);
+          healed++;
+        }
+      }
+      if (healed) {
+        state.effects.push({type:'healpulse', x:e.x, y:e.y, r:e.type.healRange, life:0.5, maxLife:0.5});
+        spawnFloat(e.x, e.y - e.type.size, `+治療`, '#6fffa0');
+      }
+      e.abilityCd = e.type.healRate;
+    } else if (ab === 'shield') {
+      // 護盾：替自己與附近貓貓套上減傷護盾
+      e.shieldUntil = now + e.type.shieldDur * 1000;
+      for (const o of state.enemies) {
+        if (o.dead || o.hp <= 0) continue;
+        if (Math.hypot(o.x - e.x, o.y - e.y) <= 90) o.shieldUntil = now + e.type.shieldDur * 1000;
+      }
+      state.effects.push({type:'shieldpulse', x:e.x, y:e.y, r:90, life:0.4, maxLife:0.4});
+      e.abilityCd = e.type.shieldRate;
+    } else if (ab === 'roar') {
+      // Boss 咆哮：加速附近貓貓 + 自己，並震動畫面
+      e.enrageUntil = now + e.type.roarDur * 1000;
+      for (const o of state.enemies) {
+        if (o.dead || o.hp <= 0) continue;
+        if (Math.hypot(o.x - e.x, o.y - e.y) <= e.type.roarRange) o.enrageUntil = now + e.type.roarDur * 1000;
+      }
+      state.effects.push({type:'roar', x:e.x, y:e.y, r:e.type.roarRange, life:0.7, maxLife:0.7});
+      addShake(8);
+      sfxBossRoar();
+      spawnFloat(e.x, e.y - e.type.size - 10, '👹 咆哮！全軍加速', '#ff6040');
+      e.abilityCd = e.type.roarRate;
     }
   }
 
@@ -1199,7 +2275,15 @@ function update(dt) {
       if (state.selectedHero === h) { state.selectedHero = null; hideInfo(); }
     }
   }
-  state.heroes = state.heroes.filter(h => !h.dead);
+  if (state.heroes.some(h => h.dead)) {
+    state.heroes = state.heroes.filter(h => !h.dead);
+    recomputeBonds();  // 有英雄陣亡 → 重算羈絆
+  }
+
+  // 大招冷卻遞減
+  for (const h of state.heroes) {
+    if (h.ultCd > 0) h.ultCd = Math.max(0, h.ultCd - dt);
+  }
 
   // 英雄攻擊
   for (const h of state.heroes) {
@@ -1233,7 +2317,10 @@ function update(dt) {
       } else {
         fire(h, best);
       }
-      h.cooldown = h.fireRate;
+      // 攻速套用羈絆加速 + 衝鋒大招
+      let haste = (h._bondHaste || 1);
+      if (h._chargeUntil && h._chargeUntil > now) haste *= 1.3;
+      h.cooldown = h.fireRate / haste;
     }
   }
 
@@ -1310,31 +2397,113 @@ function update(dt) {
   }
 
   // 清理死亡
+  const splitQueue = [];
   for (const e of state.enemies) {
     if (e.hp <= 0 && !e.dead) {
       e.dead = true;
       sfxDeath();
-      state.gold += e.type.gold + (e._bonusGold || 0);
+      // 連擊累積
+      const prevMult = comboMult();
+      state.combo += 1;
+      state.comboTimer = 3.0;
+      if (state.combo > state.comboBest) state.comboBest = state.combo;
+      const mult = comboMult();
+      // 連擊倍率提升時播放升調音效
+      if (mult > prevMult) sfxCombo(state.combo);
+      const baseGold = e.type.gold + (e._bonusGold || 0);
+      const got = Math.round(baseGold * mult);
+      state.gold += got;
+      state.killCount++;
+      state.goldEarned += got;
       sfxGold();
-      spawnFloat(e.x, e.y, `+${e.type.gold + (e._bonusGold || 0)}🦴`);
+      // 連擊時金幣文字帶倍率與顏色
+      if (mult > 1) {
+        spawnFloat(e.x, e.y, `+${got}🦴 ×${mult.toFixed(2)}`, '#ffd83a');
+      } else {
+        spawnFloat(e.x, e.y, `+${got}🦴`);
+      }
+      // 擊殺爆量粒子
+      state.effects.push({type:'killburst', x:e.x, y:e.y, r:e.type.size*1.8, life:0.4, maxLife:0.4, color:e.type.color});
+      // Boss 死亡：螢幕大震動
+      if (e.type.boss) { addShake(14); state.effects.push({type:'explode', x:e.x, y:e.y, r:80, life:0.6, maxLife:0.6, color:'#ff8040'}); }
+      else if (e.type.elite) addShake(3);
+      // 死亡分裂（橘貓）
+      if (e.type.ability === 'split' && !e._noSplit) {
+        for (let i = 0; i < (e.type.splitCount || 2); i++) {
+          splitQueue.push({ type: e.type.splitInto, x: e.x + (i?14:-14), y: e.y, pathIndex: e.pathIndex });
+        }
+      }
     }
   }
   state.enemies = state.enemies.filter(e => !e.dead);
+  // 生成分裂出的小貓（標記不可再分裂）
+  for (const s of splitQueue) {
+    const baby = spawnEnemy(s.type, { x: s.x, y: s.y, pathIndex: s.pathIndex, hpScale: 0.6, sizeScale: 0.8 });
+    baby._noSplit = true;
+  }
   state.bullets = state.bullets.filter(b => !b.dead);
+
+  // 連擊計時衰減
+  if (state.combo > 0) {
+    state.comboTimer -= dt;
+    if (state.comboTimer <= 0) state.combo = 0;
+  }
+  // 螢幕震動衰減
+  if (state.shake > 0) state.shake = Math.max(0, state.shake - dt * 30);
 
   // 波次結束判斷
   if (state.waveActive && state.spawnQueue.length === 0 && state.enemies.length === 0) {
     state.waveActive = false;
     sfxWaveClear();
-    state.gold += 30 + state.wave * 5; // 波次完成獎勵
-    spawnFloat(canvas.width / 2, 30, `波次清空！+${30 + state.wave * 5}🦴`, '#7fff5f');
-    if (state.wave >= WAVES.length) endGame(true);
+    if (state.endless) {
+      // 無盡模式：獎勵隨波數提高，記錄最佳波數，不結算
+      const waveReward = 80 + state.endlessWave * 20;
+      state.gold += waveReward;
+      spawnFloat(canvas.width / 2, 30, `無盡第 ${state.endlessWave} 波清空！+${waveReward}🦴`, '#ffd83a');
+      const mid = currentMapDef.id;
+      if (!state.bestEndless[mid] || state.endlessWave > state.bestEndless[mid]) {
+        state.bestEndless[mid] = state.endlessWave;
+        saveProgress();
+      }
+    } else {
+      const waveReward = 50 + state.wave * 10; // 波次完成獎勵
+      state.gold += waveReward;
+      spawnFloat(canvas.width / 2, 30, `波次清空！+${waveReward}🦴`, '#7fff5f');
+      if (state.wave >= WAVES.length) endGame(true);
+    }
   }
 
   // 提早召喚倒數
-  if (!state.waveActive && state.wave > 0 && state.wave < WAVES.length) {
+  if (!state.waveActive && state.wave > 0 && (state.endless || state.wave < WAVES.length)) {
     state.earlyTimer += dt;
     state.earlyBonus = Math.max(0, Math.floor(50 - state.earlyTimer * 4));
+  }
+
+  // 波次間休整：未開戰時英雄緩慢自動回血（每秒 8% 最大血）
+  if (!state.waveActive) {
+    for (const h of state.heroes) {
+      const mx = effMaxHp(h); if (h.hp < mx) h.hp = Math.min(mx, h.hp + mx * 0.08 * dt);
+    }
+  }
+
+  // 奇瓦瓦僧侶「虔誠禱告」治療光環：每 6 秒回復附近英雄
+  for (const h of state.heroes) {
+    if (!h._healAura) continue;
+    h._healTimer = (h._healTimer || 0) - dt;
+    if (h._healTimer <= 0) {
+      h._healTimer = 6;
+      let did = false;
+      for (const ally of state.heroes) {
+        const amx = effMaxHp(ally);
+        const healVal = Math.round(amx * 0.12) + 15;
+        if (Math.hypot(ally.x - h.x, ally.y - h.y) <= h.range && ally.hp < amx) {
+          ally.hp = Math.min(amx, ally.hp + healVal);
+          state.effects.push({type:'healpulse', x:ally.x, y:ally.y, r:30, life:0.45, maxLife:0.45});
+          did = true;
+        }
+      }
+      if (did) state.effects.push({type:'healpulse', x:h.x, y:h.y, r:h.range, life:0.5, maxLife:0.5});
+    }
   }
 
   updateSpells(dt);
@@ -1343,6 +2512,10 @@ function update(dt) {
 
 function applyDamage(enemy, dmg, source) {
   sfxHit();
+  // 護盾減傷
+  if (enemy.shieldUntil > performance.now()) {
+    dmg *= (1 - (enemy.type.shieldDR || 0.5));
+  }
   enemy.hp -= dmg;
   state.effects.push({type:'hit', x: enemy.x, y: enemy.y, life: 0.15, maxLife: 0.15, color: source.color});
 }
@@ -2055,6 +3228,15 @@ function drawBullet(ctx, b) {
 // 渲染（動態層）
 // =====================================================================
 function render() {
+  // 螢幕震動（用 CSS transform 平移整個 canvas，避免內容平移露出黑邊）
+  if (state.shake > 0) {
+    const sx = (Math.random() - 0.5) * state.shake;
+    const sy = (Math.random() - 0.5) * state.shake;
+    canvas.style.transform = `translate(${sx.toFixed(1)}px, ${sy.toFixed(1)}px)`;
+  } else if (canvas.style.transform) {
+    canvas.style.transform = '';
+  }
+
   // 靜態場景
   ctx.drawImage(sceneCanvas, 0, 0);
 
@@ -2122,7 +3304,9 @@ function render() {
   const CLS_COLORS = { tank: '#5fa0ff', dps: '#6fdf78', mage: '#c08eff', ctrl: '#f0b060' };
   const nowMs = performance.now();
   for (const h of state.heroes) {
-    const bob = Math.sin((nowMs + (h.x + h.y) * 7) / 400) * 1.5;
+    const bobPhase = (nowMs + (h.x + h.y) * 7) / 380;
+    const bob = Math.sin(bobPhase) * 2.6;            // 上下彈跳（更明顯）
+    const breathe = Math.sin(bobPhase * 0.9);         // 呼吸用相位
     const cy = h.y + bob;
     // 攻擊動畫進度 0~1（剛攻擊 = 1，回到 idle = 0）
     const atkPhase = h._attackUntil ? Math.max(0, (h._attackUntil - nowMs) / 220) : 0;
@@ -2158,83 +3342,124 @@ function render() {
       ctx.globalCompositeOperation = 'source-over';
     }
 
-    // 角色圖片（裁切為圓形）
-    ctx.save();
-    ctx.beginPath(); ctx.arc(hx, hy, 22, 0, Math.PI*2); ctx.clip();
-    const heroImg = HERO_IMGS[h.typeKey];
-    if (heroImg && heroImg.complete && heroImg.naturalWidth > 0) {
-      ctx.drawImage(heroImg, hx - 22, hy - 22, 44, 44);
+    // 角色圖片：全身 PNG（去背）站在底座上，呼吸/彈跳/攻擊動畫 + 面向目標
+    const sprite = HERO_SPRITE[h.typeKey];
+    const sH = 50;                         // 全身高度
+    const footY = h.y + 13 - bob;          // 腳踩底座，bob 上下跳
+    const bsx = 1 + breathe * 0.05 + atkPhase * 0.10;
+    const bsy = 1 - breathe * 0.05 + atkPhase * 0.05;
+    const faceLeft = !!h._faceLeft;
+    const lungeX = (h._attackDir != null) ? Math.cos(h._attackDir) * (1 - atkPhase) * 4 : 0; // 攻擊前撲
+    if (sprite) {
+      const ar = sprite.width / sprite.height;
+      const dw = sH * ar, dh = sH;
+      ctx.save();
+      ctx.translate(h.x + lungeX, footY);
+      ctx.scale((faceLeft ? -1 : 1) * bsx, bsy);
+      ctx.drawImage(sprite, -dw / 2, -dh, dw, dh);
+      ctx.restore();
     } else {
-      const grad = ctx.createRadialGradient(hx - 4, hy - 4, 2, hx, hy, 22);
-      grad.addColorStop(0, '#fff5d4');
-      grad.addColorStop(0.4, h.type.color);
-      grad.addColorStop(1, '#2a1a08');
-      ctx.fillStyle = grad;
-      ctx.beginPath(); ctx.arc(hx, hy, 22, 0, Math.PI*2); ctx.fill();
+      // 後備：漸層圓（圖片尚未去背完成時）
+      const heroImg = HERO_IMGS[h.typeKey];
+      ctx.save();
+      ctx.beginPath(); ctx.arc(hx, hy, 22, 0, Math.PI*2); ctx.clip();
+      if (heroImg && heroImg.complete && heroImg.naturalWidth > 0) {
+        ctx.drawImage(heroImg, hx - 22, hy - 22, 44, 44);
+      } else {
+        const grad = ctx.createRadialGradient(hx - 4, hy - 4, 2, hx, hy, 22);
+        grad.addColorStop(0, '#fff5d4'); grad.addColorStop(0.4, h.type.color); grad.addColorStop(1, '#2a1a08');
+        ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(hx, hy, 22, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.restore();
+      ctx.strokeStyle = ringColor; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(hx, hy, 22, 0, Math.PI*2); ctx.stroke();
     }
-    ctx.restore();
-    ctx.strokeStyle = ringColor; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.arc(hx, hy, 22, 0, Math.PI*2); ctx.stroke();
 
-    // 武器/裝備（依職業繪製手中物件，會隨攻擊揮動）
-    drawHeroWeapon(ctx, h, hx, hy, atkPhase);
+    // 大招就緒指示（頭頂紫色光環 + ✦）
+    if (ULTS[h.typeKey] && (h.ultCd || 0) <= 0) {
+      const tw = (Math.sin(nowMs / 200) + 1) / 2;
+      ctx.save();
+      ctx.globalAlpha = 0.5 + tw * 0.5;
+      ctx.fillStyle = '#d0a0ff';
+      ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('✦', h.x, h.y - 56);
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
 
     // 等級星星（盾頂緞帶）
     if (h.level > 0) {
       ctx.fillStyle = 'rgba(20,12,4,0.85)';
-      ctx.fillRect(h.x - 14, h.y - 22, 28, 10);
+      ctx.fillRect(h.x - 14, h.y - 52, 28, 10);
       ctx.fillStyle = '#ffd83a';
-      ctx.font = 'bold 9px sans-serif';
-      ctx.fillText('★'.repeat(h.level), h.x, h.y - 14);
+      ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('★'.repeat(h.level), h.x, h.y - 44);
     }
     // 英雄 HP 條
     if (h.maxHp) {
       const hw = 44;
-      const hpFrac = Math.max(0, h.hp / h.maxHp);
+      const hpFrac = Math.max(0, h.hp / effMaxHp(h));
       ctx.fillStyle = 'rgba(0,0,0,0.75)';
-      ctx.fillRect(h.x - hw/2 - 1, h.y - 32, hw + 2, 5);
+      ctx.fillRect(h.x - hw/2 - 1, h.y - 41, hw + 2, 5);
       ctx.fillStyle = '#600';
-      ctx.fillRect(h.x - hw/2, h.y - 31, hw, 3);
+      ctx.fillRect(h.x - hw/2, h.y - 40, hw, 3);
       ctx.fillStyle = hpFrac > 0.5 ? '#4ef04e' : hpFrac > 0.25 ? '#ffd83a' : '#ff4040';
-      ctx.fillRect(h.x - hw/2, h.y - 31, hw * hpFrac, 3);
+      ctx.fillRect(h.x - hw/2, h.y - 40, hw * hpFrac, 3);
     }
     // buff 光環
     if (h._buffUntil > nowMs) {
       ctx.strokeStyle = '#ffd83a';
       ctx.lineWidth = 2;
-      const a = (h._buffUntil - nowMs) / 500;
-      ctx.globalAlpha = Math.max(0, Math.min(1, a));
-      ctx.beginPath(); ctx.arc(h.x, h.y, 24 + (1-a)*4, 0, Math.PI*2); ctx.stroke();
+      const a = Math.max(0, Math.min(1, (h._buffUntil - nowMs) / 500));
+      ctx.globalAlpha = a;
+      const auraR = Math.max(4, 24 + (1 - a) * 4);
+      ctx.beginPath(); ctx.arc(h.x, h.y, auraR, 0, Math.PI*2); ctx.stroke();
       ctx.globalAlpha = 1;
     }
   }
 
   // 敵人
+  const tNowE = performance.now();
   for (const e of state.enemies) {
-    const wobble = Math.sin((performance.now() + e.x * 3) / 200) * 0.8;
-    // 落地陰影
-    ctx.fillStyle = 'rgba(0,0,0,0.45)';
-    ctx.beginPath(); ctx.ellipse(e.x, e.y + e.type.size*0.95, e.type.size*0.95, e.type.size*0.3, 0, 0, Math.PI*2); ctx.fill();
-    // 角色圖片（透明底，依 size 等比放大）
-    const enemyImg = ENEMY_IMGS[e.typeKey];
-    const eImgSize = e.type.size * 4;
-    if (enemyImg && enemyImg.complete && enemyImg.naturalWidth > 0) {
-      ctx.drawImage(enemyImg,
-        e.x - eImgSize / 2,
-        e.y + wobble + e.type.size - eImgSize,
-        eImgSize, eImgSize);
+    const stunned = e.stunUntil > tNowE;
+    const slowed = e.slowUntil > tNowE;
+    const moving = e.pathIndex < PATH_POINTS.length - 1 && !stunned;
+    // 跳動相位（被減速→慢，被暈→定格，待機→輕微呼吸）
+    const phase = tNowE / (slowed ? 320 : 170) + e.x * 0.06 + e.y * 0.05;
+    const hop = stunned ? 0 : (moving ? Math.abs(Math.sin(phase)) : Math.abs(Math.sin(tNowE/600 + e.x*0.05)) * 0.25);
+    const lift = hop * e.type.size * 0.32;
+    const sy = 1 + hop * 0.14 - (1 - hop) * 0.04;   // 騰空時拉長
+    const sx = 1 - hop * 0.10 + (1 - hop) * 0.04;   // 著地時壓扁
+    // 面向（依下一個路徑點）
+    const nxt = PATH_POINTS[e.pathIndex + 1];
+    const faceLeft = nxt ? nxt.x < e.x - 1 : false;
+    const feetY = e.y + e.type.size;
+    // 落地陰影（騰空時縮小變淡）
+    const shA = 0.45 * (1 - hop * 0.5), shS = 1 - hop * 0.28;
+    ctx.fillStyle = `rgba(0,0,0,${shA})`;
+    ctx.beginPath(); ctx.ellipse(e.x, feetY, e.type.size*0.95*shS, e.type.size*0.3*shS, 0, 0, Math.PI*2); ctx.fill();
+    // 角色圖片（去背後的真實 PNG，未載入完成則用程序生成後備）
+    let enemyImg = ENEMY_SPRITE[e.typeKey] || ENEMY_FALLBACK[e.typeKey];
+    if (enemyImg) {
+      // 保持原圖長寬比（直式圖不被壓扁），以腳底為錨點
+      const iw = enemyImg.naturalWidth || enemyImg.width;
+      const ih = enemyImg.naturalHeight || enemyImg.height;
+      const ar = (iw && ih) ? iw / ih : 1;
+      const drawH = e.type.size * 4.2;
+      const drawW = drawH * ar;
+      ctx.save();
+      ctx.translate(e.x, feetY - lift);
+      ctx.scale(faceLeft ? -sx : sx, sy);
+      ctx.drawImage(enemyImg, -drawW / 2, -drawH, drawW, drawH);
+      ctx.restore();
     } else {
-      // Fallback：原始漸層圓形 + emoji
-      const eg = ctx.createRadialGradient(e.x - e.type.size*0.3, e.y - e.type.size*0.3, 2, e.x, e.y, e.type.size);
-      eg.addColorStop(0, '#fff5d4');
-      eg.addColorStop(0.3, e.type.color);
-      eg.addColorStop(1, '#1a0c04');
+      // 最終後備：漸層圓形 + emoji
+      const eg = ctx.createRadialGradient(e.x - e.type.size*0.3, e.y - e.type.size*0.3 - lift, 2, e.x, e.y - lift, e.type.size);
+      eg.addColorStop(0, '#fff5d4'); eg.addColorStop(0.3, e.type.color); eg.addColorStop(1, '#1a0c04');
       ctx.fillStyle = eg;
-      ctx.beginPath(); ctx.arc(e.x, e.y + wobble, e.type.size, 0, Math.PI*2); ctx.fill();
-      ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.arc(e.x, e.y + wobble, e.type.size, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(e.x, e.y - lift, e.type.size, 0, Math.PI*2); ctx.fill();
       ctx.font = `${e.type.size*1.5}px sans-serif`; ctx.textAlign='center';
-      ctx.fillText(e.type.emoji, e.x, e.y + wobble + e.type.size*0.5);
+      ctx.fillText(e.type.emoji, e.x, e.y - lift + e.type.size*0.5);
     }
     // 血條（外框）
     const w = e.type.size * 2;
@@ -2251,7 +3476,7 @@ function render() {
       const pulse = (Math.sin(performance.now()/200) + 1) / 2;
       ctx.strokeStyle = `rgba(255,80,40,${0.5 + pulse*0.5})`;
       ctx.lineWidth = 3 + pulse * 2;
-      ctx.beginPath(); ctx.arc(e.x, e.y + wobble, e.type.size + 4, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(e.x, e.y, e.type.size + 4, 0, Math.PI*2); ctx.stroke();
       // 王冠
       ctx.fillStyle = '#ffd83a';
       ctx.font = '14px sans-serif';
@@ -2259,7 +3484,7 @@ function render() {
     } else if (e.type.elite) {
       ctx.strokeStyle = '#b08aff';
       ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(e.x, e.y + wobble, e.type.size + 2, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(e.x, e.y, e.type.size + 2, 0, Math.PI*2); ctx.stroke();
     }
     // 狀態圖示
     if (e.slowUntil > performance.now()) {
@@ -2269,6 +3494,25 @@ function render() {
     if (e.stunUntil > performance.now()) {
       ctx.fillStyle = '#ffd83a'; ctx.font = '14px sans-serif';
       ctx.fillText('💫', e.x + e.type.size, e.y - e.type.size + 2);
+    }
+    // 護盾光環
+    if (e.shieldUntil > performance.now()) {
+      const sp = (Math.sin(performance.now()/150) + 1) / 2;
+      ctx.strokeStyle = `rgba(120,200,255,${0.5 + sp*0.4})`;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.arc(e.x, e.y, e.type.size + 6, 0, Math.PI*2); ctx.stroke();
+      ctx.fillStyle = '#9fd0ff'; ctx.font = '12px sans-serif';
+      ctx.fillText('🛡', e.x - e.type.size - 4, e.y - e.type.size + 2);
+    }
+    // 狂暴（咆哮加速）
+    if (e.enrageUntil > performance.now()) {
+      ctx.fillStyle = '#ff6040'; ctx.font = '13px sans-serif';
+      ctx.fillText('🔥', e.x + e.type.size, e.y + e.type.size);
+    }
+    // 治療者標記
+    if (e.type.ability === 'heal') {
+      ctx.fillStyle = '#6fffa0'; ctx.font = '12px sans-serif';
+      ctx.fillText('✚', e.x, e.y - e.type.size - 10);
     }
   }
 
@@ -2384,6 +3628,39 @@ function render() {
       ctx.fillStyle = `rgba(255,60,60,${lifeFrac * 0.6})`;
       ctx.beginPath(); ctx.arc(e.x, e.y, 26, 0, Math.PI*2); ctx.fill();
       ctx.globalCompositeOperation = 'source-over';
+    } else if (e.type === 'killburst') {
+      // 擊殺爆量粒子
+      const p = 1 - lifeFrac;
+      ctx.globalCompositeOperation = 'lighter';
+      for (let k = 0; k < 8; k++) {
+        const a = (k / 8) * Math.PI * 2;
+        const rr = (e.r || 20) * p;
+        ctx.fillStyle = `rgba(255,${200 - k*8},120,${lifeFrac})`;
+        ctx.beginPath(); ctx.arc(e.x + Math.cos(a)*rr, e.y + Math.sin(a)*rr, 3 * lifeFrac + 1, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+    } else if (e.type === 'healpulse') {
+      // 治療綠光擴散
+      const p = 1 - lifeFrac;
+      ctx.strokeStyle = `rgba(110,255,160,${lifeFrac * 0.8})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(e.x, e.y, (e.r||100) * p, 0, Math.PI*2); ctx.stroke();
+    } else if (e.type === 'shieldpulse') {
+      // 護盾藍光擴散
+      const p = 1 - lifeFrac;
+      ctx.strokeStyle = `rgba(120,200,255,${lifeFrac * 0.8})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(e.x, e.y, (e.r||90) * p, 0, Math.PI*2); ctx.stroke();
+    } else if (e.type === 'roar') {
+      // Boss 咆哮紅色衝擊波
+      const p = 1 - lifeFrac;
+      ctx.globalCompositeOperation = 'lighter';
+      for (let k = 0; k < 2; k++) {
+        ctx.strokeStyle = `rgba(255,${80 - k*30},40,${lifeFrac * (0.7 - k*0.3)})`;
+        ctx.lineWidth = 4 - k;
+        ctx.beginPath(); ctx.arc(e.x, e.y, (e.r||160) * p * (1 - k*0.2), 0, Math.PI*2); ctx.stroke();
+      }
+      ctx.globalCompositeOperation = 'source-over';
     }
   }
 }
@@ -2406,20 +3683,44 @@ function endGame(win) {
   if (win) sfxWin(); else sfxLose();
   const panel = document.getElementById('overlayPanel');
   if (win) {
+    // 星級：依剩餘生命，>=18→⭐⭐⭐，>=10→⭐⭐，否則⭐
+    const stars = state.lives >= 18 ? 3 : state.lives >= 10 ? 2 : 1;
+    const starStr = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+    // 記錄該地圖最佳星數並存檔
+    const mid = currentMapDef.id;
+    if (!state.bestStars[mid] || stars > state.bestStars[mid]) state.bestStars[mid] = stars;
+    saveProgress();
     panel.innerHTML = `
       <h1>🏆 中古傳奇</h1>
       <h2>汪汪軍團大勝利！</h2>
-      <p>你成功擊退了貓貓軍團的全部入侵！<br>傳說中的英雄，當之無愧。</p>
-      <p style="font-size:12px;color:#c4a878;">剩餘生命：${state.lives} ❤️｜累積金幣：${state.gold} 🦴</p>
-      <button class="big-btn" id="restart">再戰一局</button>
+      <div class="result-stars">${starStr}</div>
+      <p>你成功擊退了貓貓軍團的全部入侵！</p>
+      <div class="result-stats">
+        ❤️ 剩餘生命：${state.lives} / 20<br>
+        ⚔️ 總擊殺數：${state.killCount}<br>
+        🔥 最高連擊：${state.comboBest}<br>
+        🦴 本局收益：${state.goldEarned}
+      </div>
+      <button class="big-btn" id="endlessBtn">♾️ 無盡模式</button>
+      <button class="big-btn alt" id="restart">🔄 再戰一局</button>
+      <button class="big-btn alt" id="selectLevel">🗺️ 選擇關卡</button>
     `;
   } else {
+    const mid = currentMapDef.id;
+    const progress = state.endless
+      ? `♾️ 無盡模式 挺進至 第 ${state.endlessWave} 波<br>🏅 本圖最佳：第 ${state.bestEndless[mid] || state.endlessWave} 波`
+      : `🌊 挺進至 第 ${state.wave} 波`;
     panel.innerHTML = `
       <h1>💀 戰敗</h1>
       <h2>城堡淪陷了……</h2>
       <p>貓貓軍團突破了你的防線。<br>整頓裝備，再次挑戰！</p>
-      <p style="font-size:12px;color:#c4a878;">挺進至 第 ${state.wave} 波</p>
-      <button class="big-btn" id="restart">重新挑戰</button>
+      <div class="result-stats">
+        ${progress}<br>
+        ⚔️ 總擊殺數：${state.killCount}<br>
+        🔥 最高連擊：${state.comboBest}
+      </div>
+      <button class="big-btn" id="restart">🔄 重新挑戰</button>
+      <button class="big-btn alt" id="selectLevel">🗺️ 選擇關卡</button>
     `;
   }
   document.getElementById('overlay').classList.add('show');
@@ -2427,10 +3728,34 @@ function endGame(win) {
     document.getElementById('overlay').classList.remove('show');
     resetGame();
   });
+  document.getElementById('selectLevel').addEventListener('click', () => {
+    showStartScreen();
+  });
+  const endlessBtn = document.getElementById('endlessBtn');
+  if (endlessBtn) endlessBtn.addEventListener('click', startEndless);
+}
+
+// 進入無盡模式：保留現有陣容與金幣，繼續無限波
+function startEndless() {
+  document.getElementById('overlay').classList.remove('show');
+  state.endless = true;
+  state.endlessWave = 0;
+  state.gameOver = false;
+  state.won = false;
+  state.paused = false;
+  state.waveActive = false;
+  state.enemies = [];
+  state.bullets = [];
+  state.spawnQueue = [];
+  state.gold += 300; // 進場補助
+  recomputeBonds();
+  if (!audioMuted) bgmStart();
+  spawnFloat(canvas.width/2, canvas.height/2, '♾️ 無盡模式開始！保留你的軍團', '#ffd83a');
+  updateHud();
 }
 
 function resetGame() {
-  state.gold = 250;
+  state.gold = 500;
   state.lives = 20;
   state.wave = 0;
   state.waveActive = false;
@@ -2445,11 +3770,26 @@ function resetGame() {
   state.won = false;
   state.earlyBonus = 0;
   state.earlyTimer = 0;
+  // 重置本局戰況：連擊、震動、統計、無盡、羈絆
+  state.combo = 0; state.comboTimer = 0; state.comboBest = 0;
+  state.shake = 0; state.killCount = 0; state.goldEarned = 0;
+  state.endless = false; state.endlessWave = 0;
+  state.activeBonds = []; state.bondBuff = { dmg:1, hp:1, haste:1 };
+  canvas.style.transform = '';
+  const cb = document.getElementById('comboBox'); if (cb) cb.classList.remove('show');
+  const bp = document.getElementById('bondPanel'); if (bp) { bp.style.display='none'; bp.innerHTML=''; }
+  // 收藏進度（解鎖、等級、副本、保底）跨局保留，不在此重置
   for (const sp of Object.values(SPELLS)) sp.cdLeft = 0;
   state.paused = false;
+  // 重置暫停 UI
+  const pBtn = document.getElementById('pauseBtn');
+  if (pBtn) { pBtn.textContent = '⏸'; pBtn.classList.remove('paused-active'); }
+  const pOv = document.getElementById('pauseOverlay');
+  if (pOv) pOv.classList.remove('show');
   bgmStop();
   bgmStart();
   hideInfo();
+  buildShop();
   updateHud();
 }
 
@@ -2577,6 +3917,15 @@ function sfxSpellBuff() {
   sTone(1047, .36, 'square', .2, t + .22);
 }
 
+function sfxHeal() {
+  if (audioMuted) return;
+  const c = getAC(), t = c.currentTime;
+  // 溫暖上升琶音
+  sTone(659, .18, 'sine', .16, t);
+  sTone(880, .22, 'sine', .16, t + .09);
+  sTone(1175, .35, 'sine', .14, t + .2);
+}
+
 function sfxGold() {
   const n = performance.now();
   if (n - _goldLast < 200) return;
@@ -2604,6 +3953,23 @@ function sfxLose() {
   [[440,.3],[330,.3],[261.6,.3],[196,.65]].forEach(([f, d]) => {
     sTone(f, d, 'sawtooth', .18, t); t += d;
   });
+}
+
+function sfxBossRoar() {
+  if (audioMuted) return;
+  const c = getAC(), t = c.currentTime;
+  sSweep(180, 60, 0.5, 'sawtooth', 0.22, t);
+  sSweep(90, 40, 0.6, 'square', 0.18, t + 0.05);
+  sNoise(0.4, 0.12, 800, t);
+}
+
+// 連擊里程碑音效（連擊數越高音越高）
+function sfxCombo(combo) {
+  if (audioMuted) return;
+  const c = getAC(), t = c.currentTime;
+  const step = Math.min(12, Math.floor(combo / 5));
+  const freq = 523 * Math.pow(2, step / 12);
+  sTone(freq, 0.12, 'square', 0.12, t);
 }
 
 // ─── 背景音樂（中古戰場進行曲）──────────────────────────────────────
@@ -2735,13 +4101,316 @@ document.getElementById('audioBtn').addEventListener('click', () => {
 });
 
 // =====================================================================
+// 轉蛋系統
+// =====================================================================
+
+// 根據稀有度權重抽卡
+function gachaRoll() {
+  const r = RARITY_CONFIG;
+  // 保底：連續 10 抽未出稀有以上，強制出稀有
+  const pity = state.gachaPity >= 9;
+  const roll = Math.random() * 100;
+  let rarity;
+  if (pity || roll >= (r.common.weight)) {
+    // 稀有以上：再細分
+    const r2 = Math.random() * (r.rare.weight + r.elite.weight + r.legend.weight);
+    if (r2 < r.legend.weight) rarity = 'legend';
+    else if (r2 < r.legend.weight + r.elite.weight) rarity = 'elite';
+    else rarity = 'rare';
+  } else {
+    rarity = 'common';
+  }
+  // 從該稀有度的英雄中隨機選一個
+  const pool = Object.entries(HERO_TYPES).filter(([k,h]) => h.rarity === rarity);
+  if (!pool.length) return Object.keys(HERO_TYPES)[0]; // fallback
+  return pool[Math.floor(Math.random() * pool.length)][0];
+}
+
+function doPull(count) {
+  const cost = count === 1 ? 150 : 1350;
+  if (state.gold < cost) {
+    spawnFloat(canvas.width/2, canvas.height/2, '骨頭不足！', '#ff5040');
+    return;
+  }
+  state.gold -= cost;
+  updateHud();
+
+  const results = [];
+  for (let i = 0; i < count; i++) {
+    const key = gachaRoll();
+    const rCfg = RARITY_CONFIG[HERO_TYPES[key].rarity];
+
+    // 保底計數
+    if (HERO_TYPES[key].rarity === 'common') state.gachaPity++;
+    else state.gachaPity = 0;
+    state.gachaPulls++;
+
+    // 收藏系統：首次 or 重複
+    let isNew = false, isLvUp = false, newLv = 1;
+    if (!state.heroCollection[key]) {
+      // 首次解鎖
+      state.heroCollection[key] = { lv: 1, copies: 1 };
+      state.unlockedHeroes.add(key);
+      isNew = true;
+      newLv = 1;
+    } else {
+      const coll = state.heroCollection[key];
+      coll.copies++;
+      // 檢查是否升等
+      if (coll.lv < COLL_LV_MAX) {
+        const need = COLL_LV_THRESHOLDS[coll.lv]; // 升到下一等所需累積數
+        if (coll.copies >= need) {
+          coll.lv++;
+          isLvUp = true;
+        }
+      }
+      newLv = coll.lv;
+    }
+
+    results.push({ key, isNew, isLvUp, newLv, rarity: HERO_TYPES[key].rarity, rCfg });
+  }
+
+  showPullResults(results);
+  buildShop();
+  updateGachaPool();
+  updateGachaPityText();
+  saveProgress();  // 抽卡後立即存檔
+}
+
+function showPullResults(results) {
+  const container = document.getElementById('gachaResult');
+  container.innerHTML = '';
+  results.forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = 'gacha-result-card';
+    card.style.borderColor = r.rCfg.color;
+    card.style.animationDelay = `${i * 0.08}s`;
+    if (r.rarity === 'legend') card.style.boxShadow = `0 0 14px ${r.rCfg.glowColor}`;
+    let statusHtml;
+    if (r.isNew) {
+      statusHtml = '<div class="rc-new">✨ 新英雄！</div>';
+    } else if (r.isLvUp) {
+      statusHtml = `<div class="rc-lvup">⬆ 升至 Lv.${r.newLv}</div>`;
+    } else {
+      statusHtml = `<div class="rc-dup">＋1 副本 (Lv.${r.newLv})</div>`;
+    }
+    card.innerHTML = `
+      <img src="heroes/${r.key}.png" alt="${HERO_TYPES[r.key].name}">
+      <div class="rc-name" style="color:${r.rCfg.color};">${HERO_TYPES[r.key].name}</div>
+      <div class="rc-stars" style="color:${r.rCfg.color};">${'⭐'.repeat(r.rCfg.stars)}</div>
+      ${statusHtml}
+    `;
+    container.appendChild(card);
+  });
+  // 高稀有度SFX
+  const maxRarity = results.reduce((a,b) => {
+    const order = {common:0,rare:1,elite:2,legend:3};
+    return order[b.rarity] > order[a.rarity] ? b : a;
+  });
+  const anyLvUp = results.some(r => r.isLvUp);
+  if (maxRarity.rarity === 'legend' || anyLvUp) sfxUpgrade();
+  else if (maxRarity.rarity !== 'common') sfxWaveStart();
+}
+
+function updateGachaPityText() {
+  const el = document.getElementById('gachaPityText');
+  if (el) el.textContent = `保底進度：${state.gachaPity} / 10（下次稀有以上保底）`;
+}
+
+function updateGachaPullBtns() {
+  const b1 = document.getElementById('gachaPull1');
+  const b10 = document.getElementById('gachaPull10');
+  if (b1) b1.disabled = state.gold < 150;
+  if (b10) b10.disabled = state.gold < 1350;
+}
+
+function updateGachaPool() {
+  const pool = document.getElementById('gachaPool');
+  if (!pool) return;
+  pool.innerHTML = '';
+  for (const [key, h] of Object.entries(HERO_TYPES)) {
+    const rCfg = RARITY_CONFIG[h.rarity] || RARITY_CONFIG.common;
+    const unlocked = state.unlockedHeroes.has(key);
+    const coll = state.heroCollection[key];
+    const card = document.createElement('div');
+    card.className = 'gacha-pool-card';
+    card.style.borderColor = rCfg.borderCSS;
+    let collHtml = '';
+    if (unlocked && coll) {
+      if (coll.lv >= COLL_LV_MAX) {
+        collHtml = `<div class="pc-coll" style="color:#ffd83a;">Lv.MAX</div>`;
+      } else {
+        const need = COLL_LV_THRESHOLDS[coll.lv];
+        collHtml = `<div class="pc-coll">Lv.${coll.lv} · ${coll.copies}/${need}</div>`;
+      }
+    }
+    card.innerHTML = `
+      <img src="heroes/${key}.png" alt="${h.name}" style="${!unlocked ? 'filter:grayscale(1);opacity:0.5;' : ''}">
+      <div class="pc-name" style="color:${unlocked ? rCfg.color : '#606060'};">${h.name}</div>
+      <div class="pc-stars" style="color:${rCfg.color};">${'⭐'.repeat(rCfg.stars)}</div>
+      ${collHtml}
+      ${!unlocked ? '<div class="pc-lock">🔒</div>' : ''}
+    `;
+    // 點擊圖鑑卡片 → 開啟角色詳情
+    if (unlocked) {
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', () => showHeroDetail(key));
+    }
+    pool.appendChild(card);
+  }
+}
+
+// =====================================================================
+// 角色詳情彈窗
+// =====================================================================
+function showHeroDetail(typeKey) {
+  const t = HERO_TYPES[typeKey];
+  if (!t) return;
+  const rCfg = RARITY_CONFIG[t.rarity] || RARITY_CONFIG.common;
+  const coll = state.heroCollection[typeKey] || { lv: 1, copies: 1 };
+  const base = getHeroBaseStats(typeKey);
+
+  document.getElementById('hdImg').src = `heroes/${typeKey}.png`;
+  const hdName = document.getElementById('hdName');
+  hdName.textContent = t.name;
+  hdName.style.color = rCfg.color;
+
+  document.getElementById('hdRarity').innerHTML =
+    `<span style="color:${rCfg.color};">${'⭐'.repeat(rCfg.stars)} ${rCfg.label}</span>`
+    + ` <span style="color:#c4a878;">· ${ {tank:'坦克',dps:'輸出',mage:'法師',ctrl:'輔助'}[t.cls] }</span>`;
+
+  document.getElementById('hdColl').innerHTML =
+    coll.lv >= COLL_LV_MAX
+      ? `<span style="color:#ffd83a;font-weight:bold;">收藏等級 Lv.MAX（已滿級）</span>`
+      : `<span style="color:#f9d77a;">收藏等級 Lv.${coll.lv}</span>`;
+
+  // 進度條
+  const progLabel = document.getElementById('hdProgLabel');
+  const progFill = document.getElementById('hdProgFill');
+  if (coll.lv >= COLL_LV_MAX) {
+    progLabel.textContent = `已蒐集 ${coll.copies} 張 · 已達最高等級`;
+    progFill.style.width = '100%';
+    progFill.style.background = '#ffd83a';
+  } else {
+    const need = COLL_LV_THRESHOLDS[coll.lv];
+    const prevNeed = COLL_LV_THRESHOLDS[coll.lv - 1];
+    const cur = coll.copies - prevNeed;
+    const span = need - prevNeed;
+    const remain = need - coll.copies;
+    progLabel.textContent = `升至 Lv.${coll.lv + 1} 還需 ${remain} 張副本（${coll.copies}/${need}）`;
+    progFill.style.width = Math.max(0, Math.min(100, (cur / span) * 100)) + '%';
+    progFill.style.background = rCfg.color;
+  }
+
+  document.getElementById('hdQuote').textContent = `「${t.quote}」`;
+
+  // 屬性：顯示當前等級數值，以及下一級預覽
+  const nextLv = coll.lv < COLL_LV_MAX ? coll.lv + 1 : null;
+  let nextPreview = '';
+  if (nextLv) {
+    const rM = RARITY_BASE_MULT[t.rarity] || RARITY_BASE_MULT.common;
+    const nextDmg = Math.round(t.damage * rM.atk * COLL_LV_ATK[nextLv - 1]);
+    const nextHp  = Math.round(t.maxHp  * rM.hp  * COLL_LV_HP [nextLv - 1]);
+    nextPreview = `
+      <div class="hd-stat-row next">
+        <span>下一級 Lv.${nextLv} 預覽：</span>
+        <span style="color:#6fdf78;">攻擊 ${nextDmg} · 血量 ${nextHp}</span>
+      </div>`;
+  }
+  document.getElementById('hdStats').innerHTML = `
+    <div class="hd-stat-grid">
+      <div class="hd-stat"><span class="hd-k">⚔ 攻擊力</span><span class="hd-v">${base.damage}</span></div>
+      <div class="hd-stat"><span class="hd-k">❤ 血量</span><span class="hd-v">${base.maxHp}</span></div>
+      <div class="hd-stat"><span class="hd-k">🎯 射程</span><span class="hd-v">${base.range}</span></div>
+      <div class="hd-stat"><span class="hd-k">⚡ 射速</span><span class="hd-v">${(1/base.fireRate).toFixed(2)}/s</span></div>
+      <div class="hd-stat"><span class="hd-k">💥 濺射</span><span class="hd-v">${base.splash}</span></div>
+      <div class="hd-stat"><span class="hd-k">✨ 技能</span><span class="hd-v">${t.skillName}</span></div>
+    </div>
+    ${nextPreview}
+    <div class="hd-desc">特性：${t.desc}</div>
+  `;
+
+  document.getElementById('hdStory').textContent = t.story || '';
+  document.getElementById('heroDetailModal').classList.add('show');
+}
+
+function closeHeroDetail() {
+  document.getElementById('heroDetailModal').classList.remove('show');
+}
+
+function openGachaModal() {
+  document.getElementById('gachaModal').classList.add('show');
+  document.getElementById('gachaResult').innerHTML = '';
+  updateGachaPityText();
+  updateGachaPullBtns();
+  updateGachaPool();
+}
+
+function closeGachaModal() {
+  document.getElementById('gachaModal').classList.remove('show');
+}
+
+document.getElementById('gachaClose').addEventListener('click', closeGachaModal);
+document.getElementById('gachaBtn').addEventListener('click', openGachaModal);
+document.getElementById('gachaPull1').addEventListener('click', () => {
+  doPull(1); updateGachaPullBtns();
+});
+document.getElementById('gachaPull10').addEventListener('click', () => {
+  doPull(10); updateGachaPullBtns();
+});
+// 清除進度（兩段式確認，避免誤觸）
+let _wipeArmed = false, _wipeTimer = null;
+document.getElementById('wipeSaveBtn').addEventListener('click', function() {
+  const btn = this;
+  if (!_wipeArmed) {
+    _wipeArmed = true;
+    btn.textContent = '⚠ 再按一次確定清除';
+    btn.style.color = '#ff6060';
+    btn.style.borderColor = '#ff6060';
+    _wipeTimer = setTimeout(() => {
+      _wipeArmed = false;
+      btn.textContent = '🗑 清除進度';
+      btn.style.color = '#c08aa0';
+      btn.style.borderColor = '#80506a';
+    }, 3000);
+    return;
+  }
+  clearTimeout(_wipeTimer);
+  _wipeArmed = false;
+  wipeProgress();
+  btn.textContent = '✓ 已清除';
+  btn.style.color = '#6fdf78';
+  btn.style.borderColor = '#6fdf78';
+  buildShop(); updateGachaPool(); updateGachaPityText(); updateHud(); refreshMapStars();
+  setTimeout(() => {
+    btn.textContent = '🗑 清除進度';
+    btn.style.color = '#c08aa0';
+    btn.style.borderColor = '#80506a';
+  }, 1500);
+});
+// 點擊背景關閉
+document.getElementById('gachaModal').addEventListener('click', function(e) {
+  if (e.target === this) closeGachaModal();
+});
+// 角色詳情關閉
+document.getElementById('hdClose').addEventListener('click', closeHeroDetail);
+document.getElementById('heroDetailModal').addEventListener('click', function(e) {
+  if (e.target === this) closeHeroDetail();
+});
+
+// =====================================================================
 // 啟動
 // =====================================================================
+loadProgress();           // 先載入存檔（轉蛋/收藏進度）
 buildShop();
 initSpells();
 updateHud();
+refreshMapStars();        // 開始畫面顯示各地圖最佳星數
 fitCanvas();
 requestAnimationFrame(loop);
+
+// 離開頁面前再保險存一次
+window.addEventListener('beforeunload', saveProgress);
 </script>
 </body>
 </html>

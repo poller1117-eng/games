@@ -236,6 +236,20 @@ html,body{
 }
 .mini-btn:active{transform:scale(0.9)}
 .mini-btn.warn{background:rgba(255,180,80,0.15);border-color:#ffb050;color:#ffb050}
+.mini-btn.trash{background:rgba(255,90,110,0.15);border-color:#ff5a6e;color:#ff8a9a}
+.mini-btn.trash.trash-hover{background:rgba(255,90,110,0.5);border-color:#ff5a6e;transform:scale(1.25);box-shadow:0 0 12px #ff5a6e}
+
+/* 星級徽章 */
+.star-badge{
+  position:absolute;top:6px;right:88px;
+  background:rgba(255,215,0,0.15);
+  border:1px solid #ffd24a;
+  color:#ffd24a;
+  font-size:11px;font-weight:bold;
+  padding:3px 8px;border-radius:11px;
+  letter-spacing:1px;
+  text-shadow:0 0 4px #b88800;
+}
 
 #inventoryGrid{
   flex:1;
@@ -408,6 +422,55 @@ html,body{
 .dungeon-item .d-badge{font-size:9px;padding:3px 8px;border-radius:10px;background:#2a3a64;color:#7eb8f7}
 .dungeon-item.current .d-badge{background:#7eb8f7;color:#06060f}
 .dungeon-item.cleared .d-badge{background:#3aff8a;color:#06060f}
+
+/* 隊伍列（戰鬥場景左下） */
+.party-bar{
+  position:absolute;left:6px;bottom:6px;
+  display:flex;gap:5px;
+}
+.party-chip{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  background:rgba(10,14,28,0.7);
+  border:1.5px solid #2a3460;
+  border-radius:8px;padding:3px 5px;
+  cursor:pointer;min-width:34px;
+}
+.party-chip.sel{border-color:#ffd24a;box-shadow:0 0 8px rgba(255,210,74,0.5)}
+.party-chip.downed{opacity:0.45;filter:grayscale(0.6)}
+.party-chip .pc-icon{font-size:15px;line-height:1}
+.party-chip .pc-hpbar{width:30px;height:4px;background:#1a0c0c;border-radius:2px;overflow:hidden}
+.party-chip .pc-hpfill{height:100%;background:linear-gradient(90deg,#2a7a4a,#4aff8a);transition:width 0.15s linear}
+
+/* 裝備區 header */
+#equipmentSection .eq-left{flex:1;display:flex;flex-direction:column;gap:4px}
+.eq-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1px}
+.sel-member{font-size:11px;color:#ffd24a;letter-spacing:1px;text-shadow:0 0 4px #b88800}
+.team-btn{
+  background:rgba(154,106,247,0.2);border:1px solid #9a6af7;color:#c8a0ff;
+  font-size:10px;padding:3px 9px;border-radius:10px;cursor:pointer;font-family:inherit;
+}
+.team-btn:active{transform:scale(0.94)}
+.fielded-tag{font-size:9px;color:#3aff8a;border:1px solid #3aff8a;border-radius:6px;padding:0 4px;margin-left:4px}
+.team-hint{font-size:10px;color:#7090b0;text-align:center;padding:2px 0 6px}
+.class-btn-switch.off{border-color:#ff8a6a;color:#ff8a6a;background:rgba(255,120,90,0.12)}
+
+/* 道具動作卡片 */
+.item-card-box{max-width:300px}
+#itemCardBody{padding:16px;gap:14px}
+.ic-head{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid #2a3a64;border-radius:8px;background:rgba(20,28,52,0.6)}
+.ic-icon{font-size:34px;line-height:1}
+.ic-name{font-size:13px;letter-spacing:1px}
+.ic-stats{font-size:10px;color:#9ab0d0;margin-top:3px}
+.ic-btns{display:flex;flex-direction:column;gap:8px}
+.ic-btn{
+  padding:11px;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;
+  border:1px solid #2a3a64;background:rgba(20,28,52,0.8);color:#c8d8ff;
+}
+.ic-btn:active{transform:scale(0.97)}
+.ic-btn.equip{border-color:#7eb8f7;color:#7eb8f7}
+.ic-btn.merge{border-color:#3aff8a;color:#3aff8a}
+.ic-btn.sell{border-color:#ffb050;color:#ffb050}
+.ic-btn:disabled{opacity:0.4;cursor:not-allowed}
 
 /* 職業 */
 .class-btn{

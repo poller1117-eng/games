@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>幽靈漂流記 v0.4 (recipe-scroll)</title>
+  <title>幽靈漂流記 v0.2</title>
   <style>
 /* ============ 全域 ============ */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 :root {
-  --bg-deep: #0a0613;
-  --bg-mid: #1a1233;
-  --bg-card: #251a45;
-  --bg-card-hi: #312055;
-  --accent: #ff7f3f;
-  --accent-glow: #ffb86b;
-  --ghost-blue: #7df9ff;
-  --text: #f0e8ff;
-  --text-dim: #a89bc7;
-  --border: #3b2966;
+  --bg-deep: #1a1635;
+  --bg-mid: #2a234d;
+  --bg-card: #322864;
+  --bg-card-hi: #3d3478;
+  --accent: #C9A6FF;
+  --accent-glow: #E0CCFF;
+  --ghost-blue: #B197FC;
+  --text: #F6F4FF;
+  --text-dim: #B5AFD7;
+  --border: #4d3f88;
 
   --r-common: #c8c8d0;
   --r-uncommon: #4ade80;
@@ -39,8 +39,8 @@ html, body {
 
 body {
   background:
-    radial-gradient(ellipse at 20% 10%, #3a1d5e 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 90%, #1d1d6e 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 10%, #4a3084 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 90%, #2e3a8a 0%, transparent 50%),
     var(--bg-deep);
   background-attachment: fixed;
   position: relative;
@@ -192,7 +192,8 @@ body::before {
   right: 12px;
   font-size: 18px;
 }
-.ghost-card-avatar { font-size: 60px; margin-bottom: 12px; }
+.ghost-card-avatar { width: 110px; height: 130px; margin: 0 auto 12px; }
+.ghost-card-avatar .ghost-svg { width: 100%; height: 100%; }
 .ghost-card-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
 .ghost-card-desc { font-size: 12px; color: var(--text-dim); margin-bottom: 12px; min-height: 32px; }
 .ghost-card-skill { font-size: 11px; color: var(--accent-glow); border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 8px; }
@@ -208,15 +209,22 @@ body::before {
   border-bottom: 1px solid var(--border);
 }
 .currency {
-  display: flex; align-items: center; gap: 6px;
+  display: inline-flex; align-items: center; gap: 5px;
   background: var(--bg-card);
   padding: 6px 14px;
   border-radius: 999px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   border: 1px solid var(--border);
+  white-space: nowrap;
 }
 .coin-icon { font-size: 16px; }
 .coin-label { color: var(--text-dim); font-size: 12px; }
+.town-name-badge {
+  font-size: 15px; font-weight: 700; letter-spacing: 1px;
+  color: var(--accent-glow);
+  text-shadow: 0 0 12px rgba(224,204,255,0.3);
+}
 .top-actions { display: flex; gap: 8px; }
 .icon-btn {
   background: var(--bg-card);
@@ -265,15 +273,33 @@ body::before {
 
 .ghost-display { text-align: center; z-index: 1; }
 .ghost-avatar {
-  font-size: 120px;
   display: block;
-  filter: drop-shadow(0 0 30px rgba(125, 249, 255, 0.4));
-  margin-bottom: 8px;
+  margin: 0 auto 8px;
+  width: 200px;
+  height: 240px;
 }
-.floating { animation: float 3s ease-in-out infinite; }
+.ghost-avatar .ghost-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 18px rgba(177, 151, 252, 0.4));
+}
+.floating { animation: float 3.5s ease-in-out infinite; }
 @keyframes float {
-  0%, 100% { transform: translateY(0) rotate(-2deg); }
-  50% { transform: translateY(-12px) rotate(2deg); }
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50% { transform: translateY(-10px) rotate(1.5deg); }
+}
+.ghost-flame { animation: flameflicker 0.6s ease-in-out infinite alternate; transform-origin: center bottom; }
+@keyframes flameflicker {
+  from { transform: translate(-32px, 130px) scale(1, 1); }
+  to   { transform: translate(-32px, 130px) scale(0.92, 1.08); }
+}
+.ghost-sparkles text { animation: sparkleFlick 2s ease-in-out infinite; }
+.ghost-sparkles text:nth-child(2) { animation-delay: 0.4s; }
+.ghost-sparkles text:nth-child(3) { animation-delay: 0.8s; }
+.ghost-sparkles text:nth-child(4) { animation-delay: 1.2s; }
+@keyframes sparkleFlick {
+  0%, 100% { opacity: 0.2; transform: scale(0.7); }
+  50%      { opacity: 1; transform: scale(1.2); }
 }
 .ghost-name { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
 .ghost-level { font-size: 13px; color: var(--text-dim); }
@@ -610,7 +636,8 @@ body::before {
   border-radius: 14px;
   margin-bottom: 16px;
 }
-.ghost-detail-avatar { font-size: 64px; }
+.ghost-detail-avatar { width: 84px; height: 100px; flex-shrink: 0; }
+.ghost-detail-avatar .ghost-svg { width: 100%; height: 100%; }
 .ghost-detail-info { flex: 1; }
 .ghost-detail-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
 .ghost-detail-skill { font-size: 12px; color: var(--accent-glow); margin-bottom: 8px; }
@@ -674,7 +701,8 @@ body::before {
 .ghost-mini:hover { border-color: var(--accent); }
 .ghost-mini.active { border-color: var(--accent); background: var(--bg-card-hi); }
 .ghost-mini.locked { opacity: 0.4; cursor: pointer; }
-.ghost-mini-avatar { font-size: 32px; }
+.ghost-mini-avatar { width: 56px; height: 64px; margin: 0 auto; }
+.ghost-mini-avatar .ghost-svg { width: 100%; height: 100%; }
 .ghost-mini-name { font-size: 11px; margin-top: 2px; color: var(--text-dim); }
 
 /* ============ 戰利品揭曉 ============ */
@@ -986,6 +1014,843 @@ body::before {
   background: white;
 }
 
+/* ============ 全螢幕漂流場景 ============ */
+#drift-scene { background: var(--bg-deep); }
+.drift-scene-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 110%, rgba(177,151,252,0.18) 0%, transparent 50%),
+    linear-gradient(180deg, #0e0824 0%, #1a1242 40%, #2a1e5a 100%);
+  z-index: 0;
+}
+.drift-scene-stars {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 8% 18%, white, transparent),
+    radial-gradient(1.5px 1.5px at 22% 38%, white, transparent),
+    radial-gradient(1px 1px at 42% 12%, white, transparent),
+    radial-gradient(2px 2px at 58% 28%, white, transparent),
+    radial-gradient(1px 1px at 78% 22%, white, transparent),
+    radial-gradient(1.5px 1.5px at 88% 48%, white, transparent),
+    radial-gradient(1px 1px at 15% 55%, white, transparent),
+    radial-gradient(2px 2px at 36% 8%, white, transparent),
+    radial-gradient(1px 1px at 65% 64%, white, transparent);
+  opacity: 0.7;
+  z-index: 1;
+  animation: starsTwinkle 4s ease-in-out infinite;
+}
+@keyframes starsTwinkle {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.9; }
+}
+.drift-scene-fog {
+  position: absolute;
+  height: 80px;
+  width: 200%;
+  bottom: 25%;
+  z-index: 2;
+  background: radial-gradient(ellipse, rgba(177,151,252,0.25), transparent 70%);
+  pointer-events: none;
+  animation: fogDrift 22s linear infinite;
+}
+.fog-1 { animation-duration: 22s; opacity: 0.6; }
+.fog-2 { animation-duration: 30s; animation-delay: -10s; opacity: 0.4; bottom: 20%; }
+@keyframes fogDrift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.drift-scene-ground {
+  position: absolute;
+  bottom: 0;
+  left: 0; right: 0;
+  height: 22%;
+  z-index: 3;
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(20,12,50,0.85) 30%, #0a061f 100%);
+  border-top: 1px solid rgba(177,151,252,0.2);
+}
+
+.drift-scene-top {
+  position: absolute; top: 0; left: 0; right: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: linear-gradient(180deg, rgba(10,6,30,0.7) 0%, transparent 100%);
+}
+.drift-back-btn {
+  background: rgba(50,40,100,0.7);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.drift-back-btn:hover { background: var(--bg-card-hi); }
+.drift-scene-info {
+  text-align: right;
+}
+.drift-scene-title {
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-glow), white);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 14px rgba(224,204,255,0.3);
+}
+.drift-scene-timer {
+  font-size: 14px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+}
+
+.drift-scene-stage {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 25%;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.drift-character {
+  width: 180px; height: 220px;
+  z-index: 6;
+  position: relative;
+  animation: ghostWalkBob 1.6s ease-in-out infinite;
+}
+.drift-character .ghost-svg { width: 100%; height: 100%; }
+@keyframes ghostWalkBob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-14px) rotate(2deg); }
+}
+
+/* 場景中的隨機元素 */
+.drift-scenery {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.scenery-item {
+  position: absolute;
+  bottom: 0;
+  font-size: 36px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+  animation: scenerySlide linear forwards;
+}
+@keyframes scenerySlide {
+  from { transform: translateX(110vw); }
+  to   { transform: translateX(-30vw); }
+}
+
+/* 對話泡泡 */
+.drift-balloon {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: white;
+  color: #1a1a2e;
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+  max-width: 280px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 7;
+  transition: all 0.3s;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+.drift-balloon.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.drift-balloon::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid white;
+}
+
+/* 底部進度與日誌 */
+.drift-scene-bottom {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 14px 16px 20px;
+  z-index: 10;
+}
+.drift-scene-progress {
+  height: 8px;
+  background: rgba(50,40,100,0.5);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+}
+.drift-scene-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ghost-blue), var(--accent));
+  box-shadow: 0 0 12px var(--ghost-blue);
+  width: 0%;
+  transition: width 0.5s;
+}
+.drift-scene-log {
+  max-height: 90px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.drift-log-entry {
+  font-size: 12px;
+  color: var(--text-dim);
+  background: rgba(40,30,80,0.6);
+  border-left: 2px solid var(--accent);
+  padding: 4px 10px;
+  border-radius: 4px;
+  animation: logFadeIn 0.4s ease-out;
+}
+.drift-log-entry.good { border-left-color: #4ade80; color: #d8f5e0; }
+.drift-log-entry.bad  { border-left-color: #f87171; color: #ffe0e0; }
+.drift-log-entry.boss { border-left-color: #fbbf24; color: #ffe9a8; background: rgba(80,40,20,0.6); font-weight: 700; }
+
+.drift-balloon.boss {
+  background: linear-gradient(135deg, #f97316, #fbbf24);
+  color: #1a1a2e;
+  border: 2px solid #fff;
+  font-size: 16px;
+}
+.drift-balloon.good { background: #e0fff4; color: #1a1a2e; }
+.drift-balloon.bad  { background: #ffe0e0; color: #1a1a2e; }
+
+.drift-scene-stage.shake { animation: shake 0.5s ease-in-out; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+  20%, 40%, 60%, 80% { transform: translateX(8px); }
+}
+
+.quick-enh {
+  font-size: 12px !important;
+  background: linear-gradient(135deg, var(--accent), var(--accent-glow)) !important;
+  color: #1a1a2e !important;
+  border: none !important;
+  font-weight: 700;
+}
+@keyframes logFadeIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+
+/* ============ 轉職系統 ============ */
+.ghost-class-action { margin: 4px 0 8px; }
+.ghost-class-action .btn-primary { margin: 0; }
+.class-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.class-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.class-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.class-card.current { border-color: var(--accent-glow); background: var(--bg-card-hi); }
+.class-icon { font-size: 40px; margin-bottom: 6px; }
+.class-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.class-desc { font-size: 11px; color: var(--text-dim); line-height: 1.4; margin-bottom: 8px; min-height: 30px; }
+.class-skill { font-size: 11px; color: var(--accent-glow); margin-bottom: 6px; }
+.class-bonus { font-size: 13px; font-weight: 700; }
+.class-current-tag {
+  position: absolute; top: 8px; right: 8px;
+  font-size: 10px; background: var(--accent); color: #1a1a2e;
+  padding: 2px 8px; border-radius: 999px; font-weight: 700;
+}
+
+/* ============ 商店 ============ */
+.shop-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 62vh;
+  overflow-y: auto;
+}
+.shop-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.shop-item.disabled { opacity: 0.55; }
+.shop-item-icon { font-size: 30px; flex: 0 0 auto; }
+.shop-item-info { flex: 1; min-width: 0; }
+.shop-item-name { font-size: 14px; font-weight: 700; }
+.shop-item-flavor { font-size: 11px; color: var(--text-dim); font-style: italic; }
+.shop-item-meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.shop-item-buy {
+  flex: 0 0 auto;
+  background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+  color: #1a1a2e;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  text-align: center;
+  transition: transform 0.1s;
+}
+.shop-item-buy:hover { transform: scale(1.05); }
+.shop-item-buy:active { transform: scale(0.95); }
+.shop-item.disabled .shop-item-buy { pointer-events: none; filter: grayscale(0.6); }
+.shop-item-price { font-size: 13px; white-space: nowrap; }
+
+/* ============ 限定徽章 ============ */
+.item-exclusive-tag {
+  display: inline-block;
+  font-size: 10px;
+  background: linear-gradient(135deg, #fbbf24, #f87171);
+  color: #2a0606;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+/* ============ 據點主畫面 ============ */
+.base-view {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 14px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.base-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent-glow);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+.ghost-roster { display: flex; flex-direction: column; gap: 10px; }
+
+.roster-card {
+  display: flex;
+  gap: 12px;
+  background: rgba(50,40,100,0.5);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+  align-items: center;
+}
+.roster-card.active { border-color: var(--accent); box-shadow: 0 0 14px rgba(201,166,255,0.25); }
+.roster-avatar { width: 64px; height: 76px; flex: 0 0 auto; }
+.roster-avatar .ghost-svg { width: 100%; height: 100%; }
+.roster-body { flex: 1; min-width: 0; }
+.roster-name { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.roster-name small { color: var(--text-dim); font-weight: 400; margin-left: 4px; }
+.roster-spirit { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.roster-spirit .spirit-icon { font-size: 13px; }
+.roster-spirit-bar { flex: 1; height: 7px; background: rgba(0,0,0,0.4); border-radius: 999px; overflow: hidden; max-width: 140px; }
+.roster-spirit-fill { height: 100%; background: linear-gradient(90deg, #7df9ff, #a78bfa); }
+.roster-spirit-text { font-size: 11px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.roster-status { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+.roster-status.done { color: var(--r-uncommon); font-weight: 700; }
+.roster-status.work { color: var(--accent-glow); }
+.roster-prog { height: 6px; background: rgba(0,0,0,0.4); border-radius: 999px; overflow: hidden; margin: 4px 0 6px; }
+.roster-prog-fill { height: 100%; background: linear-gradient(90deg, var(--ghost-blue), var(--accent)); transition: width 0.5s; }
+.roster-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.rbtn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.rbtn:hover { background: var(--bg-card-hi); }
+.rbtn:active { transform: scale(0.96); }
+.rbtn.primary { background: linear-gradient(135deg, var(--accent), var(--accent-glow)); color: #2a1a4e; border: none; }
+.rbtn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* 設施 */
+.facility-list { display: flex; flex-direction: column; gap: 10px; }
+.facility-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: rgba(50,40,100,0.5);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+}
+.facility-card.unbuilt { opacity: 0.92; border-style: dashed; }
+.facility-icon { font-size: 34px; flex: 0 0 auto; width: 46px; text-align: center; }
+.facility-icon.working { animation: facPulse 1.4s ease-in-out infinite; }
+@keyframes facPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+.facility-body { flex: 1; min-width: 0; }
+.facility-name { font-size: 15px; font-weight: 700; }
+.facility-name small { color: var(--text-dim); font-weight: 400; }
+.facility-desc { font-size: 12px; color: var(--text-dim); margin-top: 3px; line-height: 1.4; }
+.facility-desc b { color: var(--accent-glow); }
+.facility-mats { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.facility-actions { display: flex; flex-direction: column; gap: 5px; flex: 0 0 auto; }
+
+.gacha-entry { margin: 0; }
+
+/* 指派列表 */
+.assign-list { display: flex; flex-direction: column; gap: 8px; }
+.assign-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px;
+}
+.assign-avatar { width: 44px; height: 52px; flex: 0 0 auto; }
+.assign-avatar .ghost-svg { width: 100%; height: 100%; }
+.assign-info { flex: 1; }
+.assign-name { font-size: 14px; font-weight: 700; }
+.assign-name small { color: var(--text-dim); font-weight: 400; }
+.assign-meta { font-size: 11px; color: var(--text-dim); }
+
+/* 轉蛋 */
+.gacha-stage {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; min-height: 160px; margin-bottom: 12px;
+}
+.gacha-orb {
+  font-size: 80px;
+  animation: gachaFloat 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(177,151,252,0.6));
+}
+@keyframes gachaFloat { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-10px) rotate(3deg)} }
+.gacha-result { text-align: center; }
+.gacha-pop {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 24px;
+  animation: lootPop 0.5s ease-out;
+}
+.gacha-pop[data-rarity="uncommon"]  { border-color: var(--r-uncommon); box-shadow:0 0 14px rgba(74,222,128,0.4); }
+.gacha-pop[data-rarity="rare"]      { border-color: var(--r-rare); box-shadow:0 0 16px rgba(96,165,250,0.5); }
+.gacha-pop[data-rarity="epic"]      { border-color: var(--r-epic); box-shadow:0 0 18px rgba(192,132,252,0.6); }
+.gacha-pop[data-rarity="legendary"] { border-color: var(--r-legendary); box-shadow:0 0 22px rgba(251,191,36,0.7); }
+.gacha-icon { font-size: 56px; margin-bottom: 6px; }
+.gacha-name { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+@keyframes lootPop { from{transform:scale(0.3);opacity:0} to{transform:scale(1);opacity:1} }
+
+/* ============ 城鎮主畫面 ============ */
+.town {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.town-sky {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, #1a1242 0%, #2a1e5a 45%, #3a2d6e 70%, #2a2050 100%);
+  z-index: 0;
+}
+.town-moon {
+  position: absolute; top: 26px; right: 30px;
+  font-size: 44px;
+  filter: drop-shadow(0 0 18px rgba(255,224,138,0.5));
+  animation: float 6s ease-in-out infinite;
+}
+.town-cloud {
+  position: absolute;
+  width: 120px; height: 36px;
+  background: radial-gradient(ellipse, rgba(177,151,252,0.18), transparent 70%);
+  border-radius: 50%;
+  z-index: 1;
+}
+.town-cloud.c1 { top: 70px; left: -40px; animation: cloudDrift 32s linear infinite; }
+.town-cloud.c2 { top: 130px; left: -80px; animation: cloudDrift 44s linear infinite; animation-delay: -12s; opacity: 0.7; }
+@keyframes cloudDrift { from{transform:translateX(0)} to{transform:translateX(130vw)} }
+
+/* 外出探險狀態列 */
+.town-expedition {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px 0;
+}
+.exp-chip {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(20,12,50,0.82);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 7px 12px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+.exp-chip.done { border-color: var(--r-uncommon); box-shadow: 0 0 12px rgba(74,222,128,0.35); }
+.exp-chip-av { width: 36px; height: 42px; flex: 0 0 auto; }
+.exp-chip-av .ghost-svg { width: 100%; height: 100%; }
+.exp-chip-body { flex: 1; min-width: 0; }
+.exp-chip-name { font-size: 13px; font-weight: 700; }
+.exp-chip-name small { color: var(--text-dim); font-weight: 400; margin-left: 4px; }
+.exp-chip-bar { height: 5px; background: rgba(0,0,0,0.4); border-radius: 999px; overflow: hidden; margin-top: 4px; }
+.exp-chip-fill { height: 100%; background: linear-gradient(90deg, var(--ghost-blue), var(--accent)); transition: width 0.5s; }
+.exp-chip-act { flex: 0 0 auto; }
+.exp-time { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--text-dim); }
+.exp-done-tag { font-size: 12px; font-weight: 700; color: #2a1a4e; background: var(--r-uncommon); padding: 4px 10px; border-radius: 999px; }
+
+/* 城鎮地面（建築 + 鬼魂的舞台） */
+.town-ground {
+  position: relative;
+  flex: 1;
+  z-index: 3;
+  margin-top: auto;
+}
+.town-ground::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 38%;
+  background: linear-gradient(180deg, transparent, rgba(58,45,90,0.55) 40%, #241a48 100%);
+  border-top: 1px solid rgba(177,151,252,0.18);
+  pointer-events: none;
+}
+.town-fence {
+  position: absolute;
+  left: 0; right: 0; bottom: 30%;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, rgba(177,151,252,0.25) 0 14px, transparent 14px 28px);
+  pointer-events: none;
+}
+.town-buildings, .town-ghosts, .town-decor { position: absolute; inset: 0; pointer-events: none; }
+.building, .town-ghost { pointer-events: auto; }
+
+/* 建築 */
+.building {
+  position: absolute;
+  width: 26%;
+  max-width: 130px;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.15s;
+}
+.building:active { transform: scale(0.95); }
+.building.unbuilt { opacity: 0.75; }
+.building.unbuilt .bld-svg { filter: grayscale(0.7) brightness(0.7); }
+.bld-art { position: relative; }
+.bld-svg { width: 100%; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.5)); }
+.bld-art.working .bld-flame { animation: flameflicker2 0.5s ease-in-out infinite alternate; transform-origin: 50% 80%; }
+@keyframes flameflicker2 { from{transform:scale(1,1)} to{transform:scale(0.9,1.12)} }
+.bld-label {
+  font-size: 11px; font-weight: 600; color: var(--text);
+  background: rgba(20,12,50,0.55); border-radius: 999px;
+  padding: 2px 9px; display: inline-block; margin-top: 1px;
+}
+.bld-worker {
+  position: absolute; bottom: 14%; right: -6px;
+  width: 34px; height: 40px;
+  animation: float 3s ease-in-out infinite;
+}
+.bld-worker .ghost-svg { width: 100%; height: 100%; }
+.bld-badge {
+  position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+  font-size: 11px; font-weight: 700; white-space: nowrap;
+  padding: 3px 9px; border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.bld-badge.build   { background: var(--accent); color: #2a1a4e; animation: notifPulse 1.6s ease-in-out infinite; }
+.bld-badge.collect { background: var(--r-legendary); color: #2a1a00; animation: notifPulse 1.4s ease-in-out infinite; }
+.bld-badge.empty   { background: rgba(40,30,80,0.9); color: var(--text-dim); border: 1px dashed var(--border); }
+
+/* 城鎮裡飄動的鬼魂 */
+.town-ghost {
+  position: absolute;
+  width: 64px; height: 78px;
+  cursor: pointer;
+  animation: townFloat 4s ease-in-out infinite;
+  text-align: center;
+}
+.town-ghost .ghost-svg { width: 100%; height: 100%; }
+.town-ghost:active { transform: scale(0.92); }
+.town-ghost-tag {
+  font-size: 9px; color: var(--text-dim);
+  background: rgba(20,12,50,0.4); border-radius: 999px;
+  padding: 0 6px; display: inline-block; margin-top: -6px;
+  opacity: 0.75;
+}
+@keyframes townFloat {
+  0%,100% { transform: translateY(0) rotate(-2deg); }
+  50%     { transform: translateY(-10px) rotate(2deg); }
+}
+
+/* 底部 dock */
+.town-dock {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+  padding: 10px 12px;
+  background: linear-gradient(0deg, rgba(10,6,30,0.95), rgba(10,6,30,0.55));
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--border);
+}
+.dock-btn {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: rgba(50,40,100,0.5);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 8px 4px;
+  color: var(--text);
+  font-family: inherit; font-size: 11px; font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.dock-btn:hover { background: var(--bg-card-hi); }
+.dock-btn:active { transform: scale(0.95); }
+.dock-ico { font-size: 22px; }
+
+/* 操作面板 */
+.facaction-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5; margin-bottom: 8px; }
+.facaction-prod { font-size: 13px; margin: 8px 0; }
+.facaction-prod b { color: var(--accent-glow); }
+.ghaction-top { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+.ghaction-av { width: 60px; height: 72px; flex: 0 0 auto; }
+.ghaction-av .ghost-svg { width: 100%; height: 100%; }
+.ghaction-name { font-size: 18px; font-weight: 700; }
+.ghaction-name small { color: var(--text-dim); font-weight: 400; }
+.ghaction-class { font-size: 12px; color: var(--accent-glow); margin: 2px 0 6px; }
+
+/* ============ Boo Town 裝飾 ============ */
+.town-clocktower {
+  position: absolute;
+  top: 30px; right: 14%;
+  width: 64px; height: 128px;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 10px rgba(255,224,138,0.2));
+  z-index: 1;
+}
+.town-bunting {
+  position: absolute;
+  top: 96px; left: 0; right: 0;
+  display: flex; justify-content: space-around;
+  padding: 0 8px;
+  z-index: 2;
+}
+.town-bunting span {
+  width: 0; height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 15px solid var(--accent);
+  opacity: 0.7;
+}
+.town-bunting span:nth-child(odd)  { border-top-color: #FFD56B; }
+.town-bunting span:nth-child(3n)   { border-top-color: #FF9EC4; }
+
+.town-lamp {
+  position: absolute;
+  width: 8px; height: 46px;
+  background: linear-gradient(180deg, #2a2048, #1a1430);
+  border-radius: 3px;
+}
+.town-lamp::before {
+  content: '';
+  position: absolute;
+  top: -10px; left: 50%; transform: translateX(-50%);
+  width: 16px; height: 16px; border-radius: 50%;
+  background: radial-gradient(circle, #FFF3C4, #FFD56B 60%, transparent 75%);
+  box-shadow: 0 0 16px 6px rgba(255,213,107,0.45);
+  animation: lampFlicker 3s ease-in-out infinite;
+}
+@keyframes lampFlicker { 0%,100%{opacity:0.85} 50%{opacity:1} }
+
+.town-fountain {
+  position: absolute;
+  left: 28%; top: 40%; transform: translateX(-50%);
+  width: 130px; height: auto;
+  filter: drop-shadow(0 0 14px rgba(177,151,252,0.35));
+}
+.town-water { animation: waterPulse 1.8s ease-in-out infinite; }
+@keyframes waterPulse { 0%,100%{opacity:0.5} 50%{opacity:0.9} }
+
+.town-welcome {
+  position: absolute;
+  left: 3%; bottom: 2%;
+  z-index: 4;
+  opacity: 0.5;
+}
+.welcome-board {
+  background: linear-gradient(180deg, #6b4a2e, #4a3320);
+  color: #FFE9C0;
+  font-size: 8px; line-height: 1.3; text-align: center;
+  padding: 4px 8px; border-radius: 6px;
+  border: 1px solid #3a2616;
+}
+.welcome-board b { font-size: 10px; letter-spacing: 1px; }
+
+.town-river {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 16%;
+  background: linear-gradient(180deg, transparent, rgba(107,141,224,0.25) 50%, rgba(120,150,230,0.4));
+  overflow: hidden;
+}
+.river-glow {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 20% 60%, rgba(255,213,107,0.3), transparent 18%),
+    radial-gradient(circle at 60% 70%, rgba(177,151,252,0.3), transparent 16%),
+    radial-gradient(circle at 85% 55%, rgba(255,213,107,0.25), transparent 14%);
+  animation: riverShimmer 5s ease-in-out infinite;
+}
+@keyframes riverShimmer { 0%,100%{opacity:0.6; transform:translateX(0)} 50%{opacity:1; transform:translateX(8px)} }
+
+/* ============ 角色稀有度/招魂/圖鑑 ============ */
+.ghost-rarity-tag { font-size: 14px; font-weight: 700; letter-spacing: 1px; margin: 2px 0 6px; }
+
+/* 招魂池 */
+.summon-stage { text-align: center; padding: 12px 0 16px; }
+.summon-orb {
+  font-size: 76px;
+  animation: gachaFloat 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 22px rgba(177,151,252,0.6));
+}
+.summon-rates { font-size: 12px; color: var(--text-dim); margin-top: 8px; letter-spacing: 1px; }
+.summon-result-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.summon-result-grid:has(.summon-cell:only-child) { grid-template-columns: 1fr; max-width: 160px; margin: 0 auto 14px; }
+.summon-cell {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 8px 4px;
+  text-align: center;
+  animation: lootPop 0.4s ease-out backwards;
+}
+.summon-cell[data-rarity="r4"] { border-color: #C084FC; box-shadow: 0 0 12px rgba(192,132,252,0.5); }
+.summon-cell[data-rarity="r5"] { border-color: #FBBF24; box-shadow: 0 0 18px rgba(251,191,36,0.7); animation: lootPop 0.4s ease-out backwards, mythicGlow 1.5s ease-in-out infinite; }
+.summon-cell-av { width: 100%; aspect-ratio: 1; }
+.summon-cell-av .ghost-svg { width: 100%; height: 100%; }
+.summon-cell-name { font-size: 12px; font-weight: 700; }
+.summon-cell-star { font-size: 10px; }
+.summon-cell-tag { font-size: 10px; color: var(--accent-glow); font-weight: 700; margin-top: 2px; }
+
+/* 圖鑑 */
+.codex-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-height: 66vh;
+  overflow-y: auto;
+  padding: 2px;
+}
+.codex-cell {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.12s;
+}
+.codex-cell:active { transform: scale(0.95); }
+.codex-cell.locked { opacity: 0.6; cursor: default; filter: grayscale(0.6); }
+.codex-cell[data-rarity="r4"]:not(.locked) { border-color: #C084FC; }
+.codex-cell[data-rarity="r5"]:not(.locked) { border-color: #FBBF24; box-shadow: 0 0 12px rgba(251,191,36,0.4); }
+.codex-av { width: 70%; aspect-ratio: 1; margin: 0 auto; }
+.codex-av .ghost-svg { width: 100%; height: 100%; }
+.codex-silhouette { font-size: 40px; opacity: 0.4; line-height: 1.6; }
+.codex-name { font-size: 13px; font-weight: 700; }
+.codex-star { font-size: 11px; letter-spacing: 1px; }
+.codex-lv { font-size: 10px; color: var(--text-dim); }
+
+/* 圖鑑詳情 */
+.codexd-top { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.codexd-av { width: 70px; height: 84px; flex: 0 0 auto; }
+.codexd-av .ghost-svg { width: 100%; height: 100%; }
+.codexd-name { font-size: 18px; font-weight: 700; }
+.codexd-name small { color: var(--text-dim); font-weight: 400; }
+.codexd-star { font-size: 16px; letter-spacing: 2px; margin: 2px 0; }
+.codexd-el { font-size: 12px; color: var(--text-dim); }
+.codexd-skill { font-size: 13px; color: var(--accent-glow); margin: 8px 0; padding: 8px 10px; background: var(--bg-card); border-radius: 10px; }
+.codexd-shard { font-size: 13px; margin: 10px 0; text-align: center; }
+.codexd-shard b { color: var(--accent-glow); font-size: 16px; }
+
+/* ============ 歡迎回來 ============ */
+.welcome-offline { text-align: center; font-size: 14px; color: var(--text-dim); margin-bottom: 14px; }
+.welcome-offline b { color: var(--accent-glow); font-size: 16px; }
+.welcome-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.welcome-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px;
+  font-size: 13px; line-height: 1.5;
+}
+.welcome-row .welcome-ico { font-size: 26px; flex: 0 0 auto; }
+.welcome-row b { color: var(--accent-glow); }
+.welcome-row small { color: var(--text-dim); }
+
+/* ============ 穿戴選擇鬼魂 ============ */
+.equiptarget-list { display: flex; flex-direction: column; gap: 8px; max-height: 60vh; overflow-y: auto; }
+.equiptarget-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px; cursor: pointer;
+  transition: border-color 0.15s;
+}
+.equiptarget-row:hover { border-color: var(--accent); }
+.equiptarget-row.current { border-color: var(--accent-glow); opacity: 0.7; cursor: default; }
+.equiptarget-av { width: 44px; height: 52px; flex: 0 0 auto; }
+.equiptarget-av .ghost-svg { width: 100%; height: 100%; }
+.equiptarget-info { flex: 1; min-width: 0; }
+.equiptarget-name { font-size: 14px; font-weight: 700; }
+.equiptarget-name small { color: var(--text-dim); font-weight: 400; }
+.equiptarget-cur { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.equiptarget-btn {
+  flex: 0 0 auto; font-size: 12px; font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+  color: #2a1a4e; padding: 7px 14px; border-radius: 9px;
+}
+.equiptarget-row.current .equiptarget-btn { background: var(--bg-card-hi); color: var(--text-dim); }
+
+/* 背包：已穿戴標示穿在誰 */
+.item-slot.is-equipped { border-style: solid; }
+.item-wearer {
+  position: absolute; bottom: 1px; left: 1px; right: 1px;
+  font-size: 8px; font-weight: 700;
+  background: rgba(201,166,255,0.92); color: #2a1a4e;
+  border-radius: 0 0 8px 8px; padding: 1px 0; text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 
 </style>
 </head>
@@ -1000,7 +1865,7 @@ body::before {
     <p class="title-tagline">「夜深了，該放你出去走走了。」</p>
     <button id="btn-new-game" class="btn-primary">開始新遊戲</button>
     <button id="btn-continue" class="btn-secondary">繼續遊戲</button>
-    <p class="version-tag">v0.4 recipe-scroll</p>
+    <p class="version-tag">v0.2 prototype</p>
   </div>
 </div>
 
@@ -1019,63 +1884,109 @@ body::before {
     <div class="currency">
       <span class="coin-icon">💰</span>
       <span id="coin-display">0</span>
-      <span class="coin-label">靈幣</span>
     </div>
+    <div class="town-name-badge">🏮 幽魂小鎮</div>
     <div class="top-actions">
-      <button class="icon-btn" id="btn-forge" title="鍛造工坊">🔨</button>
-      <button class="icon-btn" id="btn-bag" title="背包">🎒</button>
-      <button class="icon-btn" id="btn-ghost-info" title="鬼魂資訊">📜</button>
       <button class="icon-btn" id="btn-menu" title="選單">⚙️</button>
     </div>
   </header>
 
-  <main class="stage">
-    <div class="stage-bg"></div>
-
-    <div class="ghost-display" id="ghost-display">
-      <div class="ghost-avatar floating" id="ghost-avatar">👻</div>
-      <div class="ghost-name" id="ghost-name">飄飄</div>
-      <div class="ghost-level">
-        Lv.<span id="ghost-level">1</span>
-        <div class="exp-bar">
-          <div class="exp-fill" id="exp-fill" style="width:0%"></div>
-        </div>
-      </div>
-      <div class="spirit-row">
-        <span class="spirit-icon">🔮</span>
-        <div class="spirit-bar">
-          <div class="spirit-fill" id="spirit-fill" style="width:100%"></div>
-        </div>
-        <span class="spirit-text" id="spirit-text">100 / 100</span>
-        <button class="heal-btn" id="btn-heal" title="補魂">＋</button>
+  <main class="town" id="town">
+    <div class="town-sky">
+      <div class="town-moon">🌙</div>
+      <div class="town-cloud c1"></div>
+      <div class="town-cloud c2"></div>
+      <!-- 遠景時鐘塔剪影 -->
+      <svg class="town-clocktower" viewBox="0 0 80 160" aria-hidden="true">
+        <rect x="26" y="40" width="28" height="120" rx="3" fill="#2a2048"/>
+        <path d="M22 40 L40 14 L58 40 Z" fill="#241b40"/>
+        <circle cx="40" cy="58" r="11" fill="#3a2d63"/>
+        <circle cx="40" cy="58" r="9" fill="#FFE08A" opacity="0.9"/>
+        <line x1="40" y1="58" x2="40" y2="52" stroke="#2a2048" stroke-width="1.5"/>
+        <line x1="40" y1="58" x2="45" y2="60" stroke="#2a2048" stroke-width="1.5"/>
+        <rect x="32" y="78" width="7" height="10" rx="1.5" fill="#FFE08A" opacity="0.7"/>
+        <rect x="42" y="78" width="7" height="10" rx="1.5" fill="#FFE08A" opacity="0.7"/>
+        <rect x="32" y="96" width="7" height="10" rx="1.5" fill="#FFE08A" opacity="0.5"/>
+        <rect x="42" y="96" width="7" height="10" rx="1.5" fill="#FFE08A" opacity="0.5"/>
+      </svg>
+      <!-- 彩帶旗 -->
+      <div class="town-bunting">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
       </div>
     </div>
-
-    <div class="drift-status" id="drift-status">
-      <div class="drift-empty" id="drift-empty">
-        <p class="drift-msg">寵物正在家裡發呆…</p>
-        <button class="btn-primary" id="btn-open-map">出門漂流</button>
-      </div>
-      <div class="drift-active hidden" id="drift-active">
-        <p class="drift-msg" id="drift-msg">漂流中...</p>
-        <div class="drift-progress">
-          <div class="drift-progress-fill" id="drift-progress-fill"></div>
+    <!-- 外出探險狀態 -->
+    <div class="town-expedition hidden" id="town-expedition"></div>
+    <!-- 城鎮地面：裝飾 + 建築 + 鬼魂 -->
+    <div class="town-ground">
+      <div class="town-fence"></div>
+      <!-- 裝飾層（不可點） -->
+      <div class="town-decor">
+        <!-- 路燈 -->
+        <div class="town-lamp" style="left:6%; top:30%"></div>
+        <div class="town-lamp" style="left:88%; top:24%"></div>
+        <div class="town-lamp" style="left:48%; top:50%"></div>
+        <!-- 中央噴泉 -->
+        <svg class="town-fountain" viewBox="0 0 120 90" aria-hidden="true">
+          <ellipse cx="60" cy="74" rx="50" ry="13" fill="#2a1f4e"/>
+          <ellipse cx="60" cy="70" rx="46" ry="12" fill="#3a2d63"/>
+          <ellipse cx="60" cy="68" rx="40" ry="10" fill="#6b8de0" opacity="0.55"/>
+          <ellipse cx="60" cy="67" rx="40" ry="9" fill="#B197FC" opacity="0.35"/>
+          <rect x="56" y="40" width="8" height="28" rx="3" fill="#4a3b78"/>
+          <ellipse cx="60" cy="40" rx="14" ry="4" fill="#5a4a8e"/>
+          <path class="town-water" d="M60 38 Q50 26 46 40 M60 38 Q70 26 74 40 M60 36 L60 24" stroke="#B197FC" stroke-width="2.5" fill="none" opacity="0.7" stroke-linecap="round"/>
+          <circle cx="60" cy="34" r="4" fill="#C9A6FF" opacity="0.8"/>
+        </svg>
+        <!-- 歡迎牌 -->
+        <div class="town-welcome">
+          <div class="welcome-board">✦ WELCOME ✦<br><b>BOO TOWN</b></div>
         </div>
-        <p class="drift-timer" id="drift-timer">--:--</p>
-        <button class="btn-secondary" id="btn-speedup">使用陰氣丹加速</button>
+        <!-- 前景河流 -->
+        <div class="town-river"><div class="river-glow"></div></div>
       </div>
-      <div class="drift-done hidden" id="drift-done">
-        <p class="drift-msg">寵物回家了！</p>
-        <button class="btn-primary" id="btn-claim">領取戰利品</button>
-      </div>
+      <div class="town-buildings" id="town-buildings"></div>
+      <div class="town-ghosts" id="town-ghosts"></div>
+    </div>
+    <!-- 城鎮底部快捷 -->
+    <div class="town-dock">
+      <button class="dock-btn" id="btn-gacha"><span class="dock-ico">🔮</span><span>招魂</span></button>
+      <button class="dock-btn" id="btn-dock-codex"><span class="dock-ico">📖</span><span>圖鑑</span></button>
+      <button class="dock-btn" id="btn-dock-forge"><span class="dock-ico">🔨</span><span>鍛造</span></button>
+      <button class="dock-btn" id="btn-dock-shop"><span class="dock-ico">🏪</span><span>商店</span></button>
+      <button class="dock-btn" id="btn-dock-bag"><span class="dock-ico">🎒</span><span>背包</span></button>
     </div>
   </main>
+</div>
 
-  <footer class="bottom-bar">
-    <div class="stat-mini" title="幸運">🍀 <span id="stat-luck">5</span></div>
-    <div class="stat-mini" title="速度">💨 <span id="stat-speed">5</span></div>
-    <div class="stat-mini" title="膽量">💪 <span id="stat-courage">5</span></div>
-    <div class="stat-mini" title="感知">👁 <span id="stat-sense">5</span></div>
+<!-- 全螢幕漂流場景 -->
+<div id="drift-scene" class="screen">
+  <div class="drift-scene-bg"></div>
+  <div class="drift-scene-stars"></div>
+  <div class="drift-scene-fog fog-1"></div>
+  <div class="drift-scene-fog fog-2"></div>
+  <div class="drift-scene-ground"></div>
+
+  <!-- 頂部資訊 -->
+  <header class="drift-scene-top">
+    <button class="drift-back-btn" id="btn-drift-back">← 主畫面</button>
+    <div class="drift-scene-info">
+      <div class="drift-scene-title" id="drift-scene-title">廢棄古宅</div>
+      <div class="drift-scene-timer" id="drift-scene-timer">00:30</div>
+    </div>
+  </header>
+
+  <!-- 中央場景 -->
+  <div class="drift-scene-stage">
+    <div class="drift-scenery" id="drift-scenery"></div>
+    <div class="drift-character" id="drift-character"></div>
+    <div class="drift-balloon" id="drift-balloon"></div>
+  </div>
+
+  <!-- 進度與日誌 -->
+  <footer class="drift-scene-bottom">
+    <div class="drift-scene-progress">
+      <div class="drift-scene-progress-fill" id="drift-scene-progress-fill"></div>
+    </div>
+    <div class="drift-scene-log" id="drift-scene-log"></div>
   </footer>
 </div>
 
@@ -1115,6 +2026,7 @@ body::before {
   <div class="modal-content">
     <div class="modal-header"><h2>鬼魂資訊</h2><button class="close-btn" data-close>✕</button></div>
     <div class="ghost-detail" id="ghost-detail"></div>
+    <div id="ghost-class-action" class="ghost-class-action"></div>
     <h3 class="section-title">穿戴裝備</h3>
     <div class="equip-grid" id="equip-grid"></div>
     <h3 class="section-title">擁有的鬼魂</h3>
@@ -1141,6 +2053,123 @@ body::before {
   <div class="modal-content small">
     <div class="modal-header"><h2>使用補血道具</h2><button class="close-btn" data-close>✕</button></div>
     <div class="heal-list" id="heal-list"></div>
+  </div>
+</div>
+
+<!-- 歡迎回來（離線結算）-->
+<div id="welcome-modal" class="modal special-modal">
+  <div class="modal-content small">
+    <div class="modal-header"><h2>🌙 歡迎回來</h2><button class="close-btn" data-close>✕</button></div>
+    <div id="welcome-body"></div>
+    <button class="btn-primary" data-close>進入小鎮</button>
+  </div>
+</div>
+
+<!-- 轉職 -->
+<div id="class-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header"><h2>✨ 選擇職業</h2><button class="close-btn" data-close>✕</button></div>
+    <p class="menu-hint" style="margin-bottom:12px">轉職會改變鬼魂的造型與能力，可隨時切換。</p>
+    <div class="class-grid" id="class-grid"></div>
+  </div>
+</div>
+
+<!-- 建築操作 -->
+<div id="facaction-modal" class="modal">
+  <div class="modal-content small">
+    <div class="modal-header"><h2 id="facaction-title">設施</h2><button class="close-btn" data-close>✕</button></div>
+    <div id="facaction-body"></div>
+    <div class="menu-actions" id="facaction-actions"></div>
+  </div>
+</div>
+
+<!-- 鬼魂操作 -->
+<div id="ghaction-modal" class="modal">
+  <div class="modal-content small">
+    <div class="modal-header"><h2 id="ghaction-title">鬼魂</h2><button class="close-btn" data-close>✕</button></div>
+    <div id="ghaction-body"></div>
+    <div class="menu-actions" id="ghaction-actions"></div>
+  </div>
+</div>
+
+<!-- 穿戴：選擇鬼魂 -->
+<div id="equip-target-modal" class="modal">
+  <div class="modal-content small">
+    <div class="modal-header"><h2 id="equiptarget-title">穿戴裝備</h2><button class="close-btn" data-close>✕</button></div>
+    <p class="menu-hint" id="equiptarget-sub" style="margin-bottom:10px"></p>
+    <div class="equiptarget-list" id="equiptarget-list"></div>
+  </div>
+</div>
+
+<!-- 指派鬼魂到設施 -->
+<div id="assign-modal" class="modal">
+  <div class="modal-content small">
+    <div class="modal-header"><h2>指派鬼魂</h2><button class="close-btn" data-close>✕</button></div>
+    <div class="assign-list" id="assign-list"></div>
+  </div>
+</div>
+
+<!-- 招魂池（抽角色）-->
+<div id="summon-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header"><h2>🔮 招魂池</h2><button class="close-btn" data-close>✕</button></div>
+    <p class="menu-hint" style="margin-bottom:8px">召喚各地的鬼魂加入城鎮。重複的鬼魂會化為魂魄碎片，可用來升星。<br>持有 💰 <span id="summon-coin">0</span></p>
+    <!-- 抽卡入口 -->
+    <div id="summon-pulls">
+      <div class="summon-stage">
+        <div class="summon-orb">🔮</div>
+        <div class="summon-rates">★5 4%　★4 17%　★3 79%</div>
+      </div>
+      <button class="btn-primary" id="btn-summon-1">單次招魂（💰500）</button>
+      <button class="btn-secondary" id="btn-summon-10">十連招魂（💰4500）</button>
+    </div>
+    <!-- 抽卡結果 -->
+    <div id="summon-result" class="hidden">
+      <div class="summon-result-grid" id="summon-result-grid"></div>
+      <button class="btn-primary" id="btn-summon-again">再抽一次 / 收下</button>
+    </div>
+  </div>
+</div>
+
+<!-- 圖鑑 -->
+<div id="codex-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header"><h2>📖 鬼魂圖鑑 <small id="codex-progress" style="font-weight:400;color:var(--text-dim);font-size:13px"></small></h2><button class="close-btn" data-close>✕</button></div>
+    <div class="codex-grid" id="codex-grid"></div>
+  </div>
+</div>
+
+<!-- 圖鑑單角色詳情 -->
+<div id="codexd-modal" class="modal">
+  <div class="modal-content small">
+    <div class="modal-header"><h2 id="codexd-title">角色</h2><button class="close-btn" data-close>✕</button></div>
+    <div id="codexd-body"></div>
+    <div class="menu-actions" id="codexd-actions"></div>
+  </div>
+</div>
+
+<!-- 道具轉蛋（保留，從選單進）-->
+<div id="gacha-modal" class="modal">
+  <div class="modal-content small">
+    <div class="modal-header"><h2>🎰 祈願（道具）</h2><button class="close-btn" data-close>✕</button></div>
+    <p class="menu-hint" style="margin-bottom:8px">投入靈幣向彼岸許願，換回隨機寶物。<br>持有 💰 <span id="gacha-coin">0</span></p>
+    <div class="gacha-stage">
+      <div class="gacha-orb">🔮</div>
+      <div class="gacha-result hidden" id="gacha-result"></div>
+    </div>
+    <button class="btn-primary" id="btn-gacha-pull">許願（💰300）</button>
+  </div>
+</div>
+
+<!-- 商店 -->
+<div id="shop-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>🏪 強化商城</h2>
+      <button class="close-btn" data-close>✕</button>
+    </div>
+    <p class="menu-hint" style="margin-bottom:10px">用靈幣購買強化素材與消耗品。目前持有 💰 <span id="shop-coin">0</span></p>
+    <div class="shop-grid" id="shop-grid"></div>
   </div>
 </div>
 
@@ -1208,36 +2237,207 @@ const RARITY = {
 const RARITY_ORDER = ['common','uncommon','rare','epic','legendary','mythic'];
 const RARITY_STAT_MUL = { common:1, uncommon:1.3, rare:1.7, epic:2.5, legendary:4, mythic:7 };
 
-/* ============ 鬼魂 ============ */
+/* ============ 鬼魂角色庫 ============ */
+// rarity: 'r3'/'r4'/'r5'（★3/★4/★5）; star=基礎星級; starter=開局可選
 const GHOSTS = [
+  // ---------- ★3 常見 ----------
   {
-    id: 'piaopiao', name: '飄飄', avatar: '👻',
-    desc: '新手小白鬼，天真好奇',
-    skill: '⭐ 偶爾帶回兩件物品 (+10%)',
-    baseStats: { luck: 5, speed: 5, courage: 5, sense: 5 },
-    baseSpirit: 100,
-    unlockCost: 0,
-    bonusDropChance: 0.10,
+    id: 'piaopiao', name: '幽幽', pinyin: 'Yōu Yōu', rarity: 'r3', star: 3, element: '靈', starter: true,
+    desc: '好奇心旺盛的小鬼魂', skill: '⭐ 偶爾帶回兩件物品 (+10%)',
+    baseStats: { luck: 5, speed: 5, courage: 5, sense: 5 }, baseSpirit: 100, bonusDropChance: 0.10,
+    art: { body: '#F6F7FF', shadow: '#8B8DFF', hat: 'witch', hatColor: '#4a3b78', hatStar: '#FFE08A', flame: '#7DB8FF' },
   },
   {
-    id: 'mingming', name: '冥冥', avatar: '🌚',
-    desc: '暗影古靈，冷靜神秘',
-    skill: '⭐ 黑暗地圖找稀有物機率 +25%',
-    baseStats: { luck: 4, speed: 4, courage: 7, sense: 5 },
-    baseSpirit: 110,
-    unlockCost: 2000,
-    rareBoost: 0.25,
+    id: 'mingming', name: '冥冥', pinyin: 'Míng Míng', rarity: 'r3', star: 3, element: '影',
+    desc: '冷靜神秘的暗影古靈', skill: '⭐ 黑暗地圖找稀有物 +25%',
+    baseStats: { luck: 4, speed: 4, courage: 7, sense: 5 }, baseSpirit: 110, rareBoost: 0.25,
+    art: { body: '#D8D5FF', shadow: '#6B5DCF', hat: 'hood', hatColor: '#2a1a4e', hatStar: '#A78BFA', flame: '#B197FC' },
   },
   {
-    id: 'linlin', name: '燐燐', avatar: '🔥',
-    desc: '磷火幽靈，暴躁熱情',
-    skill: '⭐ 帶回的鍛造素材數量 +50%',
-    baseStats: { luck: 5, speed: 7, courage: 5, sense: 3 },
-    baseSpirit: 90,
-    unlockCost: 5000,
-    materialBoost: 0.5,
+    id: 'doudou', name: '豆豆', pinyin: 'Dòu Dòu', rarity: 'r3', star: 3, element: '花',
+    desc: '愛撒嬌的圓滾鬼魂', skill: '⭐ 魂力上限 +15',
+    baseStats: { luck: 6, speed: 4, courage: 4, sense: 5 }, baseSpirit: 115, spiritMaxBonus: 15,
+    art: { body: '#FFF0F5', shadow: '#FF9EC4', hat: 'bow', hatColor: '#FF7EA8', hatStar: '#FFD1E0', flame: '#FF9EC4' },
+  },
+  {
+    id: 'apiao', name: '阿飄', pinyin: 'Ā Piāo', rarity: 'r3', star: 3, element: '靈',
+    desc: '最普通不過的小白鬼', skill: '⭐ 漂流返回速度 +8%',
+    baseStats: { luck: 5, speed: 6, courage: 4, sense: 5 }, baseSpirit: 100, speedBoost: 0.08,
+    art: { body: '#FFFFFF', shadow: '#9FB4E0', hat: 'none', flame: '#9FD8FF' },
+  },
+  {
+    id: 'dudu', name: '嘟嘟', pinyin: 'Dū Dū', rarity: 'r3', star: 3, element: '木', starter: true,
+    desc: '頭上長葉的森林鬼', skill: '⭐ 採集素材 +30%',
+    baseStats: { luck: 5, speed: 5, courage: 5, sense: 5 }, baseSpirit: 105, materialBoost: 0.3,
+    art: { body: '#EAFBE7', shadow: '#6FBF73', hat: 'leaf', hatColor: '#4a9b56', hatStar: '#a6f7d0', flame: '#7df9c0' },
+  },
+  {
+    id: 'huihui', name: '灰灰', pinyin: 'Huī Huī', rarity: 'r3', star: 3, element: '影',
+    desc: '害羞內向的灰霧鬼', skill: '⭐ 膽量 +3',
+    baseStats: { luck: 4, speed: 5, courage: 7, sense: 4 }, baseSpirit: 100,
+    art: { body: '#E0E0EA', shadow: '#7A7A95', hat: 'none', flame: '#B5B5D0' },
+  },
+  {
+    id: 'mimi', name: '咪咪', pinyin: 'Mī Mī', rarity: 'r3', star: 3, element: '花',
+    desc: '貓系鬼魂，動作輕巧', skill: '⭐ 速度 +4',
+    baseStats: { luck: 5, speed: 8, courage: 4, sense: 4 }, baseSpirit: 95,
+    art: { body: '#FFF5E8', shadow: '#FFB47E', hat: 'ears', hatColor: '#FFA033', hatStar: '#FFD1B0', flame: '#FFC46B' },
+  },
+  {
+    id: 'qiuqiu', name: '球球', pinyin: 'Qiú Qiú', rarity: 'r3', star: 3, element: '靈', starter: true,
+    desc: '滾來滾去的開心果', skill: '⭐ 幸運 +3',
+    baseStats: { luck: 8, speed: 4, courage: 4, sense: 5 }, baseSpirit: 100,
+    art: { body: '#FCFBFF', shadow: '#A6B8FF', hat: 'star', hatColor: '#7DA6FF', hatStar: '#FFFFFF', flame: '#C9D6FF' },
+  },
+  {
+    id: 'bibi', name: '嗶嗶', pinyin: 'Bì Bì', rarity: 'r3', star: 3, element: '雷',
+    desc: '頭頂觸角的電波鬼', skill: '⭐ 感知 +4',
+    baseStats: { luck: 5, speed: 5, courage: 4, sense: 6 }, baseSpirit: 100,
+    art: { body: '#EAFEFF', shadow: '#5BD0E0', hat: 'antenna', hatColor: '#33C4D8', hatStar: '#BFFCFF', flame: '#7DE8F0' },
+  },
+  {
+    id: 'bobo', name: '波波', pinyin: 'Bō Bō', rarity: 'r3', star: 3, element: '水',
+    desc: '戴鴨舌帽的街頭鬼', skill: '⭐ 速度 +3',
+    baseStats: { luck: 5, speed: 7, courage: 4, sense: 4 }, baseSpirit: 100,
+    art: { body: '#EAF2FF', shadow: '#6E9EE0', hat: 'cap', hatColor: '#3E6FC4', hatStar: '#FFD56B', flame: '#9FC4FF' },
+  },
+  {
+    id: 'jiujiu', name: '啾啾', pinyin: 'Jiū Jiū', rarity: 'r3', star: 3, element: '光',
+    desc: '繫著髮帶的活力鬼', skill: '⭐ 靈幣產出 +8%',
+    baseStats: { luck: 6, speed: 5, courage: 4, sense: 5 }, baseSpirit: 100, coinBoost: 0.08,
+    art: { body: '#FFFCEC', shadow: '#FFD24A', hat: 'ribbon', hatColor: '#FFC21F', hatStar: '#FFF3C4', flame: '#FFE08A' },
+  },
+  {
+    id: 'mochi', name: '麻糬', pinyin: 'Má Shǔ', rarity: 'r3', star: 3, element: '靈',
+    desc: '軟綿綿的米白鬼', skill: '⭐ 魂力上限 +10',
+    baseStats: { luck: 5, speed: 4, courage: 5, sense: 5 }, baseSpirit: 110, spiritMaxBonus: 10,
+    art: { body: '#FBF6EC', shadow: '#D8C8A8', hat: 'none', flame: '#EAD8B8' },
+  },
+  {
+    id: 'matcha', name: '抹茶', pinyin: 'Mǒ Chá', rarity: 'r3', star: 3, element: '木',
+    desc: '帶著葉冠的茶香鬼', skill: '⭐ 採集素材 +25%',
+    baseStats: { luck: 5, speed: 5, courage: 5, sense: 5 }, baseSpirit: 105, materialBoost: 0.25,
+    art: { body: '#F0F7E0', shadow: '#8FB04A', hat: 'leaf', hatColor: '#6B9A2E', hatStar: '#D4E89A', flame: '#A6D86B' },
+  },
+  {
+    id: 'paopao', name: '泡泡', pinyin: 'Pào Pào', rarity: 'r3', star: 3, element: '水',
+    desc: '頂著蝴蝶結的泡泡鬼', skill: '⭐ 幸運 +2、速度 +2',
+    baseStats: { luck: 6, speed: 6, courage: 4, sense: 4 }, baseSpirit: 100,
+    art: { body: '#E8F8FF', shadow: '#7EC8E8', hat: 'bow', hatColor: '#5AB8E0', hatStar: '#D4F0FF', flame: '#A6E8FF' },
+  },
+  {
+    id: 'xiaoban', name: '小斑', pinyin: 'Xiǎo Bān', rarity: 'r3', star: 3, element: '影',
+    desc: '貓耳灰白的調皮鬼', skill: '⭐ 膽量 +2、速度 +2',
+    baseStats: { luck: 5, speed: 6, courage: 6, sense: 4 }, baseSpirit: 100,
+    art: { body: '#ECECF2', shadow: '#8888A0', hat: 'ears', hatColor: '#6A6A85', hatStar: '#C8C8D8', flame: '#B5B5D0' },
+  },
+  {
+    id: 'aguang', name: '阿光', pinyin: 'Ā Guāng', rarity: 'r3', star: 3, element: '光',
+    desc: '頭頂星星的小太陽', skill: '⭐ 幸運 +4',
+    baseStats: { luck: 8, speed: 5, courage: 4, sense: 4 }, baseSpirit: 100,
+    art: { body: '#FFFBEA', shadow: '#FFCB3A', hat: 'star', hatColor: '#FFB800', hatStar: '#FFF3C4', flame: '#FFE08A' },
+  },
+
+  // ---------- ★4 稀有 ----------
+  {
+    id: 'linlin', name: '燐燐', pinyin: 'Lín Lín', rarity: 'r4', star: 4, element: '火',
+    desc: '暴躁熱情的磷火幽靈', skill: '⭐ 帶回鍛造素材 +50%',
+    baseStats: { luck: 6, speed: 8, courage: 6, sense: 4 }, baseSpirit: 100, materialBoost: 0.5,
+    art: { body: '#FFE8D8', shadow: '#FF7E50', hat: 'horn', hatColor: '#8B3A1A', hatStar: '#FFD700', flame: '#FF6B35' },
+  },
+  {
+    id: 'yuejian', name: '月見', pinyin: 'Yuè Jiàn', rarity: 'r4', star: 4, element: '月',
+    desc: '月光下綻放的銀色鬼', skill: '⭐ 稀有物機率 +35%',
+    baseStats: { luck: 8, speed: 5, courage: 5, sense: 7 }, baseSpirit: 115, rareBoost: 0.35,
+    art: { body: '#F0F4FF', shadow: '#9BB0E8', hat: 'flower', hatColor: '#8aa0d8', hatStar: '#FFFFFF', flame: '#C9D6FF' },
+  },
+  {
+    id: 'gugu', name: '骨骨', pinyin: 'Gǔ Gǔ', rarity: 'r4', star: 4, element: '骨',
+    desc: '骸骨堆裡誕生的硬漢', skill: '⭐ 膽量 +6、Boss 戰力提升',
+    baseStats: { luck: 4, speed: 5, courage: 11, sense: 5 }, baseSpirit: 120, bossPower: 1.2,
+    art: { body: '#FBF7EC', shadow: '#C7B89A', hat: 'bone', hatColor: '#E8DEC2', hatStar: '#FFFFFF', flame: '#D8E8FF' },
+  },
+  {
+    id: 'yingge', name: '影歌', pinyin: 'Yǐng Gē', rarity: 'r4', star: 4, element: '影',
+    desc: '吟唱暗夜之歌的詩人', skill: '⭐ 漂流返回速度 +15%',
+    baseStats: { luck: 6, speed: 10, courage: 6, sense: 6 }, baseSpirit: 105, speedBoost: 0.15,
+    art: { body: '#C8C2E8', shadow: '#5a4a9e', hat: 'hood', hatColor: '#1a1430', hatStar: '#C9A6FF', flame: '#9B7EE0' },
+  },
+  {
+    id: 'xuexue', name: '雪雪', pinyin: 'Xuě Xuě', rarity: 'r4', star: 4, element: '冰',
+    desc: '冰晶凝成的冷美鬼', skill: '⭐ 感知 +6、幸運 +3',
+    baseStats: { luck: 7, speed: 5, courage: 5, sense: 9 }, baseSpirit: 110,
+    art: { body: '#EAF6FF', shadow: '#7EC8E8', hat: 'crown', hatColor: '#A6E0F7', hatStar: '#FFFFFF', flame: '#A6E8FF' },
+  },
+  {
+    id: 'nangua', name: '南瓜', pinyin: 'Nán Guā', rarity: 'r4', star: 4, element: '火',
+    desc: '頂著南瓜的萬聖鬼', skill: '⭐ 靈幣產出 +15%',
+    baseStats: { luck: 8, speed: 6, courage: 7, sense: 5 }, baseSpirit: 110, coinBoost: 0.15,
+    art: { body: '#FFF0DE', shadow: '#E8843A', hat: 'pumpkin', hatColor: '#FF8B2E', hatStar: '#FFD56B', flame: '#FF9E3F' },
+  },
+  {
+    id: 'zhuzhu', name: '竹竹', pinyin: 'Zhú Zhú', rarity: 'r4', star: 4, element: '風',
+    desc: '頭戴竹蜻蜓的飛行鬼', skill: '⭐ 漂流返回速度 +18%',
+    baseStats: { luck: 6, speed: 12, courage: 5, sense: 6 }, baseSpirit: 105, speedBoost: 0.18,
+    art: { body: '#EEFBEF', shadow: '#6FBF90', hat: 'propeller', hatColor: '#3FA86B', hatStar: '#FFD56B', flame: '#9FE8C0' },
+  },
+  {
+    id: 'shenshi', name: '紳魂', pinyin: 'Shēn Hún', rarity: 'r4', star: 4, element: '影',
+    desc: '戴禮帽的優雅紳士鬼', skill: '⭐ 稀有物機率 +30%',
+    baseStats: { luck: 9, speed: 6, courage: 6, sense: 7 }, baseSpirit: 110, rareBoost: 0.30,
+    art: { body: '#E6E2F0', shadow: '#5A4A78', hat: 'tophat', hatColor: '#2A2040', hatStar: '#C9A6FF', flame: '#A78BE0' },
+  },
+  {
+    id: 'pengke', name: '龐克', pinyin: 'Páng Kè', rarity: 'r4', star: 4, element: '雷',
+    desc: '頂著尖刺的叛逆鬼', skill: '⭐ 膽量 +8、Boss 戰力提升',
+    baseStats: { luck: 6, speed: 7, courage: 12, sense: 5 }, baseSpirit: 115, bossPower: 1.25,
+    art: { body: '#F2E6F5', shadow: '#A8329E', hat: 'spike', hatColor: '#C2329E', hatStar: '#FF6BD8', flame: '#E04ABF' },
+  },
+
+  // ---------- ★5 神話 ----------
+  {
+    id: 'dishi', name: '帝釋', pinyin: 'Dì Shì', rarity: 'r5', star: 5, element: '王',
+    desc: '統御幽冥的鬼界帝王', skill: '⭐ 全屬性強化、靈幣產出 +20%',
+    baseStats: { luck: 10, speed: 8, courage: 10, sense: 9 }, baseSpirit: 140, coinBoost: 0.2,
+    art: { body: '#FFF8E0', shadow: '#D4A038', hat: 'crown', hatColor: '#FFD700', hatStar: '#FFF3C4', flame: '#FFD56B' },
+  },
+  {
+    id: 'bian', name: '彼岸', pinyin: 'Bǐ Àn', rarity: 'r5', star: 5, element: '花',
+    desc: '彼岸花田的妖異花魂', skill: '⭐ 寶物品質大幅提升、幸運 +10',
+    baseStats: { luck: 14, speed: 7, courage: 8, sense: 10 }, baseSpirit: 130, rareBoost: 0.5, lootLuck: 1.2,
+    art: { body: '#FFEAF0', shadow: '#D4326B', hat: 'flower', hatColor: '#E03060', hatStar: '#FFD1E0', flame: '#FF6B9E' },
+  },
+  {
+    id: 'tianhun', name: '天魂', pinyin: 'Tiān Hún', rarity: 'r5', star: 5, element: '聖',
+    desc: '超脫生死的純白聖靈', skill: '⭐ 魂力上限 +60、全能成長',
+    baseStats: { luck: 11, speed: 10, courage: 11, sense: 11 }, baseSpirit: 160, spiritMaxBonus: 60,
+    art: { body: '#FFFFFF', shadow: '#FFE08A', hat: 'halo', hatColor: '#FFE08A', hatStar: '#FFFFFF', flame: '#FFF3C4' },
+  },
+  {
+    id: 'yueshen', name: '月神', pinyin: 'Yuè Shén', rarity: 'r5', star: 5, element: '月',
+    desc: '掌管月相的銀輝之神', skill: '⭐ 稀有物機率 +45%、感知大增',
+    baseStats: { luck: 12, speed: 9, courage: 9, sense: 13 }, baseSpirit: 145, rareBoost: 0.45,
+    art: { body: '#EEF2FF', shadow: '#8A9FE0', hat: 'moon', hatColor: '#C9D6FF', hatStar: '#FFFFFF', flame: '#B5C8FF' },
+  },
+  {
+    id: 'yanhuang', name: '焰皇', pinyin: 'Yàn Huáng', rarity: 'r5', star: 5, element: '火',
+    desc: '烈焰加身的不滅鬼皇', skill: '⭐ Boss 戰力 ×1.5、全屬性強化',
+    baseStats: { luck: 10, speed: 11, courage: 13, sense: 9 }, baseSpirit: 150, bossPower: 1.5,
+    art: { body: '#FFEEE0', shadow: '#E84A1A', hat: 'spike', hatColor: '#FF5520', hatStar: '#FFD56B', flame: '#FF6B2E' },
   },
 ];
+
+/* ============ 招魂 / 升星 ============ */
+const SUMMON_COST_SINGLE = 500;
+const SUMMON_COST_TEN = 4500;
+const SUMMON_RATES = { r3: 79, r4: 17, r5: 4 }; // 機率權重
+const DUPE_SHARDS = { r3: 2, r4: 5, r5: 12 };    // 重複轉碎片
+const MAX_STAR = 6;
+// 升到 (star+1) 需要的碎片量
+function starUpCost(star) { return [0, 0, 0, 10, 20, 40, 80][star] || 9999; }
+function starStatMul(curStar, baseStar) { return 1 + Math.max(0, curStar - baseStar) * 0.15; }
+const RARITY_STAR = { r3: '★★★', r4: '★★★★', r5: '★★★★★' };
+const RARITY_COLOR = { r3: '#9FB4E0', r4: '#C084FC', r5: '#FBBF24' };
 
 /* ============ 物品 ============ */
 const ITEMS = {
@@ -1283,7 +2483,128 @@ const ITEMS = {
   copper_coin:       { name: '銅錢符',   icon: '🪙', type: 'equipment', slot: 'accessory', baseValue: 15,   stats: { luck: 1 },                        flavor: '冥府通用貨幣。' },
   jade_pendant:      { name: '玉墜',     icon: '💚', type: 'equipment', slot: 'accessory', baseValue: 90,   stats: { luck: 3, sense: 2 },              flavor: '溫潤如人界記憶。' },
   yama_seal:         { name: '閻王印',   icon: '🟥', type: 'equipment', slot: 'accessory', baseValue: 800,  stats: { luck: 8, courage: 6, sense: 4 },  flavor: '蓋下去什麼都做數。' },
+
+  // ---- 關卡限定裝備（只能從大魔王取得）----
+  phantom_mask:   { name: '怨靈面具', icon: '🎭', type: 'equipment', slot: 'head',      baseValue: 600,  stats: { sense: 8, courage: 6 },           flavor: '戴上後，再也看不清自己的臉。', exclusive: true },
+  warlord_armor:  { name: '將軍魂鎧', icon: '🛡️', type: 'equipment', slot: 'body',      baseValue: 1000, stats: { courage: 14, luck: 4 },           flavor: '生前未竟的戰意凝成的鎧甲。', exclusive: true },
+  headless_steed: { name: '無頭韁繩', icon: '🐴', type: 'equipment', slot: 'accessory', baseValue: 1100, stats: { speed: 10, courage: 6 },          flavor: '騎著它，連頭都不必帶。', exclusive: true },
+  reaper_scythe:  { name: '奪魂鐮',   icon: '⚰️', type: 'equipment', slot: 'weapon',    baseValue: 2200, stats: { luck: 12, speed: 8, courage: 6 }, flavor: '一揮，連自己的影子都收割。', exclusive: true },
+  hibana_crown:   { name: '花妖之冠', icon: '🌸', type: 'equipment', slot: 'head',      baseValue: 3500, stats: { luck: 15, sense: 12, courage: 8 },flavor: '彼岸花妖的本體，據說會在夜裡開花。', exclusive: true },
 };
+
+/* ============ 職業（鬼魂 Lv.10 可轉職）============ */
+const CLASS_UNLOCK_LEVEL = 10;
+const CLASSES = [
+  {
+    id: 'spiritualist', name: '靈術師', icon: '🔮',
+    desc: '操縱靈氣，幸運與感知大增',
+    skillText: '幸運 +6、感知 +6，寶物品質提升',
+    statBonus: { luck: 6, sense: 6 }, spiritBonus: 0,
+    lootLuckMul: 1.15,
+    art: { hat: 'witch', hatColor: '#5b3a9e', hatStar: '#FFE08A', flame: '#B197FC' },
+  },
+  {
+    id: 'warrior', name: '怨靈武者', icon: '⚔️',
+    desc: '勇猛無懼，可挑戰更強大魔王',
+    skillText: '膽量 +10、速度 +2，Boss 戰力 ×1.4',
+    statBonus: { courage: 10, speed: 2 }, spiritBonus: 0,
+    bossPowerMul: 1.4,
+    art: { hat: 'horn', hatColor: '#8B1A1A', hatStar: '#FFD700', flame: '#FF5530' },
+  },
+  {
+    id: 'rogue', name: '飄渺遊俠', icon: '🌀',
+    desc: '身法飄忽，漂流時間大幅縮短',
+    skillText: '速度 +10、幸運 +3',
+    statBonus: { speed: 10, luck: 3 }, spiritBonus: 0,
+    art: { hat: 'hood', hatColor: '#1a3a2e', hatStar: '#7DF9C0', flame: '#7DF9C0' },
+  },
+  {
+    id: 'maiden', name: '引魂巫女', icon: '💮',
+    desc: '溫柔治癒，魂力上限與回復大增',
+    skillText: '魂力上限 +60、感知 +4、膽量 +4',
+    statBonus: { sense: 4, courage: 4 }, spiritBonus: 60,
+    spiritRegenMul: 2,
+    art: { hat: 'flower', hatColor: '#c94f7c', hatStar: '#FFD1E0', flame: '#FF9EC4' },
+  },
+];
+
+/* ============ 據點設施 ============ */
+// 製作後可指派 1 隻鬼魂掛機生產，回據點收取
+const FACILITIES = [
+  {
+    id: 'foundry', name: '煉魂爐', icon: '🔥',
+    desc: '指派鬼魂看顧爐火，隨時間煉出靈幣。',
+    buildCost: { coins: 200, mats: { ling_stone: 10, soul_fire: 3 } },
+    produces: 'coins',
+    ratePerMin: 5,     // 基礎每分鐘產出（再 ×(1+幸運*0.04)）
+    cap: 300,          // 上限堆積量
+    statKey: 'luck',
+  },
+  {
+    id: 'garden', name: '採集園', icon: '🌿',
+    desc: '指派鬼魂在園中採集鍛造素材。',
+    buildCost: { coins: 350, mats: { ghost_bone: 8, ling_stone: 6 } },
+    produces: 'material',
+    ratePerMin: 1.2,   // 每分鐘產素材數（再 ×(1+感知*0.04)）
+    cap: 40,
+    statKey: 'sense',
+    pool: [
+      { id: 'ling_stone',  weight: 50 },
+      { id: 'ghost_bone',  weight: 35 },
+      { id: 'soul_fire',   weight: 18 },
+      { id: 'moon_dust',   weight: 8  },
+      { id: 'dark_crystal',weight: 3  },
+    ],
+  },
+  {
+    id: 'rest', name: '靜思間', icon: '🛏️',
+    desc: '指派鬼魂在此休憩，魂力回復速度大增。',
+    buildCost: { coins: 150, mats: { soul_fire: 5 } },
+    produces: 'spirit',
+    restRegenMul: 6,   // 指派的鬼魂魂力回復 ×6
+    statKey: null,
+  },
+];
+
+/* ============ 轉蛋（許願池）============ */
+const GACHA_COST = 300;       // 每抽靈幣
+const GACHA_POOL = [
+  // 素材
+  { kind: 'material', id: 'ling_stone',   count: [3,6], weight: 70 },
+  { kind: 'material', id: 'ghost_bone',   count: [2,5], weight: 55 },
+  { kind: 'material', id: 'soul_fire',    count: [2,4], weight: 35 },
+  { kind: 'material', id: 'moon_dust',    count: [1,3], weight: 22 },
+  { kind: 'material', id: 'dark_crystal', count: [1,2], weight: 12 },
+  { kind: 'material', id: 'memory_shard', count: [1,1], weight: 5  },
+  // 消耗品
+  { kind: 'consumable', id: 'paper_money', count: [2,4], weight: 30 },
+  { kind: 'consumable', id: 'offering',    count: [1,2], weight: 14 },
+  { kind: 'consumable', id: 'yin_pill',    count: [1,2], weight: 18 },
+  { kind: 'consumable', id: 'revival_pill',count: [1,1], weight: 3  },
+  // 裝備（隨機品質）
+  { kind: 'equipment', id: 'bone_crown',  rarityRoll: { uncommon:60, rare:30, epic:10 }, weight: 16 },
+  { kind: 'equipment', id: 'spirit_robe', rarityRoll: { uncommon:55, rare:32, epic:13 }, weight: 14 },
+  { kind: 'equipment', id: 'yama_blade',  rarityRoll: { rare:60, epic:30, legendary:10 }, weight: 9 },
+  { kind: 'equipment', id: 'jade_pendant',rarityRoll: { uncommon:50, rare:35, epic:15 }, weight: 11 },
+  // 配方卷軸
+  { kind: 'scroll', id: 'scroll_bonecrown', weight: 6 },
+  { kind: 'scroll', id: 'scroll_jade',      weight: 5 },
+  { kind: 'scroll', id: 'scroll_lantern',   weight: 2 },
+];
+
+/* ============ 商店（強化商城）============ */
+// markup = 買入價相對 baseValue 的倍率
+const SHOP_ITEMS = [
+  { id: 'ling_stone',   price: 25  },
+  { id: 'ghost_bone',   price: 40  },
+  { id: 'soul_fire',    price: 70  },
+  { id: 'moon_dust',    price: 110 },
+  { id: 'dark_crystal', price: 170 },
+  { id: 'paper_money',  price: 50  },
+  { id: 'offering',     price: 240 },
+  { id: 'yin_pill',     price: 80  },
+  { id: 'ghost_talisman', price: 120 },
+];
 
 /* ============ 地圖 ============ */
 const ZONES = [
@@ -1410,9 +2731,25 @@ function enhanceData(currentLv) {
 const TIER_UP_REQUIRED = 3;
 const TIER_UP_COIN = { common: 100, uncommon: 300, rare: 800, epic: 2500, legendary: 8000 };
 
+/* ============ 大魔王 ============ */
+const BOSSES = [
+  { id: 'old_house_boss',     name: '掛軸怨靈', icon: '😈', difficulty: 8,   loot: 'phantom_mask',   rarity: 'rare',      zone: 'old_house' },
+  { id: 'graveyard_boss',     name: '骸骨將軍', icon: '💀', difficulty: 18,  loot: 'warlord_armor',  rarity: 'epic',      zone: 'graveyard' },
+  { id: 'graveyard_boss2',    name: '無頭騎士', icon: '🐎', difficulty: 25,  loot: 'headless_steed', rarity: 'epic',      zone: 'graveyard' },
+  { id: 'spirit_forest_boss', name: '樹靈巨蟒', icon: '🐍', difficulty: 35,  loot: 'reaper_scythe',  rarity: 'legendary', zone: 'spirit_forest' },
+  { id: 'spirit_forest_b2',   name: '彼岸花妖', icon: '🌺', difficulty: 50,  loot: 'hibana_crown',   rarity: 'legendary', zone: 'spirit_forest' },
+];
+
 /* ============ 等級曲線 ============ */
 function expForLevel(lv) { return Math.floor(50 * Math.pow(lv, 1.6)); }
-function maxSpirit(ghost, ghostDef) { return ghostDef.baseSpirit + (ghost.level - 1) * 5; }
+function classDef(id) { return id ? CLASSES.find(c => c.id === id) : null; }
+function maxSpirit(ghost, ghostDef) {
+  let m = ghostDef.baseSpirit + (ghost.level - 1) * 5;
+  if (ghostDef.spiritMaxBonus) m += ghostDef.spiritMaxBonus;
+  const cd = classDef(ghost.class);
+  if (cd && cd.spiritBonus) m += cd.spiritBonus;
+  return m;
+}
 
 /* ============ 漂流獎勵 ============ */
 function zoneRewards(zone) {
@@ -1426,7 +2763,300 @@ function zoneRewards(zone) {
 const SPIRIT_REGEN_PER_SEC = 1 / 30; // 每 30 秒回 1 點
 
 /* ============ 幽靈漂流記 - 主邏輯 ============ */
-const SAVE_KEY = 'ghost_drift_save_v04_single';
+const SAVE_KEY = 'ghost_drift_save_release';
+
+// ============ SVG 角色 ============
+function ghostExpression(name) {
+  // 回傳 { eyes, mouth, blush }
+  const blushOn = `
+    <ellipse cx="62" cy="130" rx="11" ry="6" fill="#FFB5C5" opacity="0.65"/>
+    <ellipse cx="138" cy="130" rx="11" ry="6" fill="#FFB5C5" opacity="0.65"/>
+  `;
+  const blushOff = '';
+  const eyesDot = `
+    <ellipse cx="78" cy="110" rx="7" ry="9" fill="#1a1a2e"/>
+    <ellipse cx="122" cy="110" rx="7" ry="9" fill="#1a1a2e"/>
+    <circle cx="80" cy="106" r="2.5" fill="white"/>
+    <circle cx="124" cy="106" r="2.5" fill="white"/>
+  `;
+  const eyesClosed = `
+    <path d="M68 112 Q78 102 88 112" stroke="#1a1a2e" fill="none" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M112 112 Q122 102 132 112" stroke="#1a1a2e" fill="none" stroke-width="3.5" stroke-linecap="round"/>
+  `;
+  const eyesAngry = `
+    <path d="M70 102 L86 110" stroke="#1a1a2e" stroke-width="3.5" stroke-linecap="round"/>
+    <ellipse cx="80" cy="114" rx="6" ry="7" fill="#1a1a2e"/>
+    <path d="M114 110 L130 102" stroke="#1a1a2e" stroke-width="3.5" stroke-linecap="round"/>
+    <ellipse cx="120" cy="114" rx="6" ry="7" fill="#1a1a2e"/>
+  `;
+  const eyesSad = `
+    <path d="M70 116 Q80 108 86 116" stroke="#1a1a2e" fill="none" stroke-width="3" stroke-linecap="round"/>
+    <path d="M114 116 Q124 108 130 116" stroke="#1a1a2e" fill="none" stroke-width="3" stroke-linecap="round"/>
+  `;
+  const eyesScared = `
+    <circle cx="80" cy="110" r="5" fill="#1a1a2e"/>
+    <circle cx="120" cy="110" r="5" fill="#1a1a2e"/>
+  `;
+  const mouthSmile = `<path d="M88 140 Q100 152 112 140" stroke="#1a1a2e" stroke-width="3" fill="#FF8B8B" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const mouthOpenSmile = `<ellipse cx="100" cy="142" rx="9" ry="7" fill="#FF6B7B"/><path d="M91 142 Q100 150 109 142" stroke="#1a1a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+  const mouthO = `<ellipse cx="100" cy="144" rx="5" ry="6" fill="#1a1a2e"/>`;
+  const mouthFlat = `<path d="M90 142 L110 142" stroke="#1a1a2e" stroke-width="3" stroke-linecap="round"/>`;
+  const mouthFrown = `<path d="M88 146 Q100 138 112 146" stroke="#1a1a2e" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  const mouthSmall = `<circle cx="100" cy="143" r="2.5" fill="#1a1a2e"/>`;
+
+  switch (name) {
+    case 'happy':     return { eyes: eyesDot,     mouth: mouthOpenSmile, blush: blushOn  };
+    case 'normal':    return { eyes: eyesDot,     mouth: mouthSmile,     blush: blushOn  };
+    case 'happy_closed': return { eyes: eyesClosed, mouth: mouthSmile,   blush: blushOn  };
+    case 'surprised': return { eyes: eyesScared,  mouth: mouthO,         blush: blushOn  };
+    case 'curious':   return { eyes: eyesDot,     mouth: mouthSmall,     blush: blushOff };
+    case 'shy':       return { eyes: eyesClosed,  mouth: mouthSmall,     blush: blushOn  };
+    case 'sleeping':  return { eyes: eyesClosed,  mouth: mouthSmall,     blush: blushOn  };
+    case 'angry':     return { eyes: eyesAngry,   mouth: mouthFrown,     blush: blushOff };
+    case 'sad':       return { eyes: eyesSad,     mouth: mouthFrown,     blush: blushOff };
+    case 'walking':   return { eyes: eyesDot,     mouth: mouthSmile,     blush: blushOn  };
+    default:          return { eyes: eyesDot,     mouth: mouthOpenSmile, blush: blushOn  };
+  }
+}
+
+function ghostHat(art) {
+  const { hat, hatColor, hatStar } = art || {};
+  if (!hat || hat === 'none') return '';
+  const dk = '#00000028';       // 描邊用半透明黑，增強輪廓
+  const star5 = (cx,cy,r,fill) => `<path transform="translate(${cx},${cy})" d="M0 ${-r} L${r*0.29} ${-r*0.29} L${r} ${-r*0.29} L${r*0.4} ${r*0.16} L${r*0.6} ${r} L0 ${r*0.45} L${-r*0.6} ${r} L${-r*0.4} ${r*0.16} L${-r} ${-r*0.29} L${-r*0.29} ${-r*0.29} Z" fill="${fill}" stroke="${dk}" stroke-width="1.5"/>`;
+
+  if (hat === 'witch') {
+    // 大巫師尖帽
+    return `<g>
+      <ellipse cx="100" cy="58" rx="62" ry="12" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <path d="M46 56 Q104 -28 150 52 Q120 64 70 60 Z" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <path d="M70 44 Q120 40 138 50 L134 40 Q110 34 80 36 Z" fill="${hatStar}" opacity="0.85"/>
+      ${star5(140,18,11,hatStar)}
+    </g>`;
+  }
+  if (hat === 'hood') {
+    // 大兜帽斗篷
+    return `<g>
+      <path d="M40 86 Q34 18 100 8 Q166 18 160 86 Q146 58 100 52 Q54 58 40 86 Z" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <path d="M58 70 Q100 44 142 70 Q120 56 100 56 Q80 56 58 70 Z" fill="#00000022"/>
+      ${star5(140,40,9,hatStar)}
+    </g>`;
+  }
+  if (hat === 'horn') {
+    // 大惡魔角
+    return `<g>
+      <path d="M64 58 Q52 16 70 -6 Q86 14 86 56 Z" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <path d="M136 58 Q148 16 130 -6 Q114 14 114 56 Z" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <ellipse cx="72" cy="46" rx="11" ry="7" fill="#FFFFFF" opacity="0.3"/>
+      <ellipse cx="128" cy="46" rx="11" ry="7" fill="#FFFFFF" opacity="0.3"/>
+    </g>`;
+  }
+  if (hat === 'flower') {
+    // 大花冠（兩朵大花）
+    const flower = (cx,cy,r,c) => {
+      let p='';
+      for(let k=0;k<5;k++){const a=k*72*Math.PI/180; p+=`<circle cx="${(cx+Math.cos(a)*r).toFixed(1)}" cy="${(cy+Math.sin(a)*r).toFixed(1)}" r="${r*0.82}" fill="${c}" stroke="${dk}" stroke-width="1.2"/>`;}
+      return p+`<circle cx="${cx}" cy="${cy}" r="${r*0.7}" fill="${hatStar}"/>`;
+    };
+    return `<g>
+      ${flower(132,40,11,hatColor)}
+      ${flower(74,48,8,hatColor)}
+    </g>`;
+  }
+  if (hat === 'crown') {
+    // 大皇冠
+    return `<g transform="translate(100,46)">
+      <path d="M-44 12 L-44 -16 L-24 0 L0 -24 L24 0 L44 -16 L44 12 Z" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <rect x="-44" y="10" width="88" height="9" rx="3" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      ${star5(-44,-20,6,hatStar)}${star5(0,-28,7,hatStar)}${star5(44,-20,6,hatStar)}
+      <circle cx="0" cy="3" r="5" fill="#FF6B7B" stroke="${dk}" stroke-width="1"/>
+      <circle cx="-22" cy="6" r="3.5" fill="#7DD8FF"/><circle cx="22" cy="6" r="3.5" fill="#7DD8FF"/>
+    </g>`;
+  }
+  if (hat === 'halo') {
+    // 大光環
+    return `<g transform="translate(100,22)">
+      <ellipse cx="0" cy="0" rx="46" ry="15" fill="none" stroke="${hatColor}" stroke-width="9" opacity="0.95"/>
+      <ellipse cx="0" cy="0" rx="46" ry="15" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.8"/>
+      ${star5(46,2,6,hatStar)}${star5(-46,2,6,hatStar)}
+    </g>`;
+  }
+  if (hat === 'bow') {
+    // 大蝴蝶結
+    return `<g transform="translate(100,40)">
+      <path d="M0 0 L-34 -20 Q-42 0 -34 20 Z" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <path d="M0 0 L34 -20 Q42 0 34 20 Z" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <ellipse cx="0" cy="0" rx="9" ry="11" fill="${hatStar}" stroke="${dk}" stroke-width="1.5"/>
+    </g>`;
+  }
+  if (hat === 'leaf') {
+    // 大葉冠
+    return `<g transform="translate(100,34)">
+      <path d="M0 26 Q-26 14 -22 -16 Q2 -6 0 26 Z" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <path d="M0 26 Q26 14 22 -16 Q-2 -6 0 26 Z" fill="${hatColor}" stroke="${dk}" stroke-width="2" filter="brightness(1.12)"/>
+      <path d="M-18 -8 Q-9 2 -3 18" stroke="${dk}" stroke-width="1.2" fill="none"/>
+      <circle cx="0" cy="6" r="6" fill="${hatStar}" stroke="${dk}" stroke-width="1"/>
+    </g>`;
+  }
+  if (hat === 'bone') {
+    // 大骨頭髮飾
+    return `<g transform="translate(100,40) rotate(-10)">
+      <circle cx="-34" cy="-7" r="9" fill="${hatColor}" stroke="${dk}" stroke-width="2"/><circle cx="-34" cy="9" r="9" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <circle cx="34" cy="-7" r="9" fill="${hatColor}" stroke="${dk}" stroke-width="2"/><circle cx="34" cy="9" r="9" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <rect x="-34" y="-5" width="68" height="11" rx="2" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+    </g>`;
+  }
+  if (hat === 'star') {
+    // 頭頂大星星
+    return `<g>${star5(100,26,26,hatColor)}${star5(100,26,14,hatStar)}</g>`;
+  }
+  if (hat === 'tophat') {
+    // 紳士禮帽
+    return `<g>
+      <ellipse cx="100" cy="56" rx="56" ry="11" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <rect x="66" y="0" width="68" height="54" rx="6" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <rect x="66" y="40" width="68" height="12" fill="${hatStar}"/>
+    </g>`;
+  }
+  if (hat === 'cap') {
+    // 鴨舌帽
+    return `<g>
+      <path d="M52 50 Q100 18 150 48 Q150 56 100 56 Q60 56 52 50 Z" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <path d="M148 48 Q176 50 178 60 Q150 62 144 54 Z" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <circle cx="100" cy="22" r="6" fill="${hatStar}"/>
+    </g>`;
+  }
+  if (hat === 'ears') {
+    // 貓耳
+    return `<g>
+      <path d="M58 56 L62 6 L96 44 Z" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <path d="M142 56 L138 6 L104 44 Z" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <path d="M66 46 L68 20 L86 44 Z" fill="${hatStar}"/>
+      <path d="M134 46 L132 20 L114 44 Z" fill="${hatStar}"/>
+    </g>`;
+  }
+  if (hat === 'antenna') {
+    // 觸角（帶光球）
+    return `<g stroke="${hatColor}" stroke-width="5" fill="none" stroke-linecap="round">
+      <path d="M84 52 Q72 22 64 8"/><path d="M116 52 Q128 22 136 8"/>
+      </g>
+      <circle cx="62" cy="6" r="9" fill="${hatStar}" stroke="${dk}" stroke-width="1.5"/>
+      <circle cx="138" cy="6" r="9" fill="${hatStar}" stroke="${dk}" stroke-width="1.5"/>`;
+  }
+  if (hat === 'pumpkin') {
+    // 南瓜帽
+    return `<g transform="translate(100,34)">
+      <ellipse cx="0" cy="0" rx="40" ry="26" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <path d="M-22 -22 Q0 -14 22 -22" stroke="${dk}" stroke-width="1.5" fill="none"/>
+      <path d="M0 -24 Q-12 -16 0 24 M0 -24 Q12 -16 0 24" stroke="${dk}" stroke-width="1.2" fill="none" opacity="0.5"/>
+      <rect x="-4" y="-34" width="8" height="12" rx="2" fill="#5a7a3a"/>
+    </g>`;
+  }
+  if (hat === 'moon') {
+    // 月牙頭飾
+    return `<g transform="translate(100,22)">
+      <path d="M-8 0 A20 20 0 1 0 14 16 A15 15 0 1 1 -8 0 Z" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      ${star5(24,6,7,hatStar)}
+    </g>`;
+  }
+  if (hat === 'propeller') {
+    // 竹蜻蜓
+    return `<g transform="translate(100,18)">
+      <ellipse cx="-22" cy="0" rx="24" ry="7" fill="${hatColor}" stroke="${dk}" stroke-width="1.5"/>
+      <ellipse cx="22" cy="0" rx="24" ry="7" fill="${hatColor}" stroke="${dk}" stroke-width="1.5"/>
+      <rect x="-4" y="0" width="8" height="22" rx="3" fill="${hatStar}"/>
+      <circle cx="0" cy="0" r="6" fill="${hatStar}" stroke="${dk}" stroke-width="1.5"/>
+    </g>`;
+  }
+  if (hat === 'ribbon') {
+    // 髮帶＋側結
+    return `<g>
+      <path d="M52 48 Q100 34 148 48 L146 58 Q100 46 54 58 Z" fill="${hatColor}" stroke="${dk}" stroke-width="2"/>
+      <g transform="translate(140,46)">
+        <path d="M0 0 L-16 -12 Q-20 0 -16 12 Z" fill="${hatColor}" stroke="${dk}" stroke-width="1.5"/>
+        <path d="M0 0 L16 -12 Q20 0 16 12 Z" fill="${hatColor}" stroke="${dk}" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="5" fill="${hatStar}"/>
+      </g>
+    </g>`;
+  }
+  if (hat === 'spike') {
+    // 龐克尖刺
+    return `<g fill="${hatColor}" stroke="${dk}" stroke-width="1.5">
+      <path d="M58 54 L66 10 L80 50 Z"/><path d="M80 50 L92 4 L104 48 Z"/>
+      <path d="M104 48 L116 4 L128 50 Z"/><path d="M128 50 L142 12 L148 54 Z"/>
+    </g>`;
+  }
+  return '';
+}
+
+function flameSVG(color, side = 'left') {
+  const tx = side === 'left' ? '-32' : '232';
+  return `
+    <g transform="translate(${tx}, 130)" class="ghost-flame">
+      <ellipse cx="0" cy="28" rx="14" ry="6" fill="${color}" opacity="0.35"/>
+      <path d="M-8 30 Q-13 12 -5 -8 Q0 -14 5 -8 Q13 12 8 30 Q0 36 -8 30 Z" fill="${color}"/>
+      <path d="M-4 26 Q-6 14 -2 0 Q1 -5 3 0 Q6 14 4 26 Q0 30 -4 26 Z" fill="#FFFFFF" opacity="0.65"/>
+    </g>
+  `;
+}
+
+function renderGhostSVG(ghostId, opts = {}) {
+  const def = getGhost(ghostId) || GHOSTS[0];
+  // 合併職業外觀
+  let art = Object.assign({}, def.art || {});
+  const inst = (typeof state !== 'undefined' && state && state.ghosts) ? state.ghosts[ghostId] : null;
+  if (inst && inst.class) {
+    const cd = (typeof CLASSES !== 'undefined') ? CLASSES.find(c => c.id === inst.class) : null;
+    if (cd && cd.art) art = Object.assign(art, cd.art);
+  }
+  const expression = opts.expression || 'happy';
+  const hasFlame = opts.hasFlame !== false;
+  const flameSide = opts.flameSide || 'left';
+  const showSparkles = opts.sparkles !== false;
+  const exp = ghostExpression(expression);
+  const uid = `${def.id}-${Math.random().toString(36).slice(2,7)}`;
+
+  const sparkles = showSparkles ? `
+    <g class="ghost-sparkles" fill="white" opacity="0.9">
+      <text x="178" y="38" font-size="14">✦</text>
+      <text x="168" y="190" font-size="11">✦</text>
+      <text x="18" y="58" font-size="13">✦</text>
+      <text x="40" y="220" font-size="9" opacity="0.6">✦</text>
+    </g>
+  ` : '';
+
+  const bodyPath = `M40 110 Q40 38 100 38 Q160 38 160 110 L160 205
+    Q150 222 135 205 Q120 188 105 205 Q97 215 90 205 Q75 188 60 205 Q49 222 40 205 Z`;
+
+  return `
+    <svg viewBox="-50 -10 300 260" xmlns="http://www.w3.org/2000/svg" class="ghost-svg" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <filter id="gs-${uid}" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+          <feOffset in="blur" dx="0" dy="5" result="offsetBlur"/>
+          <feFlood flood-color="${art.shadow || '#8B8DFF'}" flood-opacity="0.55" result="shadowColor"/>
+          <feComposite in="shadowColor" in2="offsetBlur" operator="in" result="shadow"/>
+          <feMerge>
+            <feMergeNode in="shadow"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <linearGradient id="bg-${uid}" x1="50%" y1="0%" x2="50%" y2="100%">
+          <stop offset="0%"   stop-color="${art.body || '#FFFFFF'}"/>
+          <stop offset="65%"  stop-color="${art.body || '#FFFFFF'}"/>
+          <stop offset="100%" stop-color="${art.shadow || '#8B8DFF'}"/>
+        </linearGradient>
+      </defs>
+      ${sparkles}
+      ${hasFlame ? flameSVG(art.flame || '#7DB8FF', flameSide) : ''}
+      <path d="${bodyPath}" fill="url(#bg-${uid})" filter="url(#gs-${uid})"/>
+      ${exp.blush}
+      ${exp.eyes}
+      ${exp.mouth}
+      ${ghostHat(art)}
+    </svg>
+  `;
+}
 const AUDIO_KEY = 'ghost_drift_audio_v02';
 
 // ============ 音效引擎 ============
@@ -1619,14 +3249,83 @@ function defaultState() {
     ghosts: {},        // { id: { level, exp, spirit, equipped, lastTickAt } }
     inventory: {},     // { itemId: { count } }
     equipment: [],     // [{ uid, itemId, rarity, stats, enhance }]
-    drift: null,
+    drifts: {},        // { ghostId: driftObj } 多鬼魂並行
+    facilities: {},    // { facId: { built, assigned, lastCollect, stored } }
     unlockedZones: ['old_house'],
     unlockedRecipes: ['r_paperhat', 'r_coppercoin'], // 初始解鎖兩個 common
   };
 }
 
+// 存檔遷移：補齊新欄位
+function migrateState() {
+  if (!state.drifts) state.drifts = {};
+  if (state.drift) { // 舊單一 drift → 移到 drifts
+    if (state.drift.ghostId) state.drifts[state.drift.ghostId] = state.drift;
+    state.drift = undefined;
+  }
+  if (!state.facilities) state.facilities = {};
+  if (!state.unlockedRecipes) state.unlockedRecipes = ['r_paperhat', 'r_coppercoin'];
+  for (const gid of Object.keys(state.ghosts)) {
+    const g = state.ghosts[gid];
+    const gDef = getGhost(gid);
+    if (!gDef) { delete state.ghosts[gid]; continue; } // 移除已不存在的角色
+    if (g.spirit === undefined) g.spirit = gDef.baseSpirit;
+    if (!g.lastTickAt) g.lastTickAt = Date.now();
+    if (g.star === undefined) g.star = gDef.star;     // 補星級
+    if (g.shards === undefined) g.shards = 0;          // 補碎片
+  }
+  for (const eq of state.equipment) { if (eq.enhance === undefined) eq.enhance = 0; }
+}
+
+// ============ 離線結算「歡迎回來」 ============
+function fmtDuration(sec) {
+  sec = Math.floor(sec);
+  if (sec < 60) return `${sec} 秒`;
+  const m = Math.floor(sec / 60), h = Math.floor(m / 60);
+  if (h >= 1) return `${h} 小時 ${m % 60} 分`;
+  return `${m} 分鐘`;
+}
+
+function checkWelcomeBack() {
+  if (!state.lastSeen) return;
+  const offline = (Date.now() - state.lastSeen) / 1000;
+  if (offline < 60) return; // 離線太短不打擾
+
+  const doneDrifts = GHOSTS.filter(g => state.ghosts[g.id] && getDrift(g.id) && driftRemaining(g.id) <= 0);
+  const ongoing    = GHOSTS.filter(g => state.ghosts[g.id] && getDrift(g.id) && driftRemaining(g.id) > 0);
+  let facCoins = 0, facMats = 0;
+  FACILITIES.forEach(f => {
+    if (facilityBuilt(f.id) && state.facilities[f.id].assigned) {
+      const t = facilityTotal(f.id);
+      if (f.produces === 'coins') facCoins += t;
+      else if (f.produces === 'material') facMats += t;
+    }
+  });
+  // 沒有任何進度就不顯示
+  if (!doneDrifts.length && !ongoing.length && facCoins === 0 && facMats === 0) return;
+
+  const body = document.getElementById('welcome-body');
+  let html = `<p class="welcome-offline">你離開了 <b>${fmtDuration(offline)}</b></p><div class="welcome-list">`;
+  if (doneDrifts.length) {
+    html += `<div class="welcome-row"><span class="welcome-ico">✅</span><div><b>${doneDrifts.length}</b> 隻探索完成，回來等你領取！<br><small>${doneDrifts.map(g=>g.name).join('、')}</small></div></div>`;
+  }
+  if (ongoing.length) {
+    const soon = ongoing.map(g => `${g.name}（剩 ${fmtTime(driftRemaining(g.id))}）`).join('、');
+    html += `<div class="welcome-row"><span class="welcome-ico">🗺️</span><div><b>${ongoing.length}</b> 隻還在探索<br><small>${soon}</small></div></div>`;
+  }
+  if (facCoins > 0) {
+    html += `<div class="welcome-row"><span class="welcome-ico">🔥</span><div>煉魂爐累積了 <b>${facCoins}</b> 靈幣</div></div>`;
+  }
+  if (facMats > 0) {
+    html += `<div class="welcome-row"><span class="welcome-ico">🌿</span><div>採集園累積了 <b>${facMats}</b> 份素材</div></div>`;
+  }
+  html += `</div>`;
+  body.innerHTML = html;
+  openModal('welcome-modal');
+}
+
 // ============ 存取 ============
-function save() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+function save() { state.lastSeen = Date.now(); localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
 function load() {
   const raw = localStorage.getItem(SAVE_KEY);
   if (!raw) return null;
@@ -1665,7 +3364,15 @@ function ghostTotalStats(ghostId) {
   const g = state.ghosts[ghostId];
   if (!gDef || !g) return { luck:0, speed:0, courage:0, sense:0 };
   const stats = { ...gDef.baseStats };
+  // 升星加成（基礎屬性 × 星級倍率）
+  const sMul = starStatMul(g.star || gDef.star, gDef.star);
+  for (const k of Object.keys(stats)) stats[k] = Math.round(stats[k] * sMul);
   for (const k of Object.keys(stats)) stats[k] += (g.level - 1);
+  // 職業加成
+  const cd = classDef(g.class);
+  if (cd && cd.statBonus) {
+    for (const k of Object.keys(cd.statBonus)) stats[k] = (stats[k]||0) + cd.statBonus[k];
+  }
   for (const slot of Object.keys(g.equipped)) {
     const eqUid = g.equipped[slot];
     if (!eqUid) continue;
@@ -1738,61 +3445,316 @@ function itemValue(itemId, rarity = 'common', enhance = 0) {
   return Math.floor(def.baseValue * rMul * enhMul);
 }
 
-// ============ 漂流系統 ============
-function startDrift(zoneId) {
+// ============ 漂流系統（多鬼魂並行）============
+// state.drifts = { ghostId: driftObj }
+function getDrift(ghostId) { return (state.drifts && state.drifts[ghostId]) ? state.drifts[ghostId] : null; }
+function anyDrifting() { return state.drifts && Object.keys(state.drifts).length > 0; }
+function isDrifting(ghostId) { return !!getDrift(ghostId); }
+
+// 派遣指定鬼魂（預設 activeGhostId）出發
+function startDrift(zoneId, ghostId) {
+  ghostId = ghostId || state.activeGhostId;
   const zone = getZone(zoneId);
   if (!zone) return;
-  if (state.drift) { toast('已經有寵物在漂流了'); return; }
-  const g = activeGhost();
-  const gDef = activeGhostDef();
+  if (!state.drifts) state.drifts = {};
+  if (getDrift(ghostId)) { toast('這隻鬼魂已在漂流中'); return; }
+  const g = state.ghosts[ghostId];
+  const gDef = getGhost(ghostId);
   if (!g || !gDef) { toast('沒有可用的鬼魂'); return; }
-  if (g.level < zone.minGhostLevel) { toast('鬼魂等級不足'); return; }
+  if (assignedFacility(ghostId)) { toast('牠正在據點工作，先收回吧'); return; }
+  if (g.level < zone.minGhostLevel) { toast(`需要 Lv.${zone.minGhostLevel}`); return; }
   if (!state.unlockedZones.includes(zoneId)) { toast('地圖未解鎖'); return; }
   if (g.spirit < zone.spiritCost) { toast(`魂力不足！需要 ${zone.spiritCost}`); return; }
 
-  // 消耗魂力
   g.spirit = Math.max(0, g.spirit - zone.spiritCost);
 
-  const stats = ghostTotalStats(state.activeGhostId);
+  const stats = ghostTotalStats(ghostId);
   const speedMul = clamp(1 - stats.speed * 0.02, 0.6, 1);
   const duration = Math.floor(zone.duration * speedMul);
 
-  state.drift = {
-    ghostId: state.activeGhostId,
-    zoneId, startTime: Date.now(), duration, done: false,
+  state.drifts[ghostId] = {
+    ghostId, zoneId, startTime: Date.now(), duration,
+    bonusDrops: [], lostDrops: 0, scareLevel: 0,
+    bossEncountered: false, bossWon: false, earlyReturn: false,
+    viewed: false,
   };
   save();
   closeModal('map-modal');
-  renderMain();
   Audio.driftStart();
+  // 直接進入該鬼魂的全螢幕演出
+  openDriftScene(ghostId);
   toast(`${gDef.name} 出發前往 ${zone.name}！消耗 ${zone.spiritCost} 魂力`);
 }
 
-function driftRemaining() {
-  if (!state.drift) return 0;
-  const elapsed = (Date.now() - state.drift.startTime) / 1000;
-  return Math.max(0, state.drift.duration - elapsed);
+// ============ 全螢幕漂流場景 ============
+const DRIFT_EVENTS = [
+  { icon: '💎', msg: '發現一塊閃亮的水晶！', kind: 'good',    drop: { itemId: 'dark_crystal', count: 1 } },
+  { icon: '🪙', msg: '撿到一枚冥府古錢。',   kind: 'good',    drop: { itemId: 'copper_coin',  count: 1, rarity: 'common' } },
+  { icon: '✨', msg: '空氣中飄著靈氣！',     kind: 'good',    drop: { itemId: 'soul_fire',    count: 2 } },
+  { icon: '📜', msg: '撿到一張殘破紙卷。',   kind: 'good',    drop: { itemId: 'memory_shard', count: 1 } },
+  { icon: '🌙', msg: '月光從雲縫漏下來。',   kind: 'neutral' },
+  { icon: '🔥', msg: '看到遠方有鬼火...',    kind: 'neutral' },
+  { icon: '⚰️', msg: '經過一座荒涼的墓碑。', kind: 'neutral' },
+  { icon: '👻', msg: '遇見同類，揮揮手！',   kind: 'neutral' },
+  { icon: '🦇', msg: '一群蝙蝠飛過去...',    kind: 'neutral' },
+  { icon: '🕷️', msg: '撞到大蜘蛛網了！',     kind: 'bad',     scare: 12, lostDrop: 1 },
+  { icon: '🪦', msg: '差點被絆倒...',         kind: 'bad',     scare: 8 },
+  { icon: '⚡', msg: '一道閃光劃過，嚇得發抖！', kind: 'bad',  scare: 18, lostDrop: 1 },
+];
+const SCENERY_ICONS = ['🌳', '🪦', '⚰️', '🕯️', '🌲', '🦴', '🕸️', '🪨', '🏚️', '⛲'];
+
+let driftSceneTimer = null;
+let driftEventTimer = null;
+let driftScenerySpawner = null;
+let sceneGhostId = null;   // 目前在全螢幕場景查看哪一隻
+
+function sceneDrift() { return sceneGhostId ? getDrift(sceneGhostId) : null; }
+
+function openDriftScene(ghostId) {
+  sceneGhostId = ghostId || sceneGhostId;
+  const drift = sceneDrift();
+  if (!drift) return;
+  drift.viewed = true;   // 親自觀看 → 以演出累積為準，不再離線結算
+  const zone = getZone(drift.zoneId);
+  document.getElementById('drift-scene-title').textContent = `${zone.icon} ${zone.name}`;
+  const charEl = document.getElementById('drift-character');
+  charEl.innerHTML = renderGhostSVG(drift.ghostId, { expression: 'walking', flameSide: 'left' });
+  document.getElementById('drift-scenery').innerHTML = '';
+  document.getElementById('drift-scene-log').innerHTML = '';
+  document.getElementById('drift-balloon').classList.remove('show');
+
+  showScreen('drift-scene');
+  startDriftSceneTicker();
 }
 
-function speedupDrift() {
-  if (!state.drift) { toast('沒有正在漂流的寵物'); return; }
+function closeDriftScene() {
+  if (driftSceneTimer)     { clearInterval(driftSceneTimer);     driftSceneTimer = null; }
+  if (driftEventTimer)     { clearInterval(driftEventTimer);     driftEventTimer = null; }
+  if (driftScenerySpawner) { clearInterval(driftScenerySpawner); driftScenerySpawner = null; }
+}
+
+function startDriftSceneTicker() {
+  closeDriftScene();
+  driftSceneTimer = setInterval(() => {
+    const drift = sceneDrift();
+    if (!drift) { closeDriftScene(); return; }
+    const remain = driftRemaining(sceneGhostId);
+    const progress = 100 - (remain / drift.duration * 100);
+    const fill = document.getElementById('drift-scene-progress-fill');
+    const timer = document.getElementById('drift-scene-timer');
+    if (fill) fill.style.width = `${progress}%`;
+    if (timer) {
+      const mm = Math.floor(remain/60).toString().padStart(2,'0');
+      const ss = Math.floor(remain%60).toString().padStart(2,'0');
+      timer.textContent = `${mm}:${ss}`;
+    }
+    if (remain <= 0) {
+      closeDriftScene();
+      const gid = sceneGhostId;
+      claimDrift(gid);
+      goHome();
+    }
+  }, 500);
+
+  scheduleDriftEvent();
+  driftScenerySpawner = setInterval(spawnScenery, 1800);
+  spawnScenery();
+}
+
+function scheduleDriftEvent() {
+  if (!sceneDrift()) return;
+  const delay = 4000 + Math.random() * 3000;
+  driftEventTimer = setTimeout(() => {
+    if (!sceneDrift()) return;
+    triggerDriftEvent();
+    scheduleDriftEvent();
+  }, delay);
+}
+
+function triggerDriftEvent() {
+  const drift = sceneDrift();
+  if (!drift) return;
+  const elapsed = (Date.now() - drift.startTime) / 1000;
+  const driftProgress = elapsed / drift.duration;
+
+  if (driftProgress >= 0.5 && !drift.bossEncountered && Math.random() < 0.3) {
+    return triggerBossEvent();
+  }
+
+  const ev = DRIFT_EVENTS[Math.floor(Math.random() * DRIFT_EVENTS.length)];
+  showDriftEventUI(ev.icon, ev.msg, ev.kind);
+
+  if (ev.drop)     drift.bonusDrops.push(ev.drop);
+  if (ev.lostDrop) drift.lostDrops += ev.lostDrop;
+  if (ev.scare) {
+    const stats = ghostTotalStats(drift.ghostId);
+    const resist = stats.courage * 0.5 + stats.luck * 0.2;
+    drift.scareLevel += Math.max(2, ev.scare - resist);
+    if (drift.scareLevel >= 100) handleEarlyReturn('被嚇得拔腿就跑！');
+  }
+}
+
+function triggerBossEvent() {
+  const drift = sceneDrift();
+  if (!drift) return;
+  drift.bossEncountered = true;
+  const bosses = BOSSES.filter(b => b.zone === drift.zoneId);
+  if (!bosses.length) return;
+  const boss = bosses[Math.floor(Math.random() * bosses.length)];
+  const stats = ghostTotalStats(drift.ghostId);
+  const cd = classDef(state.ghosts[drift.ghostId].class);
+  const bossPowerMul = (cd && cd.bossPowerMul) ? cd.bossPowerMul : 1;
+  const power = (stats.courage + stats.luck * 0.5 + stats.sense * 0.3) * bossPowerMul;
+  const winChance = Math.min(0.95, Math.max(0.15, power / (boss.difficulty * 1.2)));
+  drift.bossWon = Math.random() < winChance;
+
+  showDriftEventUI(boss.icon, `⚠️ 出現大魔王：${boss.name}！`, 'boss');
+  Audio.tone(110, 0.6, 'sawtooth', 0.18);
+
+  setTimeout(() => {
+    const d = sceneDrift();
+    if (!d) return;
+    if (d.bossWon) {
+      showDriftEventUI('🏆', `${boss.name} 被擊敗了！獲得寶藏！`, 'good');
+      d.bonusDrops.push({ itemId: boss.loot, count: 1, rarity: boss.rarity });
+      Audio.lootByRarity(boss.rarity);
+    } else {
+      showDriftEventUI('💨', `${boss.name} 太強了，快逃！`, 'bad');
+      Audio.forgeFail();
+      setTimeout(() => handleEarlyReturn(`被 ${boss.name} 嚇跑了！`), 1500);
+    }
+  }, 2500);
+}
+
+function showDriftEventUI(icon, msg, kind) {
+  const drift = sceneDrift();
+  const balloon = document.getElementById('drift-balloon');
+  if (balloon) {
+    balloon.innerHTML = `${icon} ${msg}`;
+    balloon.classList.remove('boss', 'good', 'bad');
+    balloon.classList.add('show', kind);
+    setTimeout(() => balloon.classList.remove('show'), 2400);
+  }
+  const log = document.getElementById('drift-scene-log');
+  if (log) {
+    const entry = document.createElement('div');
+    entry.className = 'drift-log-entry ' + (kind || 'neutral');
+    entry.textContent = `${icon} ${msg}`;
+    log.appendChild(entry);
+    while (log.children.length > 4) log.removeChild(log.firstChild);
+    log.scrollTop = log.scrollHeight;
+  }
+  if (kind === 'good')      Audio.coin();
+  else if (kind === 'bad')  Audio.forgeFail();
+  else if (kind === 'boss') {/* 音效已外處理 */}
+  else                       Audio.tone(440, 0.08, 'sine', 0.08);
+  const charEl = document.getElementById('drift-character');
+  if (charEl && drift) {
+    const mood = kind === 'good' ? 'happy' : (kind === 'bad' || kind === 'boss') ? 'surprised' : 'curious';
+    charEl.innerHTML = renderGhostSVG(drift.ghostId, { expression: mood, flameSide: 'left' });
+    if (kind === 'bad' || kind === 'boss') {
+      const stage = document.querySelector('.drift-scene-stage');
+      if (stage) { stage.classList.add('shake'); setTimeout(()=>stage.classList.remove('shake'), 500); }
+    }
+    setTimeout(() => {
+      const d = sceneDrift();
+      if (charEl && d) charEl.innerHTML = renderGhostSVG(d.ghostId, { expression: 'walking', flameSide: 'left' });
+    }, 2500);
+  }
+}
+
+function handleEarlyReturn(reason) {
+  const drift = sceneDrift();
+  if (!drift || drift.earlyReturn) return;
+  drift.earlyReturn = true;
+  drift.startTime = Date.now() - drift.duration * 1000;
+  showDriftEventUI('🏃', reason + ' 提早回家了。', 'bad');
+}
+
+// 沒被玩家觀看的漂流，在 claim 時一次性結算事件
+function settleOffscreen(drift) {
+  const zone = getZone(drift.zoneId);
+  const stats = ghostTotalStats(drift.ghostId);
+  const goodEvents = DRIFT_EVENTS.filter(e => e.kind === 'good');
+  const badEvents  = DRIFT_EVENTS.filter(e => e.kind === 'bad');
+  // 依時長決定事件次數
+  const rounds = Math.max(2, Math.floor(drift.duration / 12));
+  for (let i = 0; i < rounds; i++) {
+    const r = Math.random();
+    if (r < 0.45) {
+      const ev = goodEvents[Math.floor(Math.random()*goodEvents.length)];
+      if (ev.drop) drift.bonusDrops.push(ev.drop);
+    } else if (r < 0.65) {
+      const ev = badEvents[Math.floor(Math.random()*badEvents.length)];
+      if (ev.lostDrop) drift.lostDrops += ev.lostDrop;
+      const resist = stats.courage * 0.5 + stats.luck * 0.2;
+      drift.scareLevel += Math.max(2, (ev.scare||5) - resist);
+    }
+  }
+  // Boss
+  if (Math.random() < 0.3) {
+    const bosses = BOSSES.filter(b => b.zone === drift.zoneId);
+    if (bosses.length) {
+      const boss = bosses[Math.floor(Math.random()*bosses.length)];
+      const cd = classDef(state.ghosts[drift.ghostId].class);
+      const bossPowerMul = (cd && cd.bossPowerMul) ? cd.bossPowerMul : 1;
+      const power = (stats.courage + stats.luck*0.5 + stats.sense*0.3) * bossPowerMul;
+      const winChance = Math.min(0.95, Math.max(0.15, power / (boss.difficulty * 1.2)));
+      drift.bossEncountered = true;
+      drift.bossWon = Math.random() < winChance;
+      if (drift.bossWon) drift.bonusDrops.push({ itemId: boss.loot, count: 1, rarity: boss.rarity });
+      else drift.earlyReturn = true;
+    }
+  }
+  if (drift.scareLevel >= 100) drift.earlyReturn = true;
+}
+
+function spawnScenery() {
+  const scenery = document.getElementById('drift-scenery');
+  if (!scenery) return;
+  const icon = SCENERY_ICONS[Math.floor(Math.random() * SCENERY_ICONS.length)];
+  const item = document.createElement('div');
+  item.className = 'scenery-item';
+  item.textContent = icon;
+  const size = 28 + Math.random() * 24;
+  item.style.fontSize = `${size}px`;
+  item.style.bottom = `${15 + Math.random() * 12}%`;
+  const dur = 6 + Math.random() * 4;
+  item.style.animationDuration = `${dur}s`;
+  item.style.opacity = (0.5 + Math.random() * 0.5).toFixed(2);
+  scenery.appendChild(item);
+  setTimeout(() => item.remove(), dur * 1000 + 200);
+}
+
+function driftRemaining(ghostId) {
+  const drift = getDrift(ghostId);
+  if (!drift) return 0;
+  const elapsed = (Date.now() - drift.startTime) / 1000;
+  return Math.max(0, drift.duration - elapsed);
+}
+
+function speedupDrift(ghostId) {
+  ghostId = ghostId || sceneGhostId;
+  const drift = getDrift(ghostId);
+  if (!drift) { toast('沒有正在漂流的寵物'); return; }
   if (!state.inventory['yin_pill'] || state.inventory['yin_pill'].count <= 0) { toast('沒有陰氣丹'); return; }
   removeItem('yin_pill', 1);
-  const remain = driftRemaining();
-  state.drift.startTime = Date.now() - (state.drift.duration - remain/2)*1000;
+  const remain = driftRemaining(ghostId);
+  drift.startTime = Date.now() - (drift.duration - remain/2)*1000;
   save();
   Audio.speedup();
-  renderMain();
   toast('使用了陰氣丹！剩餘時間減半');
 }
 
-function rollDriftLoot() {
-  const zone = getZone(state.drift.zoneId);
-  const gDef = getGhost(state.drift.ghostId);
-  const stats = ghostTotalStats(state.drift.ghostId);
+function rollDriftLoot(drift) {
+  const zone = getZone(drift.zoneId);
+  const gDef = getGhost(drift.ghostId);
+  const stats = ghostTotalStats(drift.ghostId);
 
   const rarityWeights = { ...zone.rarityWeights };
-  const luckBoost = 1 + stats.luck * 0.03;
+  const cdLoot = classDef(state.ghosts[drift.ghostId].class);
+  const classLuckMul = (cdLoot && cdLoot.lootLuckMul) ? cdLoot.lootLuckMul : 1;
+  const luckBoost = (1 + stats.luck * 0.03) * classLuckMul;
   if (rarityWeights.rare)      rarityWeights.rare      *= luckBoost;
   if (rarityWeights.epic)      rarityWeights.epic      *= luckBoost * 1.2;
   if (rarityWeights.legendary) rarityWeights.legendary *= luckBoost * 1.5;
@@ -1814,24 +3776,39 @@ function rollDriftLoot() {
   return loots;
 }
 
-function claimDrift() {
-  if (!state.drift || driftRemaining() > 0) return;
-  const zone = getZone(state.drift.zoneId);
+function claimDrift(ghostId) {
+  const drift = getDrift(ghostId);
+  if (!drift || driftRemaining(ghostId) > 0) return;
+  const zone = getZone(drift.zoneId);
   const rewards = zoneRewards(zone);
-  const loots = rollDriftLoot();
+
+  // 沒被玩家觀看的，離線結算事件
+  if (!drift.viewed) settleOffscreen(drift);
+
+  if (drift.earlyReturn) {
+    rewards.exp = Math.floor(rewards.exp * 0.5);
+    rewards.coins = Math.floor(rewards.coins * 0.5);
+  }
+
+  let loots = rollDriftLoot(drift);
+  for (let i = 0; i < drift.lostDrops && loots.length > 1; i++) loots.pop();
+  for (const bd of drift.bonusDrops) {
+    loots.push({ itemId: bd.itemId, count: bd.count || 1, rarity: bd.rarity || null });
+  }
+
   for (const l of loots) addItem(l.itemId, l.count, l.rarity);
   state.coins += rewards.coins;
-  addExp(state.drift.ghostId, rewards.exp);
-  state.drift = null;
+  addExp(drift.ghostId, rewards.exp);
+  delete state.drifts[ghostId];
+  if (sceneGhostId === ghostId) sceneGhostId = null;
   save();
   Audio.driftReturn();
-  // 找最高品質播一次戰利品音效
   const bestRarity = loots.reduce((best, l) => {
     const r = l.rarity || 'common';
     return RARITY_ORDER.indexOf(r) > RARITY_ORDER.indexOf(best) ? r : best;
   }, 'common');
   setTimeout(() => Audio.lootByRarity(bestRarity), 350);
-  showLoot(loots, rewards);
+  showLoot(loots, rewards, { early: drift.earlyReturn, bossWon: drift.bossWon, ghostName: getGhost(drift.ghostId).name });
   renderMain();
 }
 
@@ -1858,15 +3835,157 @@ function spiritTick() {
     const gDef = getGhost(gid);
     if (!gDef) continue;
     // 正在漂流的不回復
-    if (state.drift && state.drift.ghostId === gid) { g.lastTickAt = now; continue; }
+    if (getDrift(gid)) { g.lastTickAt = now; continue; }
     if (!g.lastTickAt) g.lastTickAt = now;
     const sec = (now - g.lastTickAt) / 1000;
     if (sec >= 1) {
       const max = maxSpirit(g, gDef);
-      g.spirit = Math.min(max, g.spirit + sec * SPIRIT_REGEN_PER_SEC);
+      const cd = classDef(g.class);
+      let regenMul = (cd && cd.spiritRegenMul) ? cd.spiritRegenMul : 1;
+      // 在靜思間休息 → 大幅加速回復
+      const facId = assignedFacility(gid);
+      if (facId === 'rest') {
+        const fdef = FACILITIES.find(f => f.id === 'rest');
+        regenMul *= (fdef.restRegenMul || 1);
+      }
+      g.spirit = Math.min(max, g.spirit + sec * SPIRIT_REGEN_PER_SEC * regenMul);
       g.lastTickAt = now;
     }
   }
+}
+
+// ============ 據點設施 ============
+function assignedFacility(ghostId) {
+  for (const fid of Object.keys(state.facilities || {})) {
+    if (state.facilities[fid].built && state.facilities[fid].assigned === ghostId) return fid;
+  }
+  return null;
+}
+function facilityBuilt(facId) { return state.facilities[facId] && state.facilities[facId].built; }
+
+function buildFacility(facId) {
+  const fdef = FACILITIES.find(f => f.id === facId);
+  if (!fdef || facilityBuilt(facId)) return;
+  const cost = fdef.buildCost;
+  if (state.coins < cost.coins) { toast(`靈幣不足（需 ${cost.coins}）`); return; }
+  if (cost.mats && !hasMaterials(cost.mats)) { toast('素材不足'); return; }
+  state.coins -= cost.coins;
+  if (cost.mats) consumeMaterials(cost.mats);
+  state.facilities[facId] = { built: true, assigned: null, lastCollect: Date.now(), stored: 0 };
+  save();
+  Audio.forgeSuccess();
+  toast(`建好了 ${fdef.icon} ${fdef.name}！`);
+  renderFacilities();
+  renderMain();
+}
+
+// 計算設施目前堆積產出（不含已存 stored）
+function facilityAccrued(facId) {
+  const fac = state.facilities[facId];
+  const fdef = FACILITIES.find(f => f.id === facId);
+  if (!fac || !fac.built || !fac.assigned || fdef.produces === 'spirit') return 0;
+  const g = state.ghosts[fac.assigned];
+  if (!g) return 0;
+  const stats = ghostTotalStats(fac.assigned);
+  const statVal = fdef.statKey ? (stats[fdef.statKey] || 0) : 0;
+  const rate = fdef.ratePerMin * (1 + statVal * 0.04); // 每分鐘
+  const mins = (Date.now() - fac.lastCollect) / 60000;
+  const produced = mins * rate;
+  return Math.min(fdef.cap - fac.stored, produced);
+}
+
+function facilityTotal(facId) {
+  const fac = state.facilities[facId];
+  if (!fac) return 0;
+  return Math.floor((fac.stored || 0) + facilityAccrued(facId));
+}
+
+function assignToFacility(facId, ghostId) {
+  const fac = state.facilities[facId];
+  if (!fac || !fac.built) return;
+  if (getDrift(ghostId)) { toast('牠正在漂流中'); return; }
+  // 先把該鬼魂從其他設施撤下
+  const prev = assignedFacility(ghostId);
+  if (prev && prev !== facId) state.facilities[prev].assigned = null;
+  // 該設施若已有別人，先結算它的產出
+  if (fac.assigned && fac.assigned !== ghostId) {
+    fac.stored = facilityTotal(facId);
+    fac.lastCollect = Date.now();
+  }
+  fac.assigned = ghostId;
+  fac.lastCollect = Date.now();
+  state.ghosts[ghostId].lastTickAt = Date.now();
+  save();
+  Audio.equip();
+  renderFacilities();
+  renderMain();
+  toast(`${getGhost(ghostId).name} 開始在${FACILITIES.find(f=>f.id===facId).name}工作`);
+}
+
+function unassignFacility(facId) {
+  const fac = state.facilities[facId];
+  if (!fac || !fac.assigned) return;
+  collectFacility(facId, true);
+  fac.assigned = null;
+  save();
+  renderFacilities();
+  renderMain();
+}
+
+function collectFacility(facId, silent) {
+  const fac = state.facilities[facId];
+  const fdef = FACILITIES.find(f => f.id === facId);
+  if (!fac || !fac.built || fdef.produces === 'spirit') return;
+  const total = facilityTotal(facId);
+  if (total <= 0) { if (!silent) toast('還沒有產出'); return; }
+  if (fdef.produces === 'coins') {
+    state.coins += total;
+    if (!silent) toast(`收取 ${total} 靈幣`);
+  } else if (fdef.produces === 'material') {
+    // 依 pool 隨機分配 total 個素材
+    const got = {};
+    for (let i = 0; i < total; i++) {
+      const pick = pickWeighted(fdef.pool, p => p.weight);
+      addItem(pick.id, 1);
+      got[pick.id] = (got[pick.id] || 0) + 1;
+    }
+    if (!silent) {
+      const str = Object.entries(got).map(([k,v]) => `${getItem(k).name}×${v}`).join('、');
+      toast(`採集：${str}`);
+    }
+  }
+  fac.stored = 0;
+  fac.lastCollect = Date.now();
+  if (!silent) Audio.coin();
+  save();
+  renderFacilities();
+  renderMain();
+}
+
+// ============ 轉蛋 ============
+function rollGachaResult() {
+  const pick = pickWeighted(GACHA_POOL, p => p.weight);
+  if (pick.kind === 'equipment') {
+    const rarity = rollItemRarity(pick.id, pick.rarityRoll);
+    return { kind: 'equipment', itemId: pick.id, rarity, count: 1 };
+  }
+  if (pick.kind === 'scroll') {
+    return { kind: 'scroll', itemId: pick.id, count: 1 };
+  }
+  const count = pick.count ? randInt(pick.count[0], pick.count[1]) : 1;
+  return { kind: pick.kind, itemId: pick.id, count };
+}
+
+function doGacha() {
+  if (state.coins < GACHA_COST) { toast(`靈幣不足（需 ${GACHA_COST}）`); return; }
+  state.coins -= GACHA_COST;
+  const res = rollGachaResult();
+  addItem(res.itemId, res.count, res.rarity || null);
+  save();
+  const rarity = res.rarity || (res.kind === 'equipment' ? 'common' : null);
+  Audio.lootByRarity(rarity || 'uncommon');
+  showGachaResult(res);
+  renderMain();
 }
 
 // ============ 配方卷軸 ============
@@ -1918,32 +4037,91 @@ function useHealItem(itemId) {
   toast(`恢復了 ${Math.floor(g.spirit) - before} 魂力`);
 }
 
-// ============ 解鎖 ============
-function unlockGhost(ghostId) {
-  if (state.ghosts[ghostId]) return false;
+// ============ 獲得角色 ============
+function grantGhost(ghostId) {
   const def = getGhost(ghostId);
   if (!def) return false;
-  if (state.coins < def.unlockCost) { toast(`需要 ${def.unlockCost} 靈幣`); return false; }
-  state.coins -= def.unlockCost;
   state.ghosts[ghostId] = {
     level: 1, exp: 0,
+    star: def.star,
+    shards: 0,
     spirit: def.baseSpirit,
     lastTickAt: Date.now(),
     equipped: { head: null, body: null, weapon: null, accessory: null },
   };
   if (!state.activeGhostId) state.activeGhostId = ghostId;
-  save();
-  toast(`解鎖了 ${def.name}！`);
   return true;
+}
+// 相容舊呼叫
+function unlockGhost(ghostId) { if (state.ghosts[ghostId]) return false; grantGhost(ghostId); save(); return true; }
+
+// ============ 招魂（抽角色）============
+function rollSummon() {
+  // 先決定稀有度
+  const rTotal = SUMMON_RATES.r3 + SUMMON_RATES.r4 + SUMMON_RATES.r5;
+  let r = Math.random() * rTotal;
+  let rarity = 'r3';
+  if ((r -= SUMMON_RATES.r3) < 0) rarity = 'r3';
+  else if ((r -= SUMMON_RATES.r4) < 0) rarity = 'r4';
+  else rarity = 'r5';
+  const pool = GHOSTS.filter(g => g.rarity === rarity);
+  const def = pool[Math.floor(Math.random() * pool.length)];
+  return def;
+}
+
+function applySummon(def) {
+  // 回傳 { def, isNew, shards }
+  if (!state.ghosts[def.id]) {
+    grantGhost(def.id);
+    return { def, isNew: true, shards: 0 };
+  } else {
+    const s = DUPE_SHARDS[def.rarity] || 1;
+    state.ghosts[def.id].shards = (state.ghosts[def.id].shards || 0) + s;
+    return { def, isNew: false, shards: s };
+  }
+}
+
+function doSummon(times) {
+  const cost = times === 10 ? SUMMON_COST_TEN : SUMMON_COST_SINGLE;
+  if (state.coins < cost) { toast(`靈幣不足（需 ${cost}）`); return; }
+  state.coins -= cost;
+  const results = [];
+  for (let i = 0; i < times; i++) results.push(applySummon(rollSummon()));
+  save();
+  // 音效：最高稀有度
+  const best = results.reduce((b, r) => {
+    const order = { r3:0, r4:1, r5:2 };
+    return order[r.def.rarity] > order[b] ? r.def.rarity : b;
+  }, 'r3');
+  Audio.lootByRarity(best === 'r5' ? 'legendary' : best === 'r4' ? 'epic' : 'rare');
+  showSummonResult(results);
+  renderMain();
+}
+
+// ============ 升星 ============
+function starUp(ghostId) {
+  const def = getGhost(ghostId);
+  const g = state.ghosts[ghostId];
+  if (!def || !g) return;
+  const cur = g.star || def.star;
+  if (cur >= MAX_STAR) { toast('已達最高星級'); return; }
+  const need = starUpCost(cur);
+  if ((g.shards || 0) < need) { toast(`碎片不足（${g.shards||0}/${need}）`); return; }
+  g.shards -= need;
+  g.star = cur + 1;
+  g.spirit = maxSpirit(g, def);
+  save();
+  Audio.levelUp();
+  toast(`${def.name} 升星！now ${'★'.repeat(g.star)}`);
+  renderCodex();
+  renderMain();
 }
 
 function switchActive(ghostId) {
   if (!state.ghosts[ghostId]) return;
-  if (state.drift && state.drift.ghostId !== ghostId) { toast('目前有鬼魂在漂流'); return; }
   state.activeGhostId = ghostId;
   save();
   renderMain();
-  toast(`已切換到 ${getGhost(ghostId).name}`);
 }
 
 function unlockZone(zoneId) {
@@ -1967,19 +4145,66 @@ function isEquipped(eqUid) {
   return false;
 }
 
-function equipItem(eqUid) {
+// 找出某件裝備正穿在哪隻鬼魂身上
+function wearerOf(eqUid) {
+  for (const gid of Object.keys(state.ghosts)) {
+    const g = state.ghosts[gid];
+    for (const s of Object.keys(g.equipped)) if (g.equipped[s] === eqUid) return gid;
+  }
+  return null;
+}
+
+function equipItem(eqUid, ghostId) {
   const eq = state.equipment.find(e=>e.uid===eqUid);
   if (!eq) return;
   const def = getItem(eq.itemId);
-  const g = activeGhost();
+  ghostId = ghostId || state.activeGhostId;
+  const g = state.ghosts[ghostId];
   if (!g) return;
+  // 先把這件從原本穿戴者身上卸下（避免一件穿兩隻）
+  unequipUid(eqUid);
   g.equipped[def.slot] = eq.uid;
   save();
   Audio.equip();
   renderMain();
-  renderGhostModal();
+  if (document.getElementById('ghost-modal').classList.contains('active')) renderGhostModal();
+  closeModal('equip-target-modal');
   closeModal('item-modal');
-  toast(`穿上了 ${def.name}`);
+  toast(`${getGhost(ghostId).name} 穿上了 ${def.name}`);
+}
+
+// 選擇要把裝備穿在哪隻鬼魂身上
+function openEquipTarget(eqUid) {
+  const eq = state.equipment.find(e=>e.uid===eqUid);
+  if (!eq) return;
+  const def = getItem(eq.itemId);
+  const slotLabel = { head:'頭飾', body:'身袍', weapon:'法器', accessory:'護符' }[def.slot];
+  document.getElementById('equiptarget-title').textContent = `穿戴 ${def.icon} ${def.name}`;
+  document.getElementById('equiptarget-sub').textContent = `選擇要把這件「${slotLabel}」穿在誰身上`;
+  const list = document.getElementById('equiptarget-list');
+  list.innerHTML = '';
+  const wearer = wearerOf(eqUid);
+  GHOSTS.filter(g => state.ghosts[g.id]).forEach(gDef => {
+    const ghost = state.ghosts[gDef.id];
+    // 該鬼魂此 slot 目前裝備
+    const curUid = ghost.equipped[def.slot];
+    const curEq = curUid ? state.equipment.find(e=>e.uid===curUid) : null;
+    const curDef = curEq ? getItem(curEq.itemId) : null;
+    const isHere = wearer === gDef.id;
+    const row = document.createElement('div');
+    row.className = 'equiptarget-row' + (isHere ? ' current' : '');
+    row.innerHTML = `
+      <div class="equiptarget-av">${renderGhostSVG(gDef.id, { expression:'happy', hasFlame:false, sparkles:false })}</div>
+      <div class="equiptarget-info">
+        <div class="equiptarget-name">${gDef.name} <small>Lv.${ghost.level}</small></div>
+        <div class="equiptarget-cur">${slotLabel}：${curDef ? `${curDef.icon}${curDef.name}${curEq.enhance?`+${curEq.enhance}`:''}` : '空著'}</div>
+      </div>
+      <div class="equiptarget-btn">${isHere ? '穿戴中' : '穿上'}</div>
+    `;
+    if (!isHere) row.onclick = () => equipItem(eqUid, gDef.id);
+    list.appendChild(row);
+  });
+  openModal('equip-target-modal');
 }
 
 function unequipUid(eqUid) {
@@ -2064,6 +4289,38 @@ function enhanceEquipment(eqUid) {
   // 若正在查看物品 modal，更新它
   if (document.getElementById('item-modal').classList.contains('active')) {
     openItemDetail({ kind:'equipment', eqUid: eq.uid, itemId: eq.itemId, rarity: eq.rarity, icon: getItem(eq.itemId).icon, equipped: isEquipped(eq.uid) });
+  }
+}
+
+// ============ 連續強化 ============
+function enhanceUntil(eqUid, target) {
+  const eq = state.equipment.find(e=>e.uid===eqUid);
+  if (!eq) return;
+  let safety = 30;
+  while (safety-- > 0) {
+    if (eq.enhance >= target) { toast(`已強化到 +${eq.enhance}`); break; }
+    const data = enhanceData(eq.enhance);
+    if (!data) break;
+    if (!hasMaterials(data.mats) || state.coins < data.coin) {
+      toast('資源不足，停止強化');
+      break;
+    }
+    state.coins -= data.coin;
+    consumeMaterials(data.mats);
+    if (Math.random() < data.successRate) {
+      eq.enhance += 1;
+    } else {
+      // 失敗就停（避免無限燒材料）
+      toast(`強化到 +${eq.enhance} 時失敗，停止`);
+      break;
+    }
+  }
+  save();
+  Audio.forgeSuccess();
+  renderMain();
+  renderForge();
+  if (document.getElementById('item-modal').classList.contains('active')) {
+    openItemDetail({ kind:'equipment', eqUid: eq.uid, itemId: eq.itemId, rarity: eq.rarity, icon: getItem(eq.itemId).icon, equipped: isEquipped(eq.uid), enhance: eq.enhance });
   }
 }
 
@@ -2156,8 +4413,8 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
-function openModal(id)  { document.getElementById(id).classList.add('active'); Audio.modalOpen(); }
-function closeModal(id) { document.getElementById(id).classList.remove('active'); Audio.modalClose(); }
+function openModal(id)  { const el = document.getElementById(id); if (!el) return; el.classList.add('active'); Audio.modalOpen(); }
+function closeModal(id) { const el = document.getElementById(id); if (!el) return; el.classList.remove('active'); Audio.modalClose(); }
 function closeAllModals() { document.querySelectorAll('.modal').forEach(m=>m.classList.remove('active')); }
 
 let toastTimer = null;
@@ -2169,98 +4426,482 @@ function toast(msg) {
   toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
 }
 
-// ============ 渲染：主畫面 ============
-function renderMain() {
-  const ghost = activeGhost();
-  const gDef = activeGhostDef();
-  if (!ghost || !gDef) return;
+// ============ 渲染：據點主畫面 ============
+let dispatchGhostId = null; // 派遣探險時鎖定的鬼魂
 
-  // 鍛造按鈕紅點提示（有未學的卷軸）
-  const forgeBtn = document.getElementById('btn-forge');
-  if (forgeBtn) forgeBtn.classList.toggle('has-notif', hasUnusedScrolls());
-
-  document.getElementById('coin-display').textContent = state.coins;
-  document.getElementById('ghost-avatar').textContent = gDef.avatar;
-  document.getElementById('ghost-name').textContent = gDef.name;
-  document.getElementById('ghost-level').textContent = ghost.level;
-
-  const need = expForLevel(ghost.level);
-  document.getElementById('exp-fill').style.width = `${Math.min(100, ghost.exp/need*100)}%`;
-
-  // 魂力條
-  const max = maxSpirit(ghost, gDef);
-  const cur = Math.floor(ghost.spirit);
-  const pct = max > 0 ? (cur/max*100) : 0;
-  document.getElementById('spirit-fill').style.width = `${pct}%`;
-  document.getElementById('spirit-text').textContent = `${cur} / ${max}`;
-
-  const stats = ghostTotalStats(state.activeGhostId);
-  document.getElementById('stat-luck').textContent = stats.luck;
-  document.getElementById('stat-speed').textContent = stats.speed;
-  document.getElementById('stat-courage').textContent = stats.courage;
-  document.getElementById('stat-sense').textContent = stats.sense;
-
-  renderDrift();
+function goHome() {
+  showScreen('main-screen');
+  renderMain();
 }
 
-function renderDrift() {
-  const empty = document.getElementById('drift-empty');
-  const active = document.getElementById('drift-active');
-  const done = document.getElementById('drift-done');
+function fmtTime(sec) {
+  const mm = Math.floor(sec/60).toString().padStart(2,'0');
+  const ss = Math.floor(sec%60).toString().padStart(2,'0');
+  return `${mm}:${ss}`;
+}
 
-  if (!state.drift) {
-    empty.classList.remove('hidden');
-    active.classList.add('hidden');
-    done.classList.add('hidden');
-    return;
+function renderMain() {
+  if (!state.activeGhostId) return;
+  document.getElementById('coin-display').textContent = state.coins;
+  const forgeBtn = document.getElementById('btn-dock-forge');
+  if (forgeBtn) forgeBtn.classList.toggle('has-notif', hasUnusedScrolls());
+  renderTown();
+}
+// 舊呼叫點相容
+function renderRoster() { renderTown(); }
+function renderFacilities() { renderTown(); }
+
+// ============ 建築 SVG（Boo Town 店鋪風）============
+// 共用色：米牆 #ECE4D2 / 深紫圓頂 #3b2d63,#4a3b78 / 暖黃窗 #FFE08A / 木 #6b4a2e
+function buildingSVG(facId, built, working) {
+  const wall   = built ? '#ECE4D2' : '#4a4566';
+  const wallSh = built ? '#d6ccb4' : '#3a3556';
+  const roof   = built ? '#3b2d63' : '#2e2848';
+  const roof2  = built ? '#4a3b78' : '#383152';
+  const win    = built ? '#FFE08A' : '#3a3556';
+  const winGlow= built ? '#FFF3C4' : '#444066';
+  const wood   = '#6b4a2e';
+
+  if (facId === 'foundry') {
+    // 煉魂鋪：圓頂 + 煙囪火焰 + 招牌
+    const flame = built ? `
+      <g class="bld-flame">
+        <path d="M70 30 Q64 18 70 8 Q77 18 80 26 Q84 34 70 40 Q58 36 61 26 Q66 22 70 30 Z" fill="#FF7E3F"/>
+        <path d="M70 32 Q67 24 70 16 Q74 24 75 30 Q77 35 70 37 Q65 35 67 30 Z" fill="#FFD56B"/>
+      </g>` : '';
+    return `<svg viewBox="0 0 120 120" class="bld-svg">
+      ${flame}
+      <rect x="64" y="36" width="13" height="26" rx="2" fill="${roof2}"/>
+      <path d="M22 56 Q60 24 98 56 L98 60 L22 60 Z" fill="${roof}"/>
+      <path d="M22 56 Q60 24 98 56" fill="none" stroke="${roof2}" stroke-width="2"/>
+      <rect x="26" y="58" width="68" height="44" rx="6" fill="${wall}"/>
+      <rect x="26" y="58" width="68" height="44" rx="6" fill="${wallSh}" opacity="0.3" transform="translate(0,30)"/>
+      <!-- 招牌 -->
+      <rect x="34" y="62" width="52" height="13" rx="3" fill="${wood}"/>
+      <!-- 拱門（爐口） -->
+      <path d="M46 102 L46 86 Q60 76 74 86 L74 102 Z" fill="${built?'#2a1f4e':'#2e2848'}"/>
+      ${built ? '<ellipse cx="60" cy="94" rx="9" ry="7" fill="#FF8B4F"/><ellipse cx="60" cy="96" rx="5" ry="4" fill="#FFD56B"/>' : ''}
+      <!-- 窗 -->
+      <rect x="30" y="80" width="11" height="13" rx="2" fill="${win}"/>
+      <rect x="79" y="80" width="11" height="13" rx="2" fill="${win}"/>
+    </svg>`;
   }
-  const remain = driftRemaining();
-  if (remain <= 0) {
-    empty.classList.add('hidden');
-    active.classList.add('hidden');
-    done.classList.remove('hidden');
-    return;
+
+  if (facId === 'garden') {
+    // 採集花鋪：條紋遮陽棚 + 花 + 暖窗
+    const awn = built ? '#9b7ec8' : '#4a4566';
+    return `<svg viewBox="0 0 120 120" class="bld-svg">
+      <path d="M24 50 Q60 26 96 50 L96 56 L24 56 Z" fill="${roof}"/>
+      <rect x="28" y="54" width="64" height="48" rx="6" fill="${wall}"/>
+      <!-- 招牌 -->
+      <rect x="34" y="57" width="52" height="12" rx="3" fill="${wood}"/>
+      <!-- 遮陽棚 -->
+      <path d="M30 72 L90 72 L86 84 L34 84 Z" fill="${awn}"/>
+      ${built ? `
+        <path d="M30 72 L38 72 L36 84 L34 84 Z" fill="#ECE4D2" opacity="0.85"/>
+        <path d="M46 72 L54 72 L52 84 L48 84 Z" fill="#ECE4D2" opacity="0.85"/>
+        <path d="M62 72 L70 72 L68 84 L64 84 Z" fill="#ECE4D2" opacity="0.85"/>
+        <path d="M78 72 L86 72 L84 84 L80 84 Z" fill="#ECE4D2" opacity="0.85"/>` : ''}
+      <!-- 窗與門 -->
+      <rect x="36" y="86" width="14" height="16" rx="2" fill="${win}"/>
+      <rect x="70" y="86" width="14" height="16" rx="2" fill="${win}"/>
+      <rect x="54" y="88" width="12" height="14" rx="2" fill="${roof2}"/>
+      ${built ? `
+        <circle cx="34" cy="100" r="4" fill="#C9A6FF"/><circle cx="40" cy="98" r="4" fill="#FF9EC4"/><circle cx="46" cy="100" r="4" fill="#7df9c0"/>
+        <circle cx="74" cy="100" r="4" fill="#FF9EC4"/><circle cx="80" cy="98" r="4" fill="#C9A6FF"/><circle cx="86" cy="100" r="4" fill="#FFE08A"/>` : ''}
+    </svg>`;
   }
-  empty.classList.add('hidden');
-  active.classList.remove('hidden');
-  done.classList.add('hidden');
 
-  const zone = getZone(state.drift.zoneId);
-  const gDef = getGhost(state.drift.ghostId);
-  document.getElementById('drift-msg').textContent = `${gDef.name} 正在 ${zone.name} 漂流...`;
+  if (facId === 'rest') {
+    // 靜思旅店：尖頂 + 暖窗 + 吊燈招牌
+    return `<svg viewBox="0 0 120 120" class="bld-svg">
+      <path d="M28 52 L60 22 L92 52 Z" fill="${roof}"/>
+      <path d="M28 52 L60 22 L92 52" fill="none" stroke="${roof2}" stroke-width="2"/>
+      <circle cx="60" cy="40" r="4.5" fill="${built?'#FFE08A':'#383152'}"/>
+      <rect x="32" y="52" width="56" height="50" rx="6" fill="${wall}"/>
+      <!-- 招牌 -->
+      <rect x="40" y="55" width="40" height="12" rx="3" fill="${wood}"/>
+      <!-- 窗 -->
+      <rect x="38" y="72" width="13" height="15" rx="2" fill="${win}"/>
+      <rect x="69" y="72" width="13" height="15" rx="2" fill="${win}"/>
+      <!-- 門 -->
+      <path d="M52 102 L52 90 Q60 84 68 90 L68 102 Z" fill="${roof2}"/>
+      ${built ? '<circle cx="65" cy="96" r="1.6" fill="#FFE08A"/>' : ''}
+      <!-- 吊燈 -->
+      <rect x="59" y="67" width="2" height="5" fill="${wood}"/>
+      <circle cx="60" cy="74" r="4" fill="${built?'#FFD56B':'#383152'}"/>
+    </svg>`;
+  }
+  return '';
+}
 
-  const progress = 100 - (remain / state.drift.duration * 100);
-  document.getElementById('drift-progress-fill').style.width = `${progress}%`;
+// 設施在城鎮地面的位置（百分比）
+const BUILD_POS = {
+  foundry: { left: 6,  top: 8 },
+  garden:  { left: 62, top: 4 },
+  rest:    { left: 64, top: 40 },
+};
 
-  const mm = Math.floor(remain/60).toString().padStart(2,'0');
-  const ss = Math.floor(remain%60).toString().padStart(2,'0');
-  document.getElementById('drift-timer').textContent = `${mm}:${ss}`;
+// ============ 城鎮渲染 ============
+function renderTown() {
+  const town = document.getElementById('town');
+  if (!town) return;
+
+  // 1) 外出探險狀態列
+  const expWrap = document.getElementById('town-expedition');
+  if (expWrap) {
+    const outGhosts = GHOSTS.filter(g => state.ghosts[g.id] && getDrift(g.id));
+    if (!outGhosts.length) {
+      expWrap.classList.add('hidden');
+      expWrap.innerHTML = '';
+    } else {
+      expWrap.classList.remove('hidden');
+      expWrap.innerHTML = '';
+      outGhosts.forEach(gDef => {
+        const remain = driftRemaining(gDef.id);
+        const drift = getDrift(gDef.id);
+        const zone = getZone(drift.zoneId);
+        const done = remain <= 0;
+        const prog = 100 - (remain / drift.duration * 100);
+        const chip = document.createElement('div');
+        chip.className = 'exp-chip' + (done ? ' done' : '');
+        chip.innerHTML = `
+          <div class="exp-chip-av">${renderGhostSVG(gDef.id, { expression: done?'happy':'walking', hasFlame:false, sparkles:false })}</div>
+          <div class="exp-chip-body">
+            <div class="exp-chip-name">${gDef.name} <small>${zone.icon}${zone.name}</small></div>
+            <div class="exp-chip-bar"><div class="exp-chip-fill" style="width:${prog}%"></div></div>
+          </div>
+          <div class="exp-chip-act">${done ? '<span class="exp-done-tag">領取</span>' : `<span class="exp-time">${fmtTime(remain)}</span>`}</div>
+        `;
+        chip.onclick = () => { if (done) claimDrift(gDef.id); else openDriftScene(gDef.id); };
+        expWrap.appendChild(chip);
+      });
+    }
+  }
+
+  // 2) 建築
+  const bWrap = document.getElementById('town-buildings');
+  if (bWrap) {
+    bWrap.innerHTML = '';
+    FACILITIES.forEach(fdef => {
+      const fac = state.facilities[fdef.id];
+      const built = fac && fac.built;
+      const assigned = built && fac.assigned ? getGhost(fac.assigned) : null;
+      const pos = BUILD_POS[fdef.id] || { left: 30, top: 20 };
+      const el = document.createElement('div');
+      el.className = 'building' + (built ? '' : ' unbuilt');
+      el.style.left = pos.left + '%';
+      el.style.top = pos.top + '%';
+
+      let badge = '';
+      if (!built) {
+        badge = `<div class="bld-badge build">🔨 建造</div>`;
+      } else if (fdef.produces !== 'spirit') {
+        const total = facilityTotal(fdef.id);
+        if (assigned && total > 0) badge = `<div class="bld-badge collect">💰${total}</div>`;
+        else if (!assigned) badge = `<div class="bld-badge empty">＋指派</div>`;
+      } else {
+        if (!assigned) badge = `<div class="bld-badge empty">＋指派</div>`;
+      }
+
+      el.innerHTML = `
+        <div class="bld-art ${assigned ? 'working' : ''}">${buildingSVG(fdef.id, built, !!assigned)}</div>
+        <div class="bld-label">${fdef.name}</div>
+        ${assigned ? `<div class="bld-worker">${renderGhostSVG(assigned.id, { expression:'curious', hasFlame:false, sparkles:false })}</div>` : ''}
+        ${badge}
+      `;
+      el.onclick = () => openFacilityAction(fdef.id);
+      bWrap.appendChild(el);
+    });
+  }
+
+  // 3) 在家（閒置）的鬼魂，在城鎮地面飄動
+  const gWrap = document.getElementById('town-ghosts');
+  if (gWrap) {
+    gWrap.innerHTML = '';
+    const idle = GHOSTS.filter(g => state.ghosts[g.id] && !getDrift(g.id) && !assignedFacility(g.id));
+    idle.forEach((gDef, i) => {
+      const ghost = state.ghosts[gDef.id];
+      const max = maxSpirit(ghost, gDef);
+      const mood = (ghost.spirit < max * 0.3) ? 'sleeping' : 'happy';
+      const el = document.createElement('div');
+      el.className = 'town-ghost';
+      // 放在前景地面（建築在後上方，鬼魂在前下方分散多排）
+      const lefts = [12, 38, 64, 84, 26, 52, 76,  8, 44, 68, 32, 58];
+      const tops  = [56, 52, 57, 50, 68, 64, 70, 74, 76, 60, 80, 53];
+      el.style.left = (lefts[i % lefts.length]) + '%';
+      el.style.top  = (tops[i % tops.length]) + '%';
+      el.style.animationDelay = (i * 0.4) + 's';
+      el.innerHTML = `
+        ${renderGhostSVG(gDef.id, { expression: mood, hasFlame:false, sparkles:false })}
+        <div class="town-ghost-tag">${gDef.name}</div>
+      `;
+      el.onclick = () => openGhostAction(gDef.id);
+      gWrap.appendChild(el);
+    });
+  }
+}
+
+// 點建築 → 設施操作面板
+function openFacilityAction(facId) {
+  const fdef = FACILITIES.find(f => f.id === facId);
+  const fac = state.facilities[facId];
+  const built = fac && fac.built;
+  document.getElementById('facaction-title').textContent = `${fdef.icon} ${fdef.name}`;
+  const body = document.getElementById('facaction-body');
+  const acts = document.getElementById('facaction-actions');
+  body.innerHTML = '';
+  acts.innerHTML = '';
+
+  if (!built) {
+    const cost = fdef.buildCost;
+    const matStr = cost.mats ? Object.entries(cost.mats).map(([k,v]) => {
+      const have = state.inventory[k]?.count || 0;
+      return `<span class="mat-req ${have>=v?'ok':'fail'}">${getItem(k).icon}${getItem(k).name} ${have}/${v}</span>`;
+    }).join('') : '';
+    const canBuild = state.coins >= cost.coins && (!cost.mats || hasMaterials(cost.mats));
+    body.innerHTML = `<p class="facaction-desc">${fdef.desc}</p>
+      <div class="facility-mats">${matStr}<span class="mat-req ${state.coins>=cost.coins?'ok':'fail'}">💰 ${cost.coins}</span></div>`;
+    const b = document.createElement('button');
+    b.className = 'btn-primary'; b.textContent = '建造';
+    b.disabled = !canBuild;
+    b.onclick = () => { buildFacility(facId); closeModal('facaction-modal'); };
+    acts.appendChild(b);
+  } else {
+    const assigned = fac.assigned ? getGhost(fac.assigned) : null;
+    let line;
+    if (fdef.produces === 'spirit') {
+      line = assigned ? `${assigned.name} 正在快速回魂中` : '空著，指派一隻鬼魂在此快速回魂。';
+    } else {
+      const total = facilityTotal(facId);
+      const unit = fdef.produces === 'coins' ? '靈幣' : '素材';
+      line = assigned ? `${assigned.name} 生產中，已累積 <b>${total}</b> ${unit}（上限 ${fdef.cap}）` : '空著，指派一隻鬼魂開始生產。';
+    }
+    body.innerHTML = `<p class="facaction-desc">${fdef.desc}</p><p class="facaction-prod">${line}</p>`;
+    if (fdef.produces !== 'spirit' && assigned) {
+      const c = document.createElement('button');
+      c.className = 'btn-primary'; c.textContent = '收取產出';
+      c.onclick = () => { collectFacility(facId); openFacilityAction(facId); };
+      acts.appendChild(c);
+    }
+    const a = document.createElement('button');
+    a.className = 'btn-secondary'; a.textContent = assigned ? '更換鬼魂' : '指派鬼魂';
+    a.onclick = () => { closeModal('facaction-modal'); openAssignModal(facId); };
+    acts.appendChild(a);
+    if (assigned) {
+      const r = document.createElement('button');
+      r.className = 'btn-secondary'; r.textContent = '召回鬼魂';
+      r.onclick = () => { unassignFacility(facId); closeModal('facaction-modal'); };
+      acts.appendChild(r);
+    }
+  }
+  openModal('facaction-modal');
+}
+
+// 點鬼魂 → 鬼魂操作面板
+function openGhostAction(ghostId) {
+  state.activeGhostId = ghostId;
+  const gDef = getGhost(ghostId);
+  const ghost = state.ghosts[ghostId];
+  const max = maxSpirit(ghost, gDef);
+  const cur = Math.floor(ghost.spirit);
+  const cd = classDef(ghost.class);
+  document.getElementById('ghaction-title').textContent = gDef.name;
+  const body = document.getElementById('ghaction-body');
+  body.innerHTML = `
+    <div class="ghaction-top">
+      <div class="ghaction-av">${renderGhostSVG(ghostId, { expression:'happy', hasFlame:false, sparkles:false })}</div>
+      <div class="ghaction-info">
+        <div class="ghaction-name">${gDef.name} <small>Lv.${ghost.level}</small></div>
+        <div class="ghaction-class">${cd ? cd.icon + cd.name : '無職業'}</div>
+        <div class="roster-spirit">
+          <span class="spirit-icon">🔮</span>
+          <div class="roster-spirit-bar"><div class="roster-spirit-fill" style="width:${max>0?cur/max*100:0}%"></div></div>
+          <span class="roster-spirit-text">${cur}/${max}</span>
+        </div>
+      </div>
+    </div>`;
+  const acts = document.getElementById('ghaction-actions');
+  acts.innerHTML = '';
+  const mkBtn = (cls, txt, fn) => { const b=document.createElement('button'); b.className=cls; b.textContent=txt; b.onclick=fn; acts.appendChild(b); };
+  mkBtn('btn-primary', '🗺 派遣探險', () => { dispatchGhostId = ghostId; closeModal('ghaction-modal'); renderMapList(); openModal('map-modal'); });
+  if (cur < max) mkBtn('btn-secondary', '🔮 補充魂力', () => { closeModal('ghaction-modal'); openHealMenu(); });
+  mkBtn('btn-secondary', '📋 詳細資訊 / 裝備 / 轉職', () => { closeModal('ghaction-modal'); renderGhostModal(); openModal('ghost-modal'); });
+  openModal('ghaction-modal');
+}
+
+// 指派鬼魂到設施（選擇空閒鬼魂）
+function openAssignModal(facId) {
+  const list = document.getElementById('assign-list');
+  list.innerHTML = '';
+  const idle = GHOSTS.filter(g => state.ghosts[g.id] && !getDrift(g.id) && assignedFacility(g.id) !== facId);
+  if (!idle.length) {
+    list.innerHTML = '<div class="empty-hint">沒有可指派的鬼魂（其他都在忙）。</div>';
+  }
+  idle.forEach(gDef => {
+    const ghost = state.ghosts[gDef.id];
+    const busy = getDrift(gDef.id) || assignedFacility(gDef.id);
+    const row = document.createElement('div');
+    row.className = 'assign-row';
+    row.innerHTML = `
+      <div class="assign-avatar">${renderGhostSVG(gDef.id, { expression:'happy', hasFlame:false, sparkles:false })}</div>
+      <div class="assign-info">
+        <div class="assign-name">${gDef.name} <small>Lv.${ghost.level}</small></div>
+        <div class="assign-meta">${busy ? (getDrift(gDef.id)?'漂流中':'其他設施工作中') : '空閒'}</div>
+      </div>
+    `;
+    const btn = document.createElement('button');
+    btn.className = 'rbtn primary';
+    btn.textContent = '指派';
+    btn.onclick = () => { assignToFacility(facId, gDef.id); closeModal('assign-modal'); };
+    row.appendChild(btn);
+    list.appendChild(row);
+  });
+  openModal('assign-modal');
+}
+
+// 轉蛋結果
+function showGachaResult(res) {
+  const def = getItem(res.itemId);
+  const box = document.getElementById('gacha-result');
+  const rarity = res.rarity || 'common';
+  box.innerHTML = `
+    <div class="gacha-pop" data-rarity="${rarity}">
+      <div class="gacha-icon">${def.icon}</div>
+      <div class="gacha-name">${def.name}${res.count>1?` ×${res.count}`:''}</div>
+      ${res.kind==='equipment'?`<span class="item-rarity-label item-rarity-${rarity}">${RARITY[rarity].label}</span>`:''}
+    </div>
+  `;
+  document.getElementById('gacha-coin').textContent = state.coins;
+  box.classList.remove('hidden');
+}
+
+// ============ 招魂結果 ============
+function showSummonResult(results) {
+  const grid = document.getElementById('summon-result-grid');
+  grid.innerHTML = '';
+  results.forEach((r, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'summon-cell';
+    cell.dataset.rarity = r.def.rarity;
+    cell.style.animationDelay = (i * 0.06) + 's';
+    cell.innerHTML = `
+      <div class="summon-cell-av">${renderGhostSVG(r.def.id, { expression:'happy', hasFlame:false, sparkles:false })}</div>
+      <div class="summon-cell-name">${r.def.name}</div>
+      <div class="summon-cell-star" style="color:${RARITY_COLOR[r.def.rarity]}">${RARITY_STAR[r.def.rarity]}</div>
+      <div class="summon-cell-tag">${r.isNew ? '✨NEW' : `碎片+${r.shards}`}</div>
+    `;
+    grid.appendChild(cell);
+  });
+  document.getElementById('summon-coin').textContent = state.coins;
+  document.getElementById('summon-result').classList.remove('hidden');
+  document.getElementById('summon-pulls').classList.add('hidden');
+}
+
+function openSummon() {
+  document.getElementById('summon-result').classList.add('hidden');
+  document.getElementById('summon-pulls').classList.remove('hidden');
+  document.getElementById('summon-coin').textContent = state.coins;
+  openModal('summon-modal');
+}
+
+// ============ 圖鑑 ============
+function renderCodex() {
+  const owned = GHOSTS.filter(g => state.ghosts[g.id]).length;
+  document.getElementById('codex-progress').textContent = `收集 ${owned} / ${GHOSTS.length}`;
+  const grid = document.getElementById('codex-grid');
+  grid.innerHTML = '';
+  // 依稀有度排序：r5, r4, r3
+  const order = { r5:0, r4:1, r3:2 };
+  const sorted = [...GHOSTS].sort((a,b)=> order[a.rarity]-order[b.rarity]);
+  sorted.forEach(gDef => {
+    const have = !!state.ghosts[gDef.id];
+    const g = state.ghosts[gDef.id];
+    const cell = document.createElement('div');
+    cell.className = 'codex-cell' + (have ? '' : ' locked');
+    cell.dataset.rarity = gDef.rarity;
+    const star = have ? (g.star || gDef.star) : gDef.star;
+    cell.innerHTML = `
+      <div class="codex-av">${have ? renderGhostSVG(gDef.id, { expression:'happy', hasFlame:false, sparkles:false }) : '<div class="codex-silhouette">❓</div>'}</div>
+      <div class="codex-name">${have ? gDef.name : '？？？'}</div>
+      <div class="codex-star" style="color:${RARITY_COLOR[gDef.rarity]}">${'★'.repeat(star)}</div>
+      ${have ? `<div class="codex-lv">Lv.${g.level}${g.shards?` ・ 碎片${g.shards}`:''}</div>` : ''}
+    `;
+    if (have) cell.onclick = () => openCodexDetail(gDef.id);
+    grid.appendChild(cell);
+  });
+}
+
+function openCodexDetail(ghostId) {
+  const gDef = getGhost(ghostId);
+  const g = state.ghosts[ghostId];
+  const cur = g.star || gDef.star;
+  const stats = ghostTotalStats(ghostId);
+  document.getElementById('codexd-title').textContent = gDef.name;
+  const body = document.getElementById('codexd-body');
+  const need = starUpCost(cur);
+  const canStar = cur < MAX_STAR && (g.shards||0) >= need;
+  body.innerHTML = `
+    <div class="codexd-top">
+      <div class="codexd-av">${renderGhostSVG(ghostId, { expression:'happy', hasFlame:false, sparkles:false })}</div>
+      <div class="codexd-info">
+        <div class="codexd-name">${gDef.name} <small>(${gDef.pinyin})</small></div>
+        <div class="codexd-star" style="color:${RARITY_COLOR[gDef.rarity]}">${'★'.repeat(cur)}${cur<MAX_STAR?`<span style="opacity:0.3">${'★'.repeat(MAX_STAR-cur)}</span>`:''}</div>
+        <div class="codexd-el">系別：${gDef.element}　Lv.${g.level}</div>
+      </div>
+    </div>
+    <div class="codexd-skill">${gDef.skill}</div>
+    <div class="ghost-stats">
+      <div class="ghost-stat-line">🍀 幸運<span>${stats.luck}</span></div>
+      <div class="ghost-stat-line">💨 速度<span>${stats.speed}</span></div>
+      <div class="ghost-stat-line">💪 膽量<span>${stats.courage}</span></div>
+      <div class="ghost-stat-line">👁 感知<span>${stats.sense}</span></div>
+    </div>
+    <div class="codexd-shard">魂魄碎片：<b>${g.shards||0}</b>${cur<MAX_STAR?` / 升星需 ${need}`:'（已滿星）'}</div>
+  `;
+  const acts = document.getElementById('codexd-actions');
+  acts.innerHTML = '';
+  if (cur < MAX_STAR) {
+    const b = document.createElement('button');
+    b.className = 'btn-primary'; b.textContent = `⭐ 升星（碎片 ${g.shards||0}/${need}）`;
+    b.disabled = !canStar;
+    b.onclick = () => { starUp(ghostId); openCodexDetail(ghostId); };
+    acts.appendChild(b);
+  }
+  const sw = document.createElement('button');
+  sw.className = 'btn-secondary'; sw.textContent = '設為當前角色';
+  sw.onclick = () => { switchActive(ghostId); toast(`已切換到 ${gDef.name}`); };
+  acts.appendChild(sw);
+  openModal('codexd-modal');
 }
 
 // ============ 渲染：選角 ============
 function renderGhostSelect() {
   const grid = document.getElementById('ghost-select-grid');
   grid.innerHTML = '';
-  GHOSTS.forEach(g => {
-    const locked = g.unlockCost > 0;
+  // 開局只從 starter（★3）三選一，其餘靠招魂
+  GHOSTS.filter(g => g.starter).forEach(g => {
     const card = document.createElement('div');
-    card.className = 'ghost-card' + (locked ? ' locked' : '');
+    card.className = 'ghost-card';
     card.innerHTML = `
-      <div class="ghost-card-avatar">${g.avatar}</div>
-      <div class="ghost-card-name">${g.name}</div>
+      <div class="ghost-card-avatar">${renderGhostSVG(g.id, { expression: 'happy' })}</div>
+      <div class="ghost-card-name">${g.name} <small style="opacity:0.6;font-weight:400">(${g.pinyin})</small></div>
+      <div class="ghost-rarity-tag" style="color:${RARITY_COLOR[g.rarity]}">${RARITY_STAR[g.rarity]}</div>
       <div class="ghost-card-desc">${g.desc}</div>
       <div class="ghost-card-skill">${g.skill}</div>
-      ${locked ? `<div class="ghost-card-skill">需 ${g.unlockCost} 靈幣解鎖</div>` : ''}
     `;
-    if (!locked) {
-      card.onclick = () => {
-        state = defaultState();
-        unlockGhost(g.id);
-        save();
-        showScreen('main-screen');
-        renderMain();
-      };
-    }
+    card.onclick = () => {
+      state = defaultState();
+      grantGhost(g.id);
+      state.activeGhostId = g.id;
+      // 開局共 3 隻：再送其餘 starter
+      GHOSTS.filter(x => x.starter && x.id !== g.id).forEach(x => grantGhost(x.id));
+      // 起步資源
+      state.coins = 800;
+      save();
+      showScreen('main-screen');
+      renderMain();
+    };
     grid.appendChild(card);
   });
 }
@@ -2294,7 +4935,7 @@ function renderMapList() {
     card.onclick = () => {
       if (!unlocked) { unlockZone(z.id); return; }
       if (!lvOk) { toast(`需要鬼魂達到 Lv.${z.minGhostLevel}`); return; }
-      startDrift(z.id);
+      startDrift(z.id, dispatchGhostId || state.activeGhostId);
     };
     list.appendChild(card);
   });
@@ -2332,13 +4973,15 @@ function renderBag() {
 
   entries.forEach(e => {
     const slot = document.createElement('div');
-    slot.className = 'item-slot';
+    slot.className = 'item-slot' + (e.equipped ? ' is-equipped' : '');
     slot.dataset.rarity = e.rarity;
+    const wId = e.equipped ? wearerOf(e.eqUid) : null;
+    const wearerName = wId ? getGhost(wId).name : '';
     slot.innerHTML = `
       ${e.icon}
       ${e.count > 1 ? `<span class="item-count">${e.count}</span>` : ''}
-      ${e.equipped ? `<span class="item-equipped">●</span>` : ''}
       ${e.enhance > 0 ? `<span class="item-enhance">+${e.enhance}</span>` : ''}
+      ${e.equipped ? `<span class="item-wearer">${wearerName}</span>` : ''}
     `;
     slot.onclick = () => openItemDetail(e);
     grid.appendChild(slot);
@@ -2357,6 +5000,7 @@ function openItemDetail(entry) {
   html += `<div class="item-detail-name">${def.name}${entry.enhance ? ` <span style="color:var(--accent-glow)">+${entry.enhance}</span>` : ''}</div>`;
   if (entry.kind === 'equipment') {
     html += `<span class="item-rarity-label item-rarity-${entry.rarity}">${RARITY[entry.rarity].label}</span>`;
+    if (def.exclusive) html += ` <span class="item-exclusive-tag">⭐ 魔王限定</span>`;
   }
   html += `<div class="item-flavor">「${def.flavor}」</div>`;
 
@@ -2400,16 +5044,22 @@ function openItemDetail(entry) {
   actions.innerHTML = '';
   if (entry.kind === 'equipment') {
     if (entry.equipped) {
+      const wId = wearerOf(entry.eqUid);
+      const btnSwap = document.createElement('button');
+      btnSwap.className = 'btn-primary';
+      btnSwap.innerHTML = `🔄 換穿在別隻<br><small style="opacity:0.7;font-size:10px">目前：${wId?getGhost(wId).name:'?'}</small>`;
+      btnSwap.onclick = () => openEquipTarget(entry.eqUid);
+      actions.appendChild(btnSwap);
       const btn = document.createElement('button');
       btn.className = 'btn-secondary';
       btn.textContent = '脫下';
-      btn.onclick = () => { unequipUid(entry.eqUid); closeModal('item-modal'); renderBag(); renderMain(); toast('已脫下'); };
+      btn.onclick = () => { unequipUid(entry.eqUid); closeModal('item-modal'); renderBag(); renderMain(); if (document.getElementById('ghost-modal').classList.contains('active')) renderGhostModal(); toast('已脫下'); };
       actions.appendChild(btn);
     } else {
       const btnEq = document.createElement('button');
       btnEq.className = 'btn-primary';
-      btnEq.textContent = '穿戴';
-      btnEq.onclick = () => equipItem(entry.eqUid);
+      btnEq.textContent = '穿戴（選擇鬼魂）';
+      btnEq.onclick = () => openEquipTarget(entry.eqUid);
       actions.appendChild(btnEq);
     }
     // 強化按鈕
@@ -2422,6 +5072,14 @@ function openItemDetail(entry) {
       btnEnh.innerHTML = `強化 +${eq.enhance + 1}<br><small style="opacity:0.7;font-size:10px">${Math.floor(enhData.successRate*100)}% ・ ${matsStr} ・ ${enhData.coin}💰</small>`;
       btnEnh.onclick = () => enhanceEquipment(eq.uid);
       actions.appendChild(btnEnh);
+      // 連續強化快捷
+      [5, 10, 15].filter(t => t > eq.enhance).forEach(t => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-secondary quick-enh';
+        btn.innerHTML = `→ +${t}<br><small style="opacity:0.7;font-size:10px">連續強化</small>`;
+        btn.onclick = () => enhanceUntil(eq.uid, t);
+        actions.appendChild(btn);
+      });
     }
     const btnSell = document.createElement('button');
     btnSell.className = 'btn-secondary';
@@ -2462,7 +5120,13 @@ function openItemDetail(entry) {
     const btnUse = document.createElement('button');
     btnUse.className = 'btn-primary';
     btnUse.textContent = '使用（加速漂流）';
-    btnUse.onclick = () => { closeModal('item-modal'); speedupDrift(); };
+    btnUse.onclick = () => {
+      closeModal('item-modal');
+      // 找第一隻漂流中的鬼魂加速
+      const gid = Object.keys(state.drifts || {})[0];
+      if (!gid) { toast('沒有鬼魂在漂流'); return; }
+      speedupDrift(gid); renderMain();
+    };
     actions.appendChild(btnUse);
     const btnSell = document.createElement('button');
     btnSell.className = 'btn-secondary';
@@ -2495,11 +5159,14 @@ function renderGhostModal() {
 
   const stats = ghostTotalStats(state.activeGhostId);
   const max = maxSpirit(ghost, gDef);
+  const cd = classDef(ghost.class);
+  const classLabel = cd ? `${cd.icon} ${cd.name}` : '無職業';
   const detail = document.getElementById('ghost-detail');
   detail.innerHTML = `
-    <div class="ghost-detail-avatar">${gDef.avatar}</div>
+    <div class="ghost-detail-avatar">${renderGhostSVG(state.activeGhostId, { expression: 'normal', hasFlame: false, sparkles: false })}</div>
     <div class="ghost-detail-info">
       <div class="ghost-detail-name">${gDef.name}　Lv.${ghost.level}</div>
+      <div class="ghost-detail-skill">職業：${classLabel}</div>
       <div class="ghost-detail-skill">${gDef.skill}</div>
       <div class="ghost-detail-skill">魂力 ${Math.floor(ghost.spirit)}/${max}</div>
       <div class="ghost-stats">
@@ -2510,6 +5177,32 @@ function renderGhostModal() {
       </div>
     </div>
   `;
+
+  // 轉職按鈕 + 補魂
+  const classBtnWrap = document.getElementById('ghost-class-action');
+  if (classBtnWrap) {
+    classBtnWrap.innerHTML = '';
+    // 補魂按鈕（魂力未滿時）
+    if (ghost.spirit < max) {
+      const healBtn = document.createElement('button');
+      healBtn.className = 'btn-secondary';
+      healBtn.textContent = '🔮 補充魂力';
+      healBtn.onclick = () => openHealMenu();
+      classBtnWrap.appendChild(healBtn);
+    }
+    if (ghost.level >= CLASS_UNLOCK_LEVEL) {
+      const btn = document.createElement('button');
+      btn.className = 'btn-primary';
+      btn.textContent = ghost.class ? '🔄 轉換職業 / 造型' : '✨ 選擇職業（已解鎖）';
+      btn.onclick = () => openClassModal();
+      classBtnWrap.appendChild(btn);
+    } else {
+      const hint = document.createElement('div');
+      hint.className = 'menu-hint';
+      hint.textContent = `達到 Lv.${CLASS_UNLOCK_LEVEL} 即可轉職（差 ${CLASS_UNLOCK_LEVEL - ghost.level} 級）`;
+      classBtnWrap.appendChild(hint);
+    }
+  }
 
   const slots = [
     { key: 'head',      label: '頭飾', emptyIcon: '🎩' },
@@ -2552,7 +5245,7 @@ function renderGhostModal() {
     const mini = document.createElement('div');
     mini.className = 'ghost-mini' + (isActive ? ' active' : '') + (owned ? '' : ' locked');
     mini.innerHTML = `
-      <div class="ghost-mini-avatar">${g.avatar}</div>
+      <div class="ghost-mini-avatar">${renderGhostSVG(g.id, { expression: 'happy', hasFlame: false, sparkles: false })}</div>
       <div class="ghost-mini-name">${g.name}</div>
       ${owned ? `<div class="ghost-mini-name">Lv.${state.ghosts[g.id].level}</div>` : `<div class="ghost-mini-name">${g.unlockCost}💰</div>`}
     `;
@@ -2566,10 +5259,101 @@ function renderGhostModal() {
 }
 
 // ============ 渲染：戰利品 ============
-function showLoot(loots, rewards) {
+// ============ 轉職系統 ============
+function openClassModal() {
+  const ghost = activeGhost();
+  if (!ghost || ghost.level < CLASS_UNLOCK_LEVEL) { toast(`需要 Lv.${CLASS_UNLOCK_LEVEL}`); return; }
+  const grid = document.getElementById('class-grid');
+  grid.innerHTML = '';
+  CLASSES.forEach(c => {
+    const isCurrent = ghost.class === c.id;
+    const card = document.createElement('div');
+    card.className = 'class-card' + (isCurrent ? ' current' : '');
+    const bonusStr = Object.entries(c.statBonus || {}).map(([k,v]) => {
+      const label = { luck:'🍀', speed:'💨', courage:'💪', sense:'👁' }[k];
+      return `${label}+${v}`;
+    }).join(' ');
+    card.innerHTML = `
+      <div class="class-icon">${c.icon}</div>
+      <div class="class-name">${c.name}</div>
+      <div class="class-desc">${c.desc}</div>
+      <div class="class-skill">${c.skillText}</div>
+      <div class="class-bonus">${bonusStr}</div>
+      ${isCurrent ? '<div class="class-current-tag">目前職業</div>' : ''}
+    `;
+    card.onclick = () => {
+      if (isCurrent) { toast('已是這個職業'); return; }
+      changeClass(c.id);
+    };
+    grid.appendChild(card);
+  });
+  openModal('class-modal');
+}
+
+function changeClass(classId) {
+  const ghost = activeGhost();
+  if (!ghost || ghost.level < CLASS_UNLOCK_LEVEL) return;
+  const cd = classDef(classId);
+  if (!cd) return;
+  ghost.class = classId;
+  // 轉職補滿魂力（外觀/上限可能改變）
+  ghost.spirit = maxSpirit(ghost, activeGhostDef());
+  save();
+  Audio.levelUp();
+  closeModal('class-modal');
+  renderMain();
+  renderGhostModal();
+  toast(`${activeGhostDef().name} 轉職為 ${cd.icon} ${cd.name}！`);
+}
+
+// ============ 商店 ============
+function renderShop() {
+  document.getElementById('shop-coin').textContent = state.coins;
+  const grid = document.getElementById('shop-grid');
+  grid.innerHTML = '';
+  SHOP_ITEMS.forEach(s => {
+    const def = getItem(s.id);
+    if (!def) return;
+    const have = (def.type === 'equipment') ? 0 : (state.inventory[s.id]?.count || 0);
+    const canBuy = state.coins >= s.price;
+    const card = document.createElement('div');
+    card.className = 'shop-item' + (canBuy ? '' : ' disabled');
+    card.innerHTML = `
+      <div class="shop-item-icon">${def.icon}</div>
+      <div class="shop-item-info">
+        <div class="shop-item-name">${def.name}</div>
+        <div class="shop-item-flavor">${def.flavor || ''}</div>
+        <div class="shop-item-meta">擁有 ${have}</div>
+      </div>
+      <div class="shop-item-buy">
+        <div class="shop-item-price">💰 ${s.price}</div>
+      </div>
+    `;
+    const btn = card.querySelector('.shop-item-buy');
+    btn.style.cursor = 'pointer';
+    btn.onclick = () => buyShopItem(s.id, s.price);
+    grid.appendChild(card);
+  });
+}
+
+function buyShopItem(itemId, price) {
+  if (state.coins < price) { toast('靈幣不足'); return; }
+  state.coins -= price;
+  addItem(itemId, 1);
+  save();
+  Audio.coin();
+  renderShop();
+  renderMain();
+  toast(`購買了 ${getItem(itemId).name}`);
+}
+
+function showLoot(loots, rewards, info = {}) {
   const list = document.getElementById('loot-list');
   list.innerHTML = '';
-  document.getElementById('loot-subtitle').textContent = `獲得 ${rewards.exp} 經驗、${rewards.coins} 靈幣`;
+  let subtitle = `獲得 ${rewards.exp} 經驗、${rewards.coins} 靈幣`;
+  if (info.bossWon) subtitle = '🏆 擊敗大魔王！' + subtitle;
+  else if (info.early) subtitle = '🏃 提早回家（獎勵減半）。' + subtitle;
+  document.getElementById('loot-subtitle').textContent = subtitle;
   loots.forEach(l => {
     const def = getItem(l.itemId);
     const rarity = l.rarity || 'common';
@@ -2787,29 +5571,30 @@ function bindEvents() {
     const saved = load();
     if (!saved || !saved.activeGhostId) { toast('沒有存檔'); return; }
     state = saved;
-    // 升級舊存檔：補上魂力欄位
-    for (const gid of Object.keys(state.ghosts)) {
-      const g = state.ghosts[gid];
-      const gDef = getGhost(gid);
-      if (g.spirit === undefined) g.spirit = gDef.baseSpirit;
-      if (!g.lastTickAt) g.lastTickAt = Date.now();
-    }
-    for (const eq of state.equipment) { if (eq.enhance === undefined) eq.enhance = 0; }
-    if (!state.unlockedRecipes) state.unlockedRecipes = ['r_paperhat', 'r_coppercoin'];
-    save();
+    migrateState();
     showScreen('main-screen');
     renderMain();
+    checkWelcomeBack(); // 先讀離線時長，再存檔
+    save();
   };
 
-  // 主畫面
-  document.getElementById('btn-open-map').onclick = () => { renderMapList(); openModal('map-modal'); };
-  document.getElementById('btn-claim').onclick = claimDrift;
-  document.getElementById('btn-speedup').onclick = speedupDrift;
-  document.getElementById('btn-bag').onclick = () => { currentBagTab = 'all'; document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab==='all')); renderBag(); openModal('bag-modal'); };
-  document.getElementById('btn-ghost-info').onclick = () => { renderGhostModal(); openModal('ghost-modal'); };
-  document.getElementById('btn-forge').onclick = () => { currentForgeTab='recipe'; document.querySelectorAll('#forge-tabs .tab').forEach(t=>t.classList.toggle('active', t.dataset.forgetab==='recipe')); renderForge(); openModal('forge-modal'); };
+  // 漂流場景返回
+  document.getElementById('btn-drift-back').onclick = () => { closeDriftScene(); goHome(); };
+  // 招魂（抽角色）
+  document.getElementById('btn-gacha').onclick = () => openSummon();
+  document.getElementById('btn-summon-1')?.addEventListener('click', () => doSummon(1));
+  document.getElementById('btn-summon-10')?.addEventListener('click', () => doSummon(10));
+  document.getElementById('btn-summon-again')?.addEventListener('click', () => openSummon());
+  // 圖鑑
+  document.getElementById('btn-dock-codex')?.addEventListener('click', () => { renderCodex(); openModal('codex-modal'); });
+  // 道具祈願
+  document.getElementById('btn-gacha-pull').onclick = () => doGacha();
+  // 城鎮底部 dock 快捷（功能統一集中於此）
+  document.getElementById('btn-dock-shop')?.addEventListener('click', () => { renderShop(); openModal('shop-modal'); });
+  document.getElementById('btn-dock-forge')?.addEventListener('click', () => { currentForgeTab='recipe'; document.querySelectorAll('#forge-tabs .tab').forEach(t=>t.classList.toggle('active', t.dataset.forgetab==='recipe')); renderForge(); openModal('forge-modal'); });
+  document.getElementById('btn-dock-bag')?.addEventListener('click', () => { currentBagTab='all'; document.querySelectorAll('#bag-modal .tab').forEach(t=>t.classList.toggle('active', t.dataset.tab==='all')); renderBag(); openModal('bag-modal'); });
   document.getElementById('btn-menu').onclick = () => openModal('menu-modal');
-  document.getElementById('btn-heal').onclick = () => { openHealMenu(); };
+  document.getElementById('btn-heal')?.addEventListener('click', () => openHealMenu());
 
   // 戰利品 / 選單
   document.getElementById('btn-close-loot').onclick = () => closeModal('loot-modal');
@@ -2891,22 +5676,17 @@ function openHealMenu() {
 }
 
 // ============ 主迴圈 ============
+let lastRosterRender = 0;
 function tick() {
   if (!state) return;
   spiritTick();
-  if (state.drift) renderDrift();
-  // 更新魂力 UI
+  // 據點畫面：每秒重繪一次列表（更新倒數、魂力、產出）
   if (document.getElementById('main-screen').classList.contains('active')) {
-    const ghost = activeGhost(); const gDef = activeGhostDef();
-    if (ghost && gDef) {
-      const max = maxSpirit(ghost, gDef);
-      const cur = Math.floor(ghost.spirit);
-      const fill = document.getElementById('spirit-fill');
-      const text = document.getElementById('spirit-text');
-      if (fill && text) {
-        fill.style.width = `${max > 0 ? (cur/max*100) : 0}%`;
-        text.textContent = `${cur} / ${max}`;
-      }
+    const now = Date.now();
+    if (now - lastRosterRender >= 1000) {
+      lastRosterRender = now;
+      renderRoster();
+      renderFacilities();
     }
   }
 }
@@ -2918,17 +5698,10 @@ function init() {
   const saved = load();
   if (saved && saved.activeGhostId) {
     state = saved;
-    // 舊存檔遷移
-    for (const gid of Object.keys(state.ghosts)) {
-      const g = state.ghosts[gid];
-      const gDef = getGhost(gid);
-      if (g.spirit === undefined && gDef) g.spirit = gDef.baseSpirit;
-      if (!g.lastTickAt) g.lastTickAt = Date.now();
-    }
-    for (const eq of state.equipment) { if (eq.enhance === undefined) eq.enhance = 0; }
-    if (!state.unlockedRecipes) state.unlockedRecipes = ['r_paperhat', 'r_coppercoin'];
+    migrateState();
     showScreen('main-screen');
     renderMain();
+    checkWelcomeBack();
   } else {
     state = defaultState();
     showScreen('title-screen');

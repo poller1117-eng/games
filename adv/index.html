@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>幽靈漂流記 v0.2</title>
+  <title>幽魂小鎮 Boo Town</title>
   <style>
 /* ============ 全域 ============ */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -1852,28 +1852,188 @@ body::before {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
+/* ============ 背包容量 ============ */
+.bag-capacity {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; margin-bottom: 8px;
+}
+.bag-cap-text { font-size: 13px; font-weight: 700; color: var(--text-dim); }
+.bag-cap-text.full { color: #ff8b8b; }
+.bag-expand-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+  color: #2a1a4e; border: none; font-family: inherit;
+  font-size: 12px; font-weight: 700; padding: 6px 12px;
+  border-radius: 999px; cursor: pointer; white-space: nowrap;
+}
+.bag-expand-btn:active { transform: scale(0.96); }
+.bag-maxed { font-size: 11px; color: var(--text-dim); }
+
+/* ============ 開頭標題畫面 ============ */
+#title-screen { overflow: hidden; }
+.title-sky {
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse at 50% 120%, rgba(177,151,252,0.25) 0%, transparent 55%),
+    linear-gradient(180deg, #0c0820 0%, #1a1242 45%, #2a1e5a 80%, #1f1648 100%);
+}
+.title-stars {
+  position: absolute; inset: 0; z-index: 1;
+  background-image:
+    radial-gradient(2px 2px at 12% 16%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 28% 30%, #fff, transparent),
+    radial-gradient(1px 1px at 46% 12%, #fff, transparent),
+    radial-gradient(2px 2px at 64% 24%, #fff, transparent),
+    radial-gradient(1px 1px at 82% 16%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 90% 34%, #fff, transparent),
+    radial-gradient(1px 1px at 20% 44%, #fff, transparent),
+    radial-gradient(2px 2px at 72% 40%, #fff, transparent);
+  opacity: 0.7; animation: starsTwinkle 4s ease-in-out infinite;
+}
+.title-moon {
+  position: absolute; top: 8%; right: 14%; z-index: 1;
+  font-size: 56px; filter: drop-shadow(0 0 24px rgba(255,224,138,0.5));
+  animation: float 7s ease-in-out infinite;
+}
+.title-skyline {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 22%; z-index: 1;
+  background:
+    linear-gradient(180deg, transparent, rgba(20,12,50,0.6) 60%, #150e30 100%);
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 22px, transparent 22px 26px, #000 26px 52px, transparent 52px 58px);
+  opacity: 0.5;
+}
+.title-ghost {
+  position: absolute; z-index: 1; font-size: 34px; opacity: 0.55;
+  filter: drop-shadow(0 0 12px rgba(177,151,252,0.5));
+  animation: titleGhostFloat 9s ease-in-out infinite;
+}
+.title-ghost.g1 { left: 8%;  top: 30%; animation-delay: 0s; }
+.title-ghost.g2 { left: 80%; top: 52%; animation-delay: -3s; font-size: 28px; }
+.title-ghost.g3 { left: 16%; top: 64%; animation-delay: -6s; font-size: 24px; opacity: 0.4; }
+@keyframes titleGhostFloat {
+  0%,100% { transform: translate(0,0) rotate(-4deg); }
+  50%     { transform: translate(10px,-18px) rotate(4deg); }
+}
+
+.title-content {
+  position: relative; z-index: 2;
+  max-width: 360px; width: 88%;
+  text-align: center;
+  background: rgba(26,18,53,0.45);
+  border: 1px solid rgba(201,166,255,0.25);
+  border-radius: 28px;
+  padding: 28px 24px 22px;
+  backdrop-filter: blur(6px);
+}
+.title-logo-ghost {
+  font-size: 64px; margin-bottom: 2px;
+  filter: drop-shadow(0 0 20px rgba(255,255,255,0.4));
+  animation: float 3.5s ease-in-out infinite;
+}
+.game-title {
+  font-size: 46px; font-weight: 900; letter-spacing: 8px;
+  background: linear-gradient(135deg, #E0CCFF, #C9A6FF 40%, #FFE08A);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  margin: 2px 0;
+  text-shadow: 0 0 28px rgba(201,166,255,0.45);
+}
+.game-subtitle {
+  color: var(--accent-glow); font-size: 13px; letter-spacing: 4px;
+  margin-bottom: 14px; opacity: 0.9;
+}
+.title-tagline {
+  color: var(--text-dim); font-size: 13px; line-height: 1.7;
+  margin-bottom: 20px;
+}
+.title-menu { display: flex; flex-direction: column; gap: 10px; }
+.title-btn { margin: 0 !important; }
+.title-menu-row { display: flex; gap: 10px; }
+.title-btn-half {
+  flex: 1; margin: 0 !important; padding: 12px 8px !important; font-size: 14px !important;
+}
+.title-hint {
+  font-size: 11px; color: var(--accent-glow); margin-top: 14px;
+  animation: hintPulse 1.8s ease-in-out infinite;
+}
+.title-hint.hidden { display: none; }
+@keyframes hintPulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+#title-screen .version-tag { position: relative; z-index: 2; margin-top: 10px; }
+
+/* 關於 */
+.about-body { text-align: center; }
+.about-logo { font-size: 56px; filter: drop-shadow(0 0 18px rgba(177,151,252,0.5)); }
+.about-name { font-size: 22px; font-weight: 900; margin: 6px 0 12px; letter-spacing: 2px; }
+.about-name small { font-size: 12px; color: var(--text-dim); letter-spacing: 2px; }
+.about-desc { font-size: 13px; color: var(--text-dim); line-height: 1.7; margin-bottom: 14px; }
+.about-feats { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.about-feats span {
+  font-size: 13px; background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 7px 12px;
+}
+.about-credit { font-size: 11px; color: var(--text-dim); line-height: 1.6; opacity: 0.7; }
+
 </style>
 </head>
 <body>
 
 <!-- 啟動畫面 -->
 <div id="title-screen" class="screen active">
+  <!-- 動態夜空背景 -->
+  <div class="title-sky"></div>
   <div class="title-stars"></div>
+  <div class="title-moon">🌙</div>
+  <!-- 遠景小鎮剪影 -->
+  <div class="title-skyline"></div>
+  <!-- 飄動的鬼魂裝飾 -->
+  <div class="title-ghost g1">👻</div>
+  <div class="title-ghost g2">🌚</div>
+  <div class="title-ghost g3">👻</div>
+
   <div class="title-content">
-    <h1 class="game-title">幽靈漂流記</h1>
-    <p class="game-subtitle">Ghost Drift Chronicle</p>
-    <p class="title-tagline">「夜深了，該放你出去走走了。」</p>
-    <button id="btn-new-game" class="btn-primary">開始新遊戲</button>
-    <button id="btn-continue" class="btn-secondary">繼續遊戲</button>
-    <p class="version-tag">v0.2 prototype</p>
+    <div class="title-logo">
+      <div class="title-logo-ghost">👻</div>
+      <h1 class="game-title">幽魂小鎮</h1>
+      <p class="game-subtitle">✦ BOO TOWN ✦</p>
+    </div>
+    <p class="title-tagline">招喚你的鬼魂夥伴，<br>派牠們踏上夜的冒險。</p>
+
+    <div class="title-menu">
+      <button id="btn-continue" class="btn-primary title-btn">▶　繼續冒險</button>
+      <button id="btn-new-game" class="btn-secondary title-btn">✨　開始新遊戲</button>
+      <div class="title-menu-row">
+        <button id="btn-title-audio" class="btn-secondary title-btn-half">🎵 音效</button>
+        <button id="btn-title-about" class="btn-secondary title-btn-half">ℹ️ 關於</button>
+      </div>
+    </div>
+
+    <p class="title-hint" id="title-hint">🔊 點擊任意處開啟音樂</p>
+    <p class="version-tag">v0.17 · 幽魂小鎮製作組</p>
+  </div>
+</div>
+
+<!-- 關於 -->
+<div id="about-modal" class="modal">
+  <div class="modal-content small">
+    <div class="modal-header"><h2>ℹ️ 關於幽魂小鎮</h2><button class="close-btn" data-close>✕</button></div>
+    <div class="about-body">
+      <div class="about-logo">👻</div>
+      <p class="about-name">幽魂小鎮　<small>BOO TOWN</small></p>
+      <p class="about-desc">一座住著各種鬼魂的小鎮。<br>招喚夥伴、派牠們夜遊探險帶回寶物、<br>蓋設施、養成升星，打造你的幽魂城鎮。</p>
+      <div class="about-feats">
+        <span>🔮 30 隻可收集鬼魂</span>
+        <span>🗺️ 探索 · 大魔王 · 寶藏</span>
+        <span>🏠 據點設施 · 掛機生產</span>
+        <span>⭐ 升星 · 轉職 · 鍛造</span>
+      </div>
+      <p class="about-credit">純 HTML / CSS / JS 單檔打造<br>音樂與音效由 Web Audio 即時生成</p>
+    </div>
   </div>
 </div>
 
 <!-- 選角畫面 -->
 <div id="select-screen" class="screen">
   <div class="select-header">
-    <h2>選擇你的第一隻幽靈寵物</h2>
-    <p class="hint">其他鬼魂可在遊戲中解鎖</p>
+    <h2>選擇你的第一隻夥伴鬼魂</h2>
+    <p class="hint">其餘鬼魂可在遊戲中用「招魂」獲得</p>
   </div>
   <div class="ghost-grid" id="ghost-select-grid"></div>
 </div>
@@ -2002,6 +2162,7 @@ body::before {
 <div id="bag-modal" class="modal">
   <div class="modal-content">
     <div class="modal-header"><h2>背包</h2><button class="close-btn" data-close>✕</button></div>
+    <div class="bag-capacity" id="bag-capacity"></div>
     <div class="tabs">
       <button class="tab active" data-tab="all">全部</button>
       <button class="tab" data-tab="equipment">裝備</button>
@@ -2762,6 +2923,12 @@ function zoneRewards(zone) {
 /* ============ 魂力 ============ */
 const SPIRIT_REGEN_PER_SEC = 1 / 30; // 每 30 秒回 1 點
 
+/* ============ 背包容量 ============ */
+const BAG_PAGE_SIZE = 24;          // 每頁格子數
+const BAG_MAX_PAGES = 4;           // 最多 4 頁
+// 解鎖第 2/3/4 頁的靈幣價（index = 目標頁數-1）
+const BAG_PAGE_COST = [0, 600, 1800, 5000];
+
 /* ============ 幽靈漂流記 - 主邏輯 ============ */
 const SAVE_KEY = 'ghost_drift_save_release';
 
@@ -3222,13 +3389,64 @@ const Audio = {
   stopBGM() {
     this.bgmNodes.forEach(n => { try { n.stop(); } catch {} });
     this.bgmNodes = [];
-    if (this.pluckTimer) { clearInterval(this.pluckTimer); this.pluckTimer = null; }
+    if (this.pluckTimer)  { clearInterval(this.pluckTimer);  this.pluckTimer = null; }
+    if (this.melodyTimer) { clearInterval(this.melodyTimer); this.melodyTimer = null; }
+  },
+
+  // 標題主題曲：低音 pad + 循環旋律
+  startTitleBGM() {
+    if (!this.ctx || !this.cfg.bgmOn || this.bgmNodes.length) return;
+    const now = this.ctx.currentTime;
+    // 低音 drone（D 小調根音）
+    [73.4, 110, 146.8].forEach(f => {
+      const o = this.ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+      const g = this.ctx.createGain(); g.gain.value = 0.10;
+      const lfo = this.ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.06;
+      const lfoG = this.ctx.createGain(); lfoG.gain.value = 0.04;
+      lfo.connect(lfoG); lfoG.connect(g.gain);
+      o.connect(g); g.connect(this.bgmGain);
+      o.start(now); lfo.start(now);
+      this.bgmNodes.push(o, lfo);
+    });
+    // 循環旋律（0 = 休止）
+    const melody = [587,523,440,523, 587,659,587,0, 523,440,392,440, 349,392,440,0,
+                    440,587,523,440, 392,349,392,0, 587,659,784,659, 587,523,440,0];
+    let i = 0;
+    const playNote = (freq, dur, vol) => {
+      if (!freq) return;
+      const t = this.ctx.currentTime;
+      const o = this.ctx.createOscillator(); o.type = 'triangle'; o.frequency.value = freq;
+      const o2 = this.ctx.createOscillator(); o2.type = 'sine'; o2.frequency.value = freq * 2;
+      const g = this.ctx.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol, t + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      const g2 = this.ctx.createGain(); g2.gain.value = 0.3;
+      o.connect(g); o2.connect(g2); g2.connect(g); g.connect(this.bgmGain);
+      o.start(t); o.stop(t + dur + 0.05); o2.start(t); o2.stop(t + dur + 0.05);
+    };
+    this.melodyTimer = setInterval(() => {
+      if (!this.cfg.bgmOn) return;
+      playNote(melody[i % melody.length], 0.5, 0.07);
+      i++;
+    }, 360);
+  },
+
+  // 依場景播放對應 BGM（title=主題曲 / ambient=城鎮環境音）
+  currentScene: null,
+  playSceneBGM(scene) {
+    if (!this.ctx || !this.cfg.bgmOn) { this.currentScene = scene; return; }
+    if (this.currentScene === scene && this.bgmNodes.length) return;
+    this.currentScene = scene;
+    this.stopBGM();
+    if (scene === 'title') this.startTitleBGM();
+    else this.startBGM();
   },
 
   setBgmOn(on) {
     this.cfg.bgmOn = on; this.saveCfg();
     if (!this.ctx) return;
-    if (on) { this.bgmGain.gain.value = this.cfg.bgmVol; this.startBGM(); }
+    if (on) { this.bgmGain.gain.value = this.cfg.bgmVol; this.playSceneBGM(this.currentScene || 'title'); }
     else    { this.bgmGain.gain.value = 0; this.stopBGM(); }
   },
   setSfxOn(on) {
@@ -3253,6 +3471,7 @@ function defaultState() {
     facilities: {},    // { facId: { built, assigned, lastCollect, stored } }
     unlockedZones: ['old_house'],
     unlockedRecipes: ['r_paperhat', 'r_coppercoin'], // 初始解鎖兩個 common
+    bagPages: 1,
   };
 }
 
@@ -3265,6 +3484,7 @@ function migrateState() {
   }
   if (!state.facilities) state.facilities = {};
   if (!state.unlockedRecipes) state.unlockedRecipes = ['r_paperhat', 'r_coppercoin'];
+  if (!state.bagPages) state.bagPages = 1;
   for (const gid of Object.keys(state.ghosts)) {
     const g = state.ghosts[gid];
     const gDef = getGhost(gid);
@@ -4145,6 +4365,30 @@ function isEquipped(eqUid) {
   return false;
 }
 
+// ============ 背包容量 ============
+// 佔格：未穿戴的裝備（每件 1 格）+ 每種素材/消耗品/卷軸（各 1 格）
+function bagSlotsUsed() {
+  const equipSlots = state.equipment.filter(e => !isEquipped(e.uid)).length;
+  const invSlots = Object.keys(state.inventory).length;
+  return equipSlots + invSlots;
+}
+function bagCapacity() { return (state.bagPages || 1) * BAG_PAGE_SIZE; }
+function bagIsFull() { return bagSlotsUsed() >= bagCapacity(); }
+
+function buyBagPage() {
+  const pages = state.bagPages || 1;
+  if (pages >= BAG_MAX_PAGES) { toast('背包已是最大容量'); return; }
+  const cost = BAG_PAGE_COST[pages]; // 解鎖第 pages+1 頁
+  if (state.coins < cost) { toast(`靈幣不足（需 ${cost}）`); return; }
+  state.coins -= cost;
+  state.bagPages = pages + 1;
+  save();
+  Audio.coin();
+  toast(`背包擴充！現在 ${bagCapacity()} 格`);
+  renderBag();
+  renderMain();
+}
+
 // 找出某件裝備正穿在哪隻鬼魂身上
 function wearerOf(eqUid) {
   for (const gid of Object.keys(state.ghosts)) {
@@ -4412,6 +4656,19 @@ function craftMaterial(mrId) {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  // 切換 BGM：標題曲 vs 城鎮環境音
+  if (Audio.ctx) Audio.playSceneBGM(id === 'title-screen' ? 'title' : 'ambient');
+  if (id === 'title-screen') refreshTitle();
+}
+
+// 依是否有存檔切換標題選單
+function refreshTitle() {
+  const saved = load();
+  const has = !!(saved && saved.activeGhostId);
+  const cont = document.getElementById('btn-continue');
+  const fresh = document.getElementById('btn-new-game');
+  if (cont) cont.style.display = has ? '' : 'none';
+  if (fresh) fresh.textContent = has ? '✨　開始新遊戲（覆蓋存檔）' : '✨　開始新遊戲';
 }
 function openModal(id)  { const el = document.getElementById(id); if (!el) return; el.classList.add('active'); Audio.modalOpen(); }
 function closeModal(id) { const el = document.getElementById(id); if (!el) return; el.classList.remove('active'); Audio.modalClose(); }
@@ -4947,13 +5204,31 @@ function renderBag() {
   const grid = document.getElementById('bag-grid');
   grid.innerHTML = '';
 
+  // 容量列
+  const capEl = document.getElementById('bag-capacity');
+  if (capEl) {
+    const used = bagSlotsUsed(), cap = bagCapacity();
+    const full = used >= cap;
+    let btn = '';
+    if ((state.bagPages || 1) < BAG_MAX_PAGES) {
+      const cost = BAG_PAGE_COST[state.bagPages || 1];
+      btn = `<button class="bag-expand-btn" id="bag-expand">＋擴充背包 💰${cost}</button>`;
+    } else {
+      btn = `<span class="bag-maxed">已達最大容量</span>`;
+    }
+    capEl.innerHTML = `<span class="bag-cap-text ${full?'full':''}">📦 ${used} / ${cap} 格</span>${btn}`;
+    const eb = document.getElementById('bag-expand');
+    if (eb) eb.onclick = () => buyBagPage();
+  }
+
   let entries = [];
   if (currentBagTab === 'all' || currentBagTab === 'equipment') {
     for (const eq of state.equipment) {
+      if (isEquipped(eq.uid)) continue; // 已穿戴 → 不佔背包、不顯示
       const def = getItem(eq.itemId);
       entries.push({
         kind: 'equipment', eqUid: eq.uid, itemId: eq.itemId, rarity: eq.rarity,
-        icon: def.icon, equipped: isEquipped(eq.uid), enhance: eq.enhance,
+        icon: def.icon, equipped: false, enhance: eq.enhance,
       });
     }
   }
@@ -5053,7 +5328,12 @@ function openItemDetail(entry) {
       const btn = document.createElement('button');
       btn.className = 'btn-secondary';
       btn.textContent = '脫下';
-      btn.onclick = () => { unequipUid(entry.eqUid); closeModal('item-modal'); renderBag(); renderMain(); if (document.getElementById('ghost-modal').classList.contains('active')) renderGhostModal(); toast('已脫下'); };
+      btn.onclick = () => {
+        if (bagIsFull()) { toast('背包已滿，無法脫下（請先清理或擴充）'); return; }
+        unequipUid(entry.eqUid); closeModal('item-modal'); renderBag(); renderMain();
+        if (document.getElementById('ghost-modal').classList.contains('active')) renderGhostModal();
+        toast('已脫下，放回背包');
+      };
       actions.appendChild(btn);
     } else {
       const btnEq = document.createElement('button');
@@ -5551,14 +5831,22 @@ function renderForgeMaterial(body) {
 
 // ============ 音效初始化（首次互動） ============
 function ensureAudio() {
-  if (!Audio.ctx) { Audio.init(); Audio.startBGM(); }
+  const fresh = !Audio.ctx;
+  if (fresh) Audio.init();
   Audio.resume();
+  // 依目前畫面播對應 BGM
+  const scene = document.getElementById('title-screen')?.classList.contains('active') ? 'title' : 'ambient';
+  Audio.playSceneBGM(scene);
 }
 
 // ============ 事件 ============
 function bindEvents() {
   // 任何點擊都先確保 AudioContext 已啟動（瀏覽器自動播放政策）
-  document.addEventListener('pointerdown', ensureAudio, { once: false });
+  document.addEventListener('pointerdown', () => {
+    ensureAudio();
+    const hint = document.getElementById('title-hint');
+    if (hint) hint.classList.add('hidden');
+  }, { once: false });
 
   // 全域按鈕點擊音
   document.addEventListener('click', (e) => {
@@ -5567,6 +5855,8 @@ function bindEvents() {
 
   // 標題
   document.getElementById('btn-new-game').onclick = () => { showScreen('select-screen'); renderGhostSelect(); };
+  document.getElementById('btn-title-audio')?.addEventListener('click', () => { renderAudioSettings(); openModal('audio-modal'); });
+  document.getElementById('btn-title-about')?.addEventListener('click', () => openModal('about-modal'));
   document.getElementById('btn-continue').onclick = () => {
     const saved = load();
     if (!saved || !saved.activeGhostId) { toast('沒有存檔'); return; }

@@ -277,7 +277,7 @@
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.88);
     display: none; align-items: center; justify-content: center;
-    z-index: 80; padding: 12px;
+    z-index: 120; padding: 12px;
   }
   #gachaModal.show { display: flex; }
   .gacha-panel {
@@ -378,7 +378,7 @@
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.85);
     display: none; align-items: center; justify-content: center;
-    z-index: 90; padding: 12px;
+    z-index: 130; padding: 12px;
   }
   #heroDetailModal.show { display: flex; }
   .hd-panel {
@@ -454,6 +454,16 @@
     box-shadow: 0 4px 24px rgba(0,0,0,0.6);
   }
   #pauseOverlay .pause-hint { font-size: 13px; color: #c4a878; margin-top: 6px; font-weight: normal; }
+  #pauseOverlay .pause-menu { display: flex; flex-direction: column; gap: 9px; margin-top: 16px; }
+  #pauseOverlay .pause-mbtn {
+    width: 200px; padding: 10px; border-radius: 8px;
+    background: linear-gradient(180deg, #4a3a6a, #2a1e44);
+    border: 2px solid #8c6ac0; color: #f0e4ff;
+    font-size: 15px; font-weight: bold; cursor: pointer; text-shadow: none;
+  }
+  #pauseOverlay .pause-mbtn:hover { filter: brightness(1.15); }
+  #pauseOverlay .pause-mbtn:active { transform: translateY(1px); }
+  #pauseOverlay .pause-mbtn.resume { background: linear-gradient(180deg, #2f8f3a, #1a5520); border-color: #6fdf78; }
 
   /* 連擊顯示 */
   #comboBox {
@@ -471,6 +481,70 @@
   /* 結算星級 */
   .result-stars { font-size: 34px; margin: 8px 0; letter-spacing: 4px; }
   .result-stats { font-size: 12px; color: #c4a878; margin: 8px 0; line-height: 1.7; }
+  /* ============== 標題畫面 ============== */
+  #titleScreen {
+    position: fixed; inset: 0; z-index: 100;
+    display: none; align-items: center; justify-content: center;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 50% 30%, #3a2a5a 0%, #1e1430 45%, #0a0812 100%);
+  }
+  #titleScreen.show { display: flex; }
+  /* 飄動裝飾層 */
+  #titleScreen .title-deco { position: absolute; inset: 0; pointer-events: none; }
+  #titleScreen .deco-item {
+    position: absolute; font-size: 26px; opacity: 0.18;
+    animation: decoFloat linear infinite;
+    will-change: transform;
+  }
+  @keyframes decoFloat {
+    0%   { transform: translateY(110vh) rotate(0deg); }
+    100% { transform: translateY(-20vh) rotate(360deg); }
+  }
+  #titleScreen .title-inner {
+    position: relative; z-index: 2; text-align: center; padding: 20px;
+    max-width: 440px; animation: titleIn 0.7s ease-out;
+  }
+  @keyframes titleIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  #titleScreen .title-crest {
+    font-size: 64px; line-height: 1; margin-bottom: 4px;
+    filter: drop-shadow(0 0 16px rgba(255,216,120,0.6));
+    animation: crestBob 3s ease-in-out infinite;
+  }
+  @keyframes crestBob { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-6px) scale(1.04); } }
+  #titleScreen .title-main {
+    font-size: 52px; font-weight: 900; letter-spacing: 6px;
+    color: #ffe9a8;
+    text-shadow: 0 2px 0 #7a4a10, 0 4px 0 #5a3408, 0 0 24px rgba(255,200,90,0.55);
+    margin-bottom: 2px;
+  }
+  #titleScreen .title-sub {
+    font-size: 30px; font-weight: 800; letter-spacing: 10px;
+    color: #ffd060;
+    text-shadow: 0 2px 4px #000, 0 0 16px rgba(255,160,60,0.5);
+    margin-bottom: 6px;
+  }
+  #titleScreen .title-tag { color: #c0a0e0; font-size: 13px; letter-spacing: 3px; margin-bottom: 14px; }
+  #titleScreen .title-quote { color: #b8a8d0; font-size: 13px; line-height: 1.7; margin-bottom: 22px; font-style: italic; }
+  #titleScreen .title-menu { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  #titleScreen .title-btn {
+    width: 230px; padding: 12px; border-radius: 10px;
+    background: linear-gradient(180deg, #4a3a6a, #2a1e44);
+    border: 2px solid #8c6ac0; color: #f0e4ff;
+    font-size: 16px; font-weight: bold; cursor: pointer;
+    transition: transform 0.1s, filter 0.15s;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.4);
+  }
+  #titleScreen .title-btn:hover { filter: brightness(1.18); }
+  #titleScreen .title-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.4); }
+  #titleScreen .title-btn.primary {
+    background: linear-gradient(180deg, #c84020, #802010);
+    border-color: #ff7048; font-size: 18px; width: 250px;
+    animation: titlePulse 1.6s infinite;
+  }
+  @keyframes titlePulse { 0%,100% { box-shadow: 0 3px 0 rgba(0,0,0,0.4), 0 0 0 0 rgba(255,112,72,0.5); } 50% { box-shadow: 0 3px 0 rgba(0,0,0,0.4), 0 0 18px 4px rgba(255,112,72,0.35); } }
+  #titleScreen .title-foot { margin-top: 20px; color: #7a6a98; font-size: 11px; letter-spacing: 1px; }
+
 </style>
 </head>
 <body>
@@ -494,7 +568,13 @@
   <div id="canvasWrap">
     <canvas id="game" width="900" height="540"></canvas>
     <div id="waveBanner"></div>
-    <div id="pauseOverlay"><div class="pause-box">⏸ 已暫停<div class="pause-hint">點 ▶ 繼續遊戲</div></div></div>
+    <div id="pauseOverlay"><div class="pause-box">⏸ 已暫停
+      <div class="pause-menu">
+        <button class="pause-mbtn resume" id="poResume">▶ 繼續遊戲</button>
+        <button class="pause-mbtn" id="poLevels">🗺️ 重選關卡</button>
+        <button class="pause-mbtn" id="poHome">🏠 回首頁</button>
+      </div>
+    </div></div>
     <div id="comboBox"><span id="comboNum">0</span> <span class="combo-label">連擊</span><span id="comboMult"></span></div>
     <div id="bondPanel" style="display:none;"></div>
     <div id="infoPanel">
@@ -577,7 +657,26 @@
   </div>
 </div>
 
-<div id="overlay" class="show">
+<!-- =============== 標題畫面 =============== -->
+<div id="titleScreen" class="show">
+  <div class="title-deco" id="titleDeco"></div>
+  <div class="title-inner">
+    <div class="title-crest">🐕‍🦺</div>
+    <h1 class="title-main">汪汪紀元</h1>
+    <h2 class="title-sub">中古傳奇</h2>
+    <div class="title-tag">— 英雄派駐式塔防 —</div>
+    <p class="title-quote">「招募汪汪猛將，抵抗狡詐貓貓軍團，<br>在中古大陸成就屬於你的傳說。」</p>
+    <div class="title-menu">
+      <button class="title-btn primary" id="tmStart">⚔️ 開始冒險</button>
+      <button class="title-btn" id="tmGacha">🎲 轉蛋召喚</button>
+      <button class="title-btn" id="tmCodex">📖 英雄圖鑑</button>
+      <button class="title-btn" id="tmAudio">🔊 音效：開</button>
+    </div>
+    <div class="title-foot">點擊畫面開始 · 進度自動存檔 🦴</div>
+  </div>
+</div>
+
+<div id="overlay">
   <div class="panel" id="overlayPanel">
     <h1>汪汪紀元：中古傳奇</h1>
     <h2>英雄派駐式塔防</h2>
@@ -1775,14 +1874,38 @@ document.getElementById('speedBtn').addEventListener('click', () => {
   state.speed = state.speed === 1 ? 2 : state.speed === 2 ? 4 : 1;
   document.getElementById('speedBtn').textContent = `x${state.speed}`;
 });
+function setPaused(p) {
+  state.paused = p;
+  const btn = document.getElementById('pauseBtn');
+  btn.textContent = p ? '▶' : '⏸';
+  btn.classList.toggle('paused-active', p);
+  document.getElementById('pauseOverlay').classList.toggle('show', p);
+  if (p) bgmStop(); else if (!audioMuted && state.wave > 0) bgmStart();
+}
 document.getElementById('pauseBtn').addEventListener('click', () => {
   if (state.gameOver) return;
-  state.paused = !state.paused;
+  setPaused(!state.paused);
+});
+// 暫停選單：繼續
+document.getElementById('poResume').addEventListener('click', () => setPaused(false));
+// 暫停選單：重選關卡（回到地圖選擇）
+document.getElementById('poLevels').addEventListener('click', () => {
+  document.getElementById('pauseOverlay').classList.remove('show');
   const btn = document.getElementById('pauseBtn');
-  btn.textContent = state.paused ? '▶' : '⏸';
-  btn.classList.toggle('paused-active', state.paused);
-  document.getElementById('pauseOverlay').classList.toggle('show', state.paused);
-  if (state.paused) bgmStop(); else if (!audioMuted && state.wave > 0) bgmStart();
+  btn.textContent = '⏸'; btn.classList.remove('paused-active');
+  bgmStop();
+  showStartScreen();   // 顯示地圖選擇；按「開始冒險」會 resetGame 重新開始
+});
+// 暫停選單：回首頁
+document.getElementById('poHome').addEventListener('click', () => {
+  document.getElementById('pauseOverlay').classList.remove('show');
+  document.getElementById('overlay').classList.remove('show');
+  const btn = document.getElementById('pauseBtn');
+  btn.textContent = '⏸'; btn.classList.remove('paused-active');
+  state.paused = true;
+  bgmStop();
+  document.getElementById('titleScreen').classList.add('show');
+  if (!audioMuted) titleBgmStart();
 });
 // 保存開始畫面原始 HTML，供通關後重選關卡時還原
 const START_PANEL_HTML = document.getElementById('overlayPanel').innerHTML;
@@ -4058,6 +4181,7 @@ let _bgmT=null;
 
 function bgmStart() {
   if (_bgmOn || audioMuted) return;
+  titleBgmStop();      // 進戰鬥停止標題音樂
   _bgmOn = true;
   const c = getAC();
   if (_bgmGain) { try { _bgmGain.disconnect(); } catch(e){} }
@@ -4068,6 +4192,72 @@ function bgmStart() {
   _bgmNM = _bgmNB = _bgmNK = t;
   _bgmMI = _bgmBI = _bgmKI = 0;
   _bgmSched();
+}
+
+// ─── 標題音樂（悠揚中古主題，與戰鬥曲不同）─────────────────────────
+const TITLE_BEAT = 60 / 84;
+// [頻率, 拍數]，0=休止
+const TITLE_MEL = [
+  [392,1],[523,1],[659,1.5],[587,0.5],[523,1],[440,1],
+  [494,1.5],[392,0.5],[440,1],[523,2],[0,1],
+  [349,1],[440,1],[523,1.5],[494,0.5],[440,1],[392,1],
+  [330,1.5],[392,0.5],[440,1],[392,2],[0,1]
+];
+const TITLE_BASS = [[131,2],[98,2],[110,2],[131,2],[87,2],[98,2],[110,2],[98,2]];
+let _tOn=false,_tGain=null,_tT=null,_tNM=0,_tNB=0,_tMI=0,_tBI=0;
+function titleBgmStart() {
+  if (_tOn || audioMuted) return;
+  _tOn = true;
+  const c = getAC();
+  if (_tGain) { try { _tGain.disconnect(); } catch(e){} }
+  _tGain = c.createGain(); _tGain.gain.value = 0.10; _tGain.connect(c.destination);
+  const t = c.currentTime + 0.08;
+  _tNM = _tNB = t; _tMI = _tBI = 0;
+  _titleSched();
+}
+function titleBgmStop() {
+  if (!_tOn) return; _tOn = false; clearTimeout(_tT);
+  if (_tGain) { try { const c = getAC(); _tGain.gain.linearRampToValueAtTime(0, c.currentTime + 0.5); } catch(e){} }
+}
+function _titleSched() {
+  if (!_tOn) return;
+  const c = getAC(); const ahead = 0.5;
+  // 主旋律（三角波，柔和）+ 上方五度泛音
+  while (_tNM < c.currentTime + ahead) {
+    const [f, b] = TITLE_MEL[_tMI % TITLE_MEL.length];
+    const dur = b * TITLE_BEAT;
+    if (f > 0) {
+      const w = _tNM;
+      for (const [mult, vol, type] of [[1, 0.5, 'triangle'], [1.5, 0.18, 'sine']]) {
+        const o = c.createOscillator(), g = c.createGain();
+        o.type = type; o.frequency.value = f * mult;
+        o.connect(g); g.connect(_tGain);
+        g.gain.setValueAtTime(0, w);
+        g.gain.linearRampToValueAtTime(vol, w + 0.05);
+        g.gain.setValueAtTime(vol, w + dur * 0.6);
+        g.gain.linearRampToValueAtTime(0, w + dur * 0.96);
+        o.start(w); o.stop(w + dur + 0.05);
+      }
+    }
+    _tNM += dur; _tMI++;
+  }
+  // 低音襯底
+  while (_tNB < c.currentTime + ahead) {
+    const [f, b] = TITLE_BASS[_tBI % TITLE_BASS.length];
+    const dur = b * TITLE_BEAT;
+    if (f > 0) {
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      o.connect(g); g.connect(_tGain);
+      const w = _tNB;
+      g.gain.setValueAtTime(0, w);
+      g.gain.linearRampToValueAtTime(0.4, w + 0.06);
+      g.gain.linearRampToValueAtTime(0, w + dur * 0.9);
+      o.start(w); o.stop(w + dur + 0.05);
+    }
+    _tNB += dur; _tBI++;
+  }
+  _tT = setTimeout(_titleSched, 140);
 }
 
 function bgmStop() {
@@ -4465,6 +4655,60 @@ requestAnimationFrame(loop);
 
 // 離開頁面前再保險存一次
 window.addEventListener('beforeunload', saveProgress);
+
+// =====================================================================
+// 標題畫面
+// =====================================================================
+(function initTitleScreen() {
+  // 飄動裝飾（貓狗腳印與角色）
+  const deco = document.getElementById('titleDeco');
+  const icons = ['🐾','🦴','🐕','🐈','⚔️','🛡️','🏰','✦','🐶','🐱'];
+  for (let i = 0; i < 16; i++) {
+    const el = document.createElement('div');
+    el.className = 'deco-item';
+    el.textContent = icons[i % icons.length];
+    el.style.left = (Math.random() * 96) + '%';
+    el.style.fontSize = (16 + Math.random() * 26) + 'px';
+    el.style.animationDuration = (10 + Math.random() * 14) + 's';
+    el.style.animationDelay = (-Math.random() * 20) + 's';
+    deco.appendChild(el);
+  }
+
+  // 首次與標題畫面互動 → 啟動標題音樂（瀏覽器需使用者手勢才能播放）
+  let _titleAudioKicked = false;
+  function kickTitleAudio() {
+    if (_titleAudioKicked) return;
+    _titleAudioKicked = true;
+    if (!audioMuted) titleBgmStart();
+  }
+  document.getElementById('titleScreen').addEventListener('pointerdown', kickTitleAudio, { once: false });
+
+  function syncTitleAudioLabel() {
+    document.getElementById('tmAudio').textContent = audioMuted ? '🔇 音效：關' : '🔊 音效：開';
+  }
+
+  // ⚔️ 開始冒險 → 收起標題、顯示地圖選擇
+  document.getElementById('tmStart').addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('titleScreen').classList.remove('show');
+    document.getElementById('overlay').classList.add('show');
+    refreshMapStars();
+  });
+  // 🎲 轉蛋召喚
+  document.getElementById('tmGacha').addEventListener('click', (e) => { e.stopPropagation(); kickTitleAudio(); openGachaModal(); });
+  // 📖 英雄圖鑑（沿用轉蛋商城底部的圖鑑）
+  document.getElementById('tmCodex').addEventListener('click', (e) => { e.stopPropagation(); kickTitleAudio(); openGachaModal(); });
+  // 🔊 音效開關
+  document.getElementById('tmAudio').addEventListener('click', (e) => {
+    e.stopPropagation();
+    audioMuted = !audioMuted;
+    document.getElementById('audioBtn').textContent = audioMuted ? '🔇' : '🔊';
+    syncTitleAudioLabel();
+    if (audioMuted) { titleBgmStop(); bgmStop(); }
+    else { titleBgmStart(); }
+  });
+  syncTitleAudioLabel();
+})();
 </script>
 </body>
 </html>
